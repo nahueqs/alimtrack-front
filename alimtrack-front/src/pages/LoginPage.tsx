@@ -1,24 +1,35 @@
-﻿import React, { useState } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { LoginForm } from '../components/auth/LoginForm';
 import { RegisterForm } from '../components/auth/RegisterForm';
-import { useAuth } from '../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 import logoUnlu from '../assets/logoUnlu.png';
-import logoCideta from '../assets/logoCideta.png';
-
+import logoCideta from '../assets/logoCideta.png'
+import { useAuth } from '../hooks/authProvider';
+import './LoginPage.css';
 
 
 export const LoginPage: React.FC = () => {
     const [isLogin, setIsLogin] = useState(true);
-    const { login, register, loading, error, clearError } = useAuth();
+    const { login, register, loading, error, clearError, isAuthenticated, user } = useAuth();
     const navigate = useNavigate();
+
+    useEffect(() => {
+        console.log('🔐 LoginPage - Estado:', {
+            isAuthenticated,
+            user,
+            loading,
+            hasUser: !!user
+        });
+
+        if (isAuthenticated && user && !loading) {
+            navigate('/dashboard', { replace: true });
+        }
+    }, [isAuthenticated, user, loading, navigate]);
+
 
     const handleLogin = async (credentials: any) => {
         try {
             const result = await login(credentials);
-            if (result) {
-                navigate('/dashboard', { replace: true });
-            }
         } catch (err) {
             console.error('Login error:', err);
         }
@@ -27,9 +38,6 @@ export const LoginPage: React.FC = () => {
     const handleRegister = async (userData: any) => {
         try {
             const result =  await register(userData);
-            if (result) {
-                navigate('/dashboard', { replace: true });
-            }
         } catch (err) {
             console.error('Register error:', err);
         }
@@ -39,6 +47,31 @@ export const LoginPage: React.FC = () => {
         clearError();
         setIsLogin(!isLogin);
     };
+
+    const { loading: authLoading } = useAuth();
+
+    if (authLoading) {
+        return (
+            <div className="login-page">
+                <div className="loading-container">
+                    <div className="loading-spinner"></div>
+                    <p>Verificando sesión...</p>
+                </div>
+            </div>
+        );
+    }
+
+    if (isAuthenticated && user) {
+        console.log('🔐 LoginPage - Usuario autenticado, mostrando loading de redirección...');
+        return (
+            <div className="login-page">
+                <div className="loading-container">
+                    <div className="loading-spinner"></div>
+                    <p>Redirigiendo al dashboard...</p>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="login-page">

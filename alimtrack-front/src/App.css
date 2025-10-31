@@ -1,4 +1,4 @@
-/* ========== LAYOUT DE LA APLICACI”N ========== */
+Ôªø/* ========== LAYOUT DE LA APLICACI√ìN ========== */
 .app {
     width: 100%;
     min-height: 100vh;
@@ -38,7 +38,7 @@
     width: 100%;
 }
 
-/* Contenedor de p·ginas */
+/* Contenedor de p√°ginas */
 .page-container {
     width: 100%;
     max-width: 1280px;
@@ -49,7 +49,7 @@
     flex-direction: column;
 }
 
-/* ========== COMPONENTES ESPECÕFICOS ========== */
+/* ========== COMPONENTES ESPEC√çFICOS ========== */
 .logo {
     height: 3em;
     padding: 0.5em;

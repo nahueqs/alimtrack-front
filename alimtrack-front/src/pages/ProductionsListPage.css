@@ -1,0 +1,265 @@
+﻿/* Productions List Styles */
+.productions-list {
+    width: 100%;
+}
+
+.productions-list__header {
+    margin-bottom: 2rem;
+}
+
+.productions-list__title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 1rem 0 0.5rem 0;
+}
+
+.productions-list__subtitle {
+    color: var(--text-secondary);
+    font-size: 1.125rem;
+    margin-bottom: 1.5rem;
+}
+
+/* Production Grid */
+.productions-grid {
+    display: grid;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+/* Production Card */
+.production-card {
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-lg);
+    padding: 1.5rem;
+    display: flex;
+    justify-content: between;
+    align-items: flex-start;
+    gap: 1rem;
+    transition: all 0.3s ease;
+}
+
+    .production-card:hover {
+        box-shadow: var(--shadow-md);
+        border-color: var(--primary-500);
+    }
+
+.production-card__content {
+    flex: 1;
+    min-width: 0;
+}
+
+.production-card__header {
+    display: flex;
+    justify-content: between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+    gap: 1rem;
+}
+
+.production-card__title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+    flex: 1;
+}
+
+/* Badges de estado */
+.production-badge {
+    padding: 0.375rem 0.75rem;
+    border-radius: var(--radius-sm);
+    font-size: 0.75rem;
+    font-weight: 500;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.production-badge--completed {
+    background-color: var(--primary-100);
+    color: var(--primary-700);
+}
+
+.production-badge--in-progress {
+    background-color: var(--secondary-100);
+    color: var(--secondary-700);
+}
+
+.production-badge--pending {
+    background-color: var(--bg-tertiary);
+    color: var(--text-secondary);
+}
+
+.production-badge--default {
+    background-color: var(--bg-tertiary);
+    color: var(--text-secondary);
+}
+
+/* Detalles de producción */
+.production-card__details {
+    display: grid;
+    gap: 0.75rem;
+}
+
+.production-detail {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.production-detail__label {
+    font-weight: 500;
+    color: var(--text-secondary);
+    min-width: 80px;
+    flex-shrink: 0;
+}
+
+.production-detail__value {
+    color: var(--text-primary);
+    word-break: break-word;
+}
+
+/* Acciones */
+.production-card__actions {
+    flex-shrink: 0;
+}
+
+.btn--sm {
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+}
+
+/* Paginación */
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 2rem;
+    padding: 1rem 0;
+}
+
+.pagination__btn {
+    padding: 0.75rem 1.5rem;
+    border: 1px solid var(--border-light);
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+    .pagination__btn:hover:not(:disabled) {
+        background-color: var(--bg-tertiary);
+        border-color: var(--border-medium);
+    }
+
+    .pagination__btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+.pagination__info {
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+}
+
+/* Estados de carga y vacío */
+.loading-container,
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem;
+    text-align: center;
+}
+
+.loading-spinner {
+    width: 2rem;
+    height: 2rem;
+    border: 2px solid var(--border-light);
+    border-top: 2px solid var(--primary-500);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 1rem;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* ========== RESPONSIVE ========== */
+
+/* Tablets */
+@media (max-width: 1024px) {
+    .production-card {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .production-card__actions {
+        align-self: flex-end;
+        margin-top: 1rem;
+    }
+}
+
+/* Móviles */
+@media (max-width: 768px) {
+    .productions-list__title {
+        font-size: 1.5rem;
+    }
+
+    .productions-list__subtitle {
+        font-size: 1rem;
+    }
+
+    .production-card {
+        padding: 1.25rem;
+    }
+
+    .production-card__header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+
+    .production-detail {
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+
+    .production-detail__label {
+        min-width: auto;
+    }
+
+    .pagination {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .btn--icon span {
+        display: none;
+    }
+
+    .btn--icon::after {
+        content: "Ver";
+    }
+}
+
+/* Móviles pequeños */
+@media (max-width: 480px) {
+    .production-card {
+        padding: 1rem;
+    }
+
+    .productions-grid {
+        gap: 1rem;
+    }
+}

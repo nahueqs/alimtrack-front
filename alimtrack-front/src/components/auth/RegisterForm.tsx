@@ -1,4 +1,5 @@
 ﻿import React, { useState } from 'react';
+import './RegisterForm.css';
 
 interface RegisterFormProps {
     onRegister: (userData: any) => Promise<void>;

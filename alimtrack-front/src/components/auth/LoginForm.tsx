@@ -1,4 +1,5 @@
 ﻿import React, { useState } from 'react';
+import './LoginForm.css';
 
 interface LoginFormProps {
     onLogin: (credentials: any) => Promise<void>;

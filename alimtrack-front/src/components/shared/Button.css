@@ -1,4 +1,4 @@
-.btn {
+﻿.btn {
     padding: 0.75rem 1.5rem;
     border-radius: var(--radius-md);
     font-weight: 500;
@@ -9,6 +9,11 @@
     cursor: pointer;
     width: 100%;
     position: relative;
+    /* Centrado vertical y horizontal */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
 }
 
     .btn:focus {
@@ -61,13 +66,13 @@
 
 /* Estados adicionales para mejor UX */
 .btn-secondary {
-    background-color: var(--bg-secondary);
+    background-color: var( --bg-secondary);
     color: var(--text-primary);
     border: 1px solid var(--border-light);
 }
 
     .btn-secondary:hover:not(:disabled) {
-        background-color: var(--bg-tertiary);
+        background-color: var(--bg- tertiary);
         border-color: var(--border-medium);
     }
 
@@ -88,7 +93,7 @@
     }
 }
 
-/* Modo oscuro - ajustes espec�ficos */
+/* Modo oscuro - ajustes específicos */
 [data-theme="dark"] .btn-primary:focus {
     box-shadow: 0 0 0 3px rgba(13, 137, 64, 0.3);
 }

@@ -1,4 +1,4 @@
-/* ========== VARIABLES CSS GLOBALES ========== */
+﻿/* ========== VARIABLES CSS GLOBALES ========== */
 :root {
     /* Colores base */
     --sea-green: #0d8940ff;
@@ -31,7 +31,7 @@
     /* Colores neutros - Modo claro */
     --bg-primary: #ffffff;
     --bg-secondary: #eef0f2ff;
-    --bg-tertiary: #f5f6f7;
+    --bg-tertiary: #a1a2a0;
     --bg-card: #ffffff;
     --text-primary: #353b3cff;
     --text-secondary: #5a6263;
@@ -59,7 +59,7 @@
     --radius-lg: 0.75rem;
     --radius-xl: 1rem;
     --radius-2xl: 1.5rem;
-    /* Configuraci�n base */
+    /* Configuración base */
     font-size: 14px;
     font-weight: 400;
     color-scheme: light dark;

@@ -163,87 +163,6 @@
     margin-bottom: 1.5rem;
 }
 
-.dashboard__grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 1.5rem;
-    margin-top: 1.5rem;
-    width: 100%;
-    box-sizing: border-box;
-}
-
-.dashboard__card {
-    background-color: var(--bg-card);
-    border: 1px solid var(--border-light);
-    border-radius: var(--radius-lg);
-    padding: 1.5rem;
-    transition: all 0.3s ease;
-    cursor: pointer;
-    min-height: 180px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    width: 100%;
-    box-sizing: border-box;
-}
-
-    .dashboard__card:hover {
-        box-shadow: var(--shadow-md);
-        transform: translateY(-2px);
-        border-color: var(--primary-500);
-    }
-
-.dashboard__card-title {
-    font-size: 1.25rem;
-    font-weight: 600;
-    color: var(--text-primary);
-    margin-bottom: 0.75rem;
-}
-
-.dashboard__card-description {
-    color: var(--text-secondary);
-    font-size: 0.875rem;
-    margin-bottom: 1.25rem;
-    line-height: 1.5;
-}
-
-.dashboard__card-actions {
-    display: flex;
-    gap: 0.75rem;
-}
-
-.dashboard__card-btn {
-    padding: 0.625rem 1.25rem;
-    border: 1px solid var(--border-medium);
-    border-radius: var(--radius-md);
-    background-color: var(--bg-primary);
-    color: var(--text-primary);
-    font-size: 0.875rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s;
-    flex: 1;
-    box-sizing: border-box;
-}
-
-.dashboard__card-btn--primary {
-    background-color: var(--primary-500);
-    color: white;
-    border-color: var(--primary-500);
-}
-
-    .dashboard__card-btn--primary:hover {
-        background-color: var(--secondary-600);
-        border-color: var(--secondary-600);
-        color:white;
-    }
-
-.dashboard__card-btn:hover {
-    border-color: var(--secondary-600);
-    color: white;
-    background-color: var(--secondary-600);
-}
-
 /* DROPDOWN MENU */
 .dashboard__dropdown {
     position: relative;
@@ -335,11 +254,6 @@
         padding: 2.5rem 1.5rem;
     }
 
-    .dashboard__grid {
-        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-        gap: 1.75rem;
-    }
-
     .dashboard__welcome {
         padding: 2.5rem;
     }
@@ -373,16 +287,6 @@
 
     .dashboard__welcome-title {
         font-size: 2rem;
-    }
-
-    .dashboard__grid {
-        grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-        gap: 2rem;
-    }
-
-    .dashboard__card {
-        padding: 2rem;
-        min-height: 200px;
     }
 }
 
@@ -426,20 +330,6 @@
     .dashboard__welcome-subtitle {
         font-size: 1rem;
     }
-
-    .dashboard__grid {
-        grid-template-columns: 1fr;
-        gap: 1rem;
-    }
-
-    .dashboard__card {
-        padding: 1.25rem;
-        min-height: auto;
-    }
-
-    .dashboard__card-actions {
-        flex-direction: column;
-    }
 }
 
 /* Móviles pequeños */
@@ -467,14 +357,6 @@
 
     .dashboard__welcome {
         padding: 1.25rem;
-    }
-
-    .dashboard__card {
-        padding: 1rem;
-    }
-
-    .dashboard__grid {
-        gap: 0.75rem;
     }
 
     .dashboard_nav__images {
