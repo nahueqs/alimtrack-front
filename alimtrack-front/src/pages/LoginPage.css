@@ -1,0 +1,170 @@
+﻿.login-page {
+    min-height: 100vh;
+    background: linear-gradient(135deg, var(--primary-50) 0%, var(--primary-100) 100%);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem 1rem;
+    width: 100%;
+    box-sizing: border-box;
+    overflow: auto; /* ✅ Permitir scroll si es necesario */
+}
+
+[data-theme="dark"] .login-page {
+    background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%);
+}
+
+.login-page__container {
+    width: 100%;
+    max-width: 28rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: auto; /* ✅ Centrado adicional */
+}
+
+.login-page__header {
+    text-align: center;
+    margin-bottom: 2rem;
+    width: 100%;
+}
+
+.login-page__title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+    width: 100%;
+    line-height: 1.2; /* ✅ Mejor espaciado */
+}
+
+.login-page__subtitle {
+    font-size: 1.125rem;
+    color: var(--text-secondary);
+    width: 100%;
+    line-height: 1.4; /* ✅ Mejor espaciado */
+}
+
+.login-page__card {
+    background-color: var(--bg-primary);
+    padding: 2rem 1.5rem;
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--border-light);
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.login-page__info {
+    margin-top: 2rem;
+    text-align: center;
+    width: 100%;
+}
+
+.login-page__info-text {
+    font-size: 0.875rem;
+    color: var(--text-tertiary);
+    width: 100%;
+}
+
+/* ========== BREAKPOINTS CORREGIDOS ========== */
+
+/* Tablets */
+@media (min-width: 768px) {
+    .login-page {
+        padding: 2rem 1.5rem; /* ✅ Menos padding para más espacio */
+    }
+
+    .login-page__container {
+        max-width: 32rem;
+    }
+
+    .login-page__title {
+        font-size: 2.25rem; /* ✅ Un poco más pequeño */
+    }
+
+    .login-page__card {
+        padding: 2.5rem 2rem;
+    }
+}
+
+/* Escritorio */
+@media (min-width: 1024px) {
+    .login-page__container {
+        max-width: 38rem; /* ✅ Un poco menos ancho */
+    }
+
+    .login-page__title {
+        font-size: 2.5rem; /* ✅ Tamaño balanceado */
+    }
+
+    .login-page__subtitle {
+        font-size: 1.125rem;
+    }
+
+    .login-page__card {
+        padding: 2.5rem 2.5rem; /* ✅ Padding balanceado */
+        border-radius: var(--radius-2xl);
+    }
+}
+
+/* Pantallas grandes */
+@media (min-width: 1440px) {
+    .login-page__container {
+        max-width: 42rem;
+    }
+
+    .login-page__title {
+        font-size: 2.75rem;
+    }
+}
+
+/* Móviles - ASEGURAR VISIBILIDAD */
+@media (max-width: 480px) {
+    .login-page {
+        padding: 1rem 0.5rem; /* ✅ Menos padding en móviles */
+        justify-content: flex-start; /* ✅ Empezar desde arriba en móviles */
+        min-height: 100vh;
+        overflow-y: auto; /* ✅ Permitir scroll */
+    }
+
+    .login-page__container {
+        margin: 1rem auto; /* ✅ Margen en móviles */
+    }
+
+    .login-page__title {
+        font-size: 1.75rem;
+        margin-bottom: 0.25rem; /* ✅ Menos margen */
+    }
+
+    .login-page__subtitle {
+        font-size: 1rem;
+        margin-bottom: 1rem; /* ✅ Espacio antes del card */
+    }
+
+    .login-page__card {
+        padding: 1.5rem 1rem;
+        border-radius: var(--radius-lg);
+        margin-bottom: 1rem; /* ✅ Espacio después del card */
+    }
+}
+
+/* Para pantallas muy pequeñas */
+@media (max-width: 360px) {
+    .login-page {
+        padding: 0.5rem;
+    }
+
+    .login-page__title {
+        font-size: 1.5rem;
+    }
+
+    .login-page__subtitle {
+        font-size: 0.875rem;
+    }
+
+    .login-page__card {
+        padding: 1.25rem 0.75rem;
+    }
+}

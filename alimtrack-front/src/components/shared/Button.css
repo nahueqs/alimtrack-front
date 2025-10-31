@@ -1,0 +1,63 @@
+.btn {
+    padding: 0.75rem 1.5rem;
+    border-radius: var(--radius-md);
+    font-weight: 500;
+    font-size: 1rem;
+    transition: all 0.2s;
+    outline: none;
+    border: none;
+    cursor: pointer;
+    width: 100%;
+    position: relative;
+}
+
+    .btn:focus {
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+
+.btn-primary {
+    background-color: var(--primary-500);
+    color: white;
+}
+
+    .btn-primary:hover:not(:disabled) {
+        background-color: var(--primary-600);
+    }
+
+.btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.btn-loading {
+    color: transparent;
+}
+
+    .btn-loading::after {
+        content: "";
+        position: absolute;
+        width: 1rem;
+        height: 1rem;
+        top: 50%;
+        left: 50%;
+        margin-left: -0.5rem;
+        margin-top: -0.5rem;
+        border: 2px solid #ffffff;
+        border-radius: 50%;
+        border-right-color: transparent;
+        animation: button-spin 1s linear infinite;
+    }
+
+@keyframes button-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Escritorio */
+@media (min-width: 1024px) {
+    .btn {
+        padding: 0.875rem 1.75rem;
+        font-size: 1.0625rem;
+    }
+}

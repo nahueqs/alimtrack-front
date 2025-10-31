@@ -1,0 +1,107 @@
+.login-form {
+    width: 100%;
+    
+    /* Quitamos max-width para que use todo el espacio disponible */
+}
+
+.login-form__title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 1.5rem;
+    color: var(--text-primary);
+}
+
+.login-form__form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.login-form__switch {
+    margin-top: 1rem;
+    text-align: center;
+}
+
+.login-form__switch-button {
+    color: var(--primary-600);
+    font-size: 0.875rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    font-weight: 500;
+}
+
+    .login-form__switch-button:hover {
+        color: var(--primary-700);
+        text-decoration: underline;
+    }
+
+    .login-form__switch-button:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+.login-form__error {
+    background-color: #fef2f2;
+    border: 1px solid #fecaca;
+    color: #dc2626;
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+    margin-bottom: 1rem;
+    font-size: 0.875rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.login-form--loading {
+    opacity: 0.7;
+    pointer-events: none;
+}
+
+/* ========== MEJORAS PARA ESCRITORIO ========== */
+
+/* Tablets */
+@media (min-width: 768px) {
+    .login-form__title {
+        font-size: 1.75rem;
+        margin-bottom: 2rem;
+    }
+
+    .login-form__form {
+        gap: 1.25rem;
+    }
+}
+
+/* Escritorio - más espacioso */
+@media (min-width: 1024px) {
+    .login-form__title {
+        font-size: 2rem;
+        margin-bottom: 2.5rem;
+    }
+
+    .login-form__form {
+        gap: 1.5rem;
+    }
+
+    .login-form__switch {
+        margin-top: 1.5rem;
+    }
+
+    .login-form__switch-button {
+        font-size: 1rem;
+    }
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+    .login-form {
+        padding: 0 0.5rem;
+    }
+
+    .login-form__title {
+        font-size: 1.25rem;
+    }
+}
