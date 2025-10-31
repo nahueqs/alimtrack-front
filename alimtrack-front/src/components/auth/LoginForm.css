@@ -1,7 +1,5 @@
 .login-form {
     width: 100%;
-    
-    /* Quitamos max-width para que use todo el espacio disponible */
 }
 
 .login-form__title {
@@ -44,11 +42,11 @@
     }
 
 .login-form__error {
-    background-color: #fef2f2;
+    background-color: var(--alert-red-light);
     border: 1px solid #fecaca;
-    color: #dc2626;
+    color: var(--error);
     padding: 0.75rem;
-    border-radius: 0.5rem;
+    border-radius: var(--radius-md);
     margin-bottom: 1rem;
     font-size: 0.875rem;
     display: flex;
@@ -61,9 +59,6 @@
     pointer-events: none;
 }
 
-/* ========== MEJORAS PARA ESCRITORIO ========== */
-
-/* Tablets */
 @media (min-width: 768px) {
     .login-form__title {
         font-size: 1.75rem;
@@ -75,7 +70,6 @@
     }
 }
 
-/* Escritorio - más espacioso */
 @media (min-width: 1024px) {
     .login-form__title {
         font-size: 2rem;
@@ -95,7 +89,6 @@
     }
 }
 
-/* Responsive */
 @media (max-width: 640px) {
     .login-form {
         padding: 0 0.5rem;

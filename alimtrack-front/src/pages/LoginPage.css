@@ -8,11 +8,11 @@
     padding: 2rem 1rem;
     width: 100%;
     box-sizing: border-box;
-    overflow: auto; /* ✅ Permitir scroll si es necesario */
+    overflow: auto;
 }
 
 [data-theme="dark"] .login-page {
-    background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%);
+    background: var(--bg-primary);
 }
 
 .login-page__container {
@@ -21,7 +21,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin: auto; /* ✅ Centrado adicional */
+    margin: auto;
 }
 
 .login-page__header {
@@ -36,14 +36,14 @@
     color: var(--text-primary);
     margin-bottom: 0.5rem;
     width: 100%;
-    line-height: 1.2; /* ✅ Mejor espaciado */
+    line-height: 1.2;
 }
 
 .login-page__subtitle {
     font-size: 1.125rem;
     color: var(--text-secondary);
     width: 100%;
-    line-height: 1.4; /* ✅ Mejor espaciado */
+    line-height: 1.4;
 }
 
 .login-page__card {
@@ -68,12 +68,36 @@
     width: 100%;
 }
 
-/* ========== BREAKPOINTS CORREGIDOS ========== */
+.login-page__images {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    width: 100%;
+}
 
-/* Tablets */
+.login-page__image {
+    width: 80px;
+    height: 80px;
+    border-radius: var(--radius-lg);
+    object-fit: cover;
+    border: 2px solid var(--border-light);
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+    .login-page__image:hover {
+        transform: scale(1.05);
+        box-shadow: var(--shadow-md);
+    }
+
+[data-theme="dark"] .login-page__image {
+    border-color: var(--border-dark);
+}
+
+/* ========== BREAKPOINTS ========== */
 @media (min-width: 768px) {
     .login-page {
-        padding: 2rem 1.5rem; /* ✅ Menos padding para más espacio */
+        padding: 2rem 1.5rem;
     }
 
     .login-page__container {
@@ -81,7 +105,7 @@
     }
 
     .login-page__title {
-        font-size: 2.25rem; /* ✅ Un poco más pequeño */
+        font-size: 2.25rem;
     }
 
     .login-page__card {
@@ -89,27 +113,21 @@
     }
 }
 
-/* Escritorio */
 @media (min-width: 1024px) {
     .login-page__container {
-        max-width: 38rem; /* ✅ Un poco menos ancho */
+        max-width: 38rem;
     }
 
     .login-page__title {
-        font-size: 2.5rem; /* ✅ Tamaño balanceado */
-    }
-
-    .login-page__subtitle {
-        font-size: 1.125rem;
+        font-size: 2.5rem;
     }
 
     .login-page__card {
-        padding: 2.5rem 2.5rem; /* ✅ Padding balanceado */
+        padding: 2.5rem 2.5rem;
         border-radius: var(--radius-2xl);
     }
 }
 
-/* Pantallas grandes */
 @media (min-width: 1440px) {
     .login-page__container {
         max-width: 42rem;
@@ -120,37 +138,45 @@
     }
 }
 
-/* Móviles - ASEGURAR VISIBILIDAD */
 @media (max-width: 480px) {
     .login-page {
-        padding: 1rem 0.5rem; /* ✅ Menos padding en móviles */
-        justify-content: flex-start; /* ✅ Empezar desde arriba en móviles */
+        padding: 1rem 0.5rem;
+        justify-content: flex-start;
         min-height: 100vh;
-        overflow-y: auto; /* ✅ Permitir scroll */
+        overflow-y: auto;
     }
 
     .login-page__container {
-        margin: 1rem auto; /* ✅ Margen en móviles */
+        margin: 1rem auto;
     }
 
     .login-page__title {
         font-size: 1.75rem;
-        margin-bottom: 0.25rem; /* ✅ Menos margen */
+        margin-bottom: 0.25rem;
     }
 
     .login-page__subtitle {
         font-size: 1rem;
-        margin-bottom: 1rem; /* ✅ Espacio antes del card */
+        margin-bottom: 1rem;
     }
 
     .login-page__card {
         padding: 1.5rem 1rem;
         border-radius: var(--radius-lg);
-        margin-bottom: 1rem; /* ✅ Espacio después del card */
+        margin-bottom: 1rem;
+    }
+
+    .login-page__images {
+        margin-bottom: 1.5rem;
+        gap: 0.75rem;
+    }
+
+    .login-page__image {
+        width: 70px;
+        height: 70px;
     }
 }
 
-/* Para pantallas muy pequeñas */
 @media (max-width: 360px) {
     .login-page {
         padding: 0.5rem;
@@ -166,5 +192,15 @@
 
     .login-page__card {
         padding: 1.25rem 0.75rem;
+    }
+
+    .login-page__images {
+        margin-bottom: 1rem;
+        gap: 0.5rem;
+    }
+
+    .login-page__image {
+        width: 60px;
+        height: 60px;
     }
 }

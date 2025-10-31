@@ -1,6 +1,5 @@
 .register-form {
     width: 100%;
-    /* Sin max-width para usar todo el espacio */
 }
 
 .register-form__title {
@@ -43,11 +42,11 @@
     }
 
 .register-form__error {
-    background-color: #fef2f2;
+    background-color: var(--alert-red-light);
     border: 1px solid #fecaca;
-    color: #dc2626;
+    color: var(--error);
     padding: 0.75rem;
-    border-radius: 0.5rem;
+    border-radius: var(--radius-md);
     margin-bottom: 1rem;
     font-size: 0.875rem;
     display: flex;
@@ -60,7 +59,6 @@
     pointer-events: none;
 }
 
-/* Escritorio */
 @media (min-width: 1024px) {
     .register-form__title {
         font-size: 2rem;

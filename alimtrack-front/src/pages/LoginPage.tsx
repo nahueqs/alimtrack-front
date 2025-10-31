@@ -4,6 +4,10 @@ import { RegisterForm } from '../components/auth/RegisterForm';
 import { useAuth } from '../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 import './LoginPage.css';
+import logoUnlu from '../assets/logoUnlu.png';
+import logoCideta from '../assets/logoCideta.png';
+
+
 
 export const LoginPage: React.FC = () => {
     const [isLogin, setIsLogin] = useState(true);
@@ -39,6 +43,18 @@ export const LoginPage: React.FC = () => {
         <div className="login-page">
             <div className="login-page__container">
                 <div className="login-page__header">
+                    <div className="login-page__images">
+                        <img
+                            src={logoUnlu}
+                            alt="Imagen 1"
+                            className="login-page__image"
+                        />
+                        <img
+                            src={logoCideta}
+                            alt="Imagen 2"
+                            className="login-page__image"
+                        />
+                    </div>
                     <h1 className="login-page__title">AlimTrack</h1>
                     <p className="login-page__subtitle">Sistema de Gestión de Producciones</p>
                 </div>

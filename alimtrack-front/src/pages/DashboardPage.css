@@ -3,10 +3,9 @@
     background-color: var(--bg-secondary);
     width: 100%;
     display: flex;
-    flex-direction: column; /* ✅ Asegurar que header y main estén en columna */
+    flex-direction: column;
 }
 
-/* Header - PROTEGIDO del grid */
 .dashboard__header {
     background-color: var(--bg-primary);
     border-bottom: 1px solid var(--border-light);
@@ -15,7 +14,7 @@
     top: 0;
     z-index: 100;
     width: 100%;
-    flex-shrink: 0; /* ✅ Evitar que el header se reduzca */
+    flex-shrink: 0;
 }
 
 .dashboard__nav {
@@ -23,14 +22,13 @@
     justify-content: space-between;
     align-items: center;
     height: 4rem;
-    /* El padding viene del .container */
 }
 
 .dashboard__brand {
     display: flex;
     align-items: center;
     gap: 0.75rem;
-    flex-shrink: 0; /* ✅ Evitar que el brand se comprima */
+    flex-shrink: 0;
 }
 
 .dashboard__logo-placeholder {
@@ -43,14 +41,14 @@
     background-color: var(--primary-100);
     border-radius: var(--radius-md);
     color: var(--primary-700);
-    flex-shrink: 0; /* ✅ Logo fijo */
+    flex-shrink: 0;
 }
 
 .dashboard__app-name {
     font-size: 1.25rem;
     font-weight: 700;
     color: var(--text-primary);
-    white-space: nowrap; /* ✅ Evitar que el texto se parta */
+    white-space: nowrap;
 }
 
 .dashboard__badge {
@@ -61,15 +59,14 @@
     font-size: 0.75rem;
     font-weight: 500;
     margin-left: 0.75rem;
-    white-space: nowrap; /* ✅ Badge fijo */
+    white-space: nowrap;
 }
 
-/* Controles del header - PROTEGIDOS */
 .dashboard__user-menu {
     display: flex;
     align-items: center;
     gap: 1rem;
-    flex-shrink: 0; /* ✅ User menu fijo */
+    flex-shrink: 0;
 }
 
 .dashboard__user-info {
@@ -101,7 +98,7 @@
     align-items: center;
     justify-content: center;
     color: var(--text-secondary);
-    flex-shrink: 0; /* ✅ Botones fijos */
+    flex-shrink: 0;
 }
 
     .dashboard__menu-toggle:hover {
@@ -114,11 +111,10 @@
     flex-shrink: 0;
 }
 
-/* Main content - AISLADO del header */
 .dashboard__main {
     padding: 2rem 0;
     width: 100%;
-    flex: 1; /* ✅ Ocupar el espacio restante */
+    flex: 1;
     overflow-x: hidden;
 }
 
@@ -146,7 +142,6 @@
     margin-bottom: 1.5rem;
 }
 
-/* Grid FLEXIBLE pero AISLADO */
 .dashboard__grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -224,7 +219,6 @@
     background-color: var(--bg-tertiary);
 }
 
-/* Dropdown menu */
 .dashboard__dropdown {
     position: relative;
 }
@@ -270,9 +264,7 @@
         background-color: var(--bg-tertiary);
     }
 
-/* ========== BREAKPOINTS CON NAV PROTEGIDO ========== */
-
-/* Tablets */
+/* ========== BREAKPOINTS ========== */
 @media (min-width: 768px) {
     .dashboard__grid {
         grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
@@ -288,7 +280,6 @@
     }
 }
 
-/* Escritorio */
 @media (min-width: 1024px) {
     .dashboard__nav {
         height: 4.5rem;
@@ -328,7 +319,6 @@
     }
 }
 
-/* MÓVILES - NAV COMPACTO */
 @media (max-width: 767px) {
     .dashboard__nav {
         height: 3.5rem;
@@ -379,14 +369,13 @@
     }
 }
 
-/* Móviles muy pequeños */
 @media (max-width: 480px) {
     .dashboard__nav {
         padding: 0 0.5rem;
     }
 
     .dashboard__app-name {
-        font-size: 1rem; /* ✅ Más pequeño en móviles muy pequeños */
+        font-size: 1rem;
     }
 
     .dashboard__main {
@@ -406,7 +395,6 @@
     }
 }
 
-/* Para pantallas muy estrechas */
 @media (max-width: 360px) {
     .dashboard__nav {
         padding: 0 0.25rem;

@@ -1,37 +1,50 @@
-/* Variables CSS para modo claro y oscuro */
+/* ========== VARIABLES CSS GLOBALES ========== */
 :root {
-    /* Colores primarios */
-    --primary-50: #eff6ff;
-    --primary-100: #dbeafe;
-    --primary-200: #bfdbfe;
-    --primary-300: #93c5fd;
-    --primary-400: #60a5fa;
-    --primary-500: #3b82f6;
-    --primary-600: #2563eb;
-    --primary-700: #1d4ed8;
-    --primary-800: #1e40af;
-    --primary-900: #1e3a8a;
+    /* Tu paleta de colores principal */
+    --oxford-blue: #011638ff;
+    --charcoal: #364156ff;
+    --silver: #cdcdcdff;
+    --honeydew: #dff8ebff;
+    --cal-poly-green: #214e34ff;
+    /* Color de alerta rojo añadido */
+    --alert-red: #dc2626;
+    --alert-red-light: #fef2f2;
+    --alert-red-dark: #991b1b;
+    /* Sistema de colores para la aplicación */
+    --primary-50: #dff8ebff;
+    --primary-100: #c8f0db;
+    --primary-200: #a3e4c2;
+    --primary-300: #7ed8a9;
+    --primary-400: #59cc90;
+    --primary-500: #214e34ff;
+    --primary-600: #1a3e2a;
+    --primary-700: #142f20;
+    --primary-800: #0d1f15;
+    --primary-900: #07100b;
+    /* Colores secundarios */
+    --secondary-500: #364156ff;
+    --secondary-600: #2a3142;
+    --secondary-700: #1f2532;
     /* Colores neutros - Modo claro */
     --bg-primary: #ffffff;
     --bg-secondary: #f8fafc;
     --bg-tertiary: #f1f5f9;
     --bg-card: #ffffff;
-    --text-primary: #1e293b;
-    --text-secondary: #475569;
+    --text-primary: #011638ff;
+    --text-secondary: #364156ff;
     --text-tertiary: #64748b;
-    --border-light: #e2e8f0;
-    --border-medium: #cbd5e1;
-    --border-strong: #94a3b8;
+    --border-light: #cdcdcdff;
+    --border-medium: #94a3b8;
+    --border-strong: #64748b;
     /* Estados */
-    --success: #10b981;
+    --success: #214e34ff;
     --warning: #f59e0b;
-    --error: #ef4444;
-    --info: #3b82f6;
+    --error: var(--alert-red);
+    --info: #364156ff;
     /* Sombras */
-    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    --shadow-sm: 0 1px 2px 0 rgba(1, 22, 56, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(1, 22, 56, 0.1), 0 2px 4px -1px rgba(1, 22, 56, 0.06);
+    --shadow-lg: 0 10px 15px -3px rgba(1, 22, 56, 0.1), 0 4px 6px -2px rgba(1, 22, 56, 0.05);
     /* Bordes */
     --radius-sm: 0.375rem;
     --radius-md: 0.5rem;
@@ -43,22 +56,19 @@
 /* Modo oscuro */
 [data-theme="dark"] {
     --bg-primary: #0f172a;
-    --bg-secondary: #1e293b;
-    --bg-tertiary: #334155;
+    --bg-secondary: #011638ff;
+    --bg-tertiary: #0a1a3a;
     --bg-card: #1e293b;
-    --text-primary: #f1f5f9;
-    --text-secondary: #cbd5e1;
+    --text-primary: #dff8ebff;
+    --text-secondary: #cdcdcdff;
     --text-tertiary: #94a3b8;
-    --border-light: #334155;
-    --border-medium: #475569;
-    --border-strong: #64748b;
-    /* Sombras ajustadas para modo oscuro */
-    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
-    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
-    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.3);
-    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.4), 0 10px 10px -5px rgba(0, 0, 0, 0.3);
+    --border-light: #1e3a5c;
+    --border-medium: #2d4a76;
+    --border-strong: #3c5a90;
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.4);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -1px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -2px rgba(0, 0, 0, 0.4);
 }
-
 /* Base responsive */
 
 #root {
