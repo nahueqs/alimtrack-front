@@ -12,7 +12,7 @@
 }
 
     .btn:focus {
-        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        box-shadow: 0 0 0 3px var(--primary-50);
     }
 
 .btn-primary {
@@ -24,8 +24,13 @@
         background-color: var(--primary-600);
     }
 
+    .btn-primary:active:not(:disabled) {
+        background-color: var(--primary-700);
+    }
+
 .btn:disabled {
-    opacity: 0.5;
+    background-color: var(--bg-tertiary);
+    color: var(--text-tertiary);
     cursor: not-allowed;
 }
 
@@ -42,7 +47,7 @@
         left: 50%;
         margin-left: -0.5rem;
         margin-top: -0.5rem;
-        border: 2px solid #ffffff;
+        border: 2px solid var(--bg-primary);
         border-radius: 50%;
         border-right-color: transparent;
         animation: button-spin 1s linear infinite;
@@ -54,10 +59,40 @@
     }
 }
 
+/* Estados adicionales para mejor UX */
+.btn-secondary {
+    background-color: var(--bg-secondary);
+    color: var(--text-primary);
+    border: 1px solid var(--border-light);
+}
+
+    .btn-secondary:hover:not(:disabled) {
+        background-color: var(--bg-tertiary);
+        border-color: var(--border-medium);
+    }
+
+    .btn-secondary:focus {
+        box-shadow: 0 0 0 3px var(--secondary-50);
+    }
+
 /* Escritorio */
 @media (min-width: 1024px) {
     .btn {
         padding: 0.875rem 1.75rem;
         font-size: 1.0625rem;
+        width: auto;
     }
+
+    .btn--full-width {
+        width: 100%;
+    }
+}
+
+/* Modo oscuro - ajustes específicos */
+[data-theme="dark"] .btn-primary:focus {
+    box-shadow: 0 0 0 3px rgba(13, 137, 64, 0.3);
+}
+
+[data-theme="dark"] .btn-secondary:focus {
+    box-shadow: 0 0 0 3px rgba(212, 177, 0, 0.2);
 }

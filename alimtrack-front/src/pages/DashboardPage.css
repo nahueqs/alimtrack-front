@@ -1,5 +1,6 @@
 ﻿.dashboard {
     min-height: 100vh;
+    min-height: 100dvh;
     background-color: var(--bg-secondary);
     width: 100%;
     display: flex;
@@ -10,25 +11,30 @@
     background-color: var(--bg-primary);
     border-bottom: 1px solid var(--border-light);
     box-shadow: var(--shadow-sm);
-    position: sticky;
-    top: 0;
-    z-index: 100;
     width: 100%;
-    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
 }
 
 .dashboard__nav {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    height: 4rem;
+    min-height: 4rem;
+    padding: 0 1rem;
+    gap: 1rem;
+    flex-wrap: wrap;
+    flex: 1;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .dashboard__brand {
     display: flex;
     align-items: center;
-    gap: 0.75rem;
+    gap: 1rem;
     flex-shrink: 0;
+    min-width: 0; /* Permite que se encoja */
 }
 
 .dashboard__logo-placeholder {
@@ -44,11 +50,22 @@
     flex-shrink: 0;
 }
 
+.dashboard__brand-text {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    min-width: 0;
+    flex-shrink: 1;
+}
+
 .dashboard__app-name {
     font-size: 1.25rem;
     font-weight: 700;
     color: var(--text-primary);
     white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex-shrink: 1;
 }
 
 .dashboard__badge {
@@ -58,8 +75,8 @@
     border-radius: var(--radius-sm);
     font-size: 0.75rem;
     font-weight: 500;
-    margin-left: 0.75rem;
     white-space: nowrap;
+    flex-shrink: 0;
 }
 
 .dashboard__user-menu {
@@ -99,6 +116,7 @@
     justify-content: center;
     color: var(--text-secondary);
     flex-shrink: 0;
+    transition: background-color 0.2s ease;
 }
 
     .dashboard__menu-toggle:hover {
@@ -112,10 +130,13 @@
 }
 
 .dashboard__main {
-    padding: 2rem 0;
+    padding: 2rem 1rem;
     width: 100%;
     flex: 1;
     overflow-x: hidden;
+    max-width: 1200px;
+    margin: 0 auto;
+    box-sizing: border-box;
 }
 
 .dashboard__welcome {
@@ -212,13 +233,18 @@
 }
 
     .dashboard__card-btn--primary:hover {
-        background-color: var(--primary-600);
+        background-color: var(--secondary-600);
+        border-color: var(--secondary-600);
+        color:white;
     }
 
 .dashboard__card-btn:hover {
-    background-color: var(--bg-tertiary);
+    border-color: var(--secondary-600);
+    color: white;
+    background-color: var(--secondary-600);
 }
 
+/* DROPDOWN MENU */
 .dashboard__dropdown {
     position: relative;
 }
@@ -258,21 +284,60 @@
     cursor: pointer;
     border-radius: var(--radius-sm);
     font-size: 0.875rem;
+    transition: background-color 0.2s ease;
 }
 
     .dashboard__dropdown-item:hover {
         background-color: var(--bg-tertiary);
     }
 
-/* ========== BREAKPOINTS ========== */
+/* IMÁGENES DEL NAV (si las necesitas) */
+.dashboard_nav__images {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    width: 100%;
+    flex-shrink: 0;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+}
+
+.dashboard_nav__image {
+    width: 80px;
+    height: 80px;
+    border-radius: var(--radius-lg);
+    object-fit: cover;
+    border: 2px solid var(--border-light);
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    flex-shrink: 0;
+}
+
+    .dashboard_nav__image:hover {
+        transform: scale(1.05);
+        box-shadow: var(--shadow-md);
+    }
+
+/* ========== BREAKPOINTS MEJORADOS ========== */
+
+/* Tablets */
 @media (min-width: 768px) {
-    .dashboard__grid {
-        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-        gap: 1.75rem;
+    .dashboard__nav {
+        padding: 0 1.5rem;
+        height: 4.5rem;
+    }
+
+    .dashboard__brand {
+        gap: 1.5rem;
     }
 
     .dashboard__main {
-        padding: 2.5rem 0;
+        padding: 2.5rem 1.5rem;
+    }
+
+    .dashboard__grid {
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: 1.75rem;
     }
 
     .dashboard__welcome {
@@ -280,23 +345,25 @@
     }
 }
 
+/* Desktop */
 @media (min-width: 1024px) {
     .dashboard__nav {
-        height: 4.5rem;
+        padding: 0 2rem;
+        height: 5rem;
     }
 
     .dashboard__logo-placeholder {
-        width: 2.75rem;
-        height: 2.75rem;
-        font-size: 1.375rem;
+        width: 3rem;
+        height: 3rem;
+        font-size: 1.5rem;
     }
 
     .dashboard__app-name {
-        font-size: 1.375rem;
+        font-size: 1.5rem;
     }
 
     .dashboard__main {
-        padding: 3rem 0;
+        padding: 3rem 2rem;
     }
 
     .dashboard__welcome {
@@ -319,10 +386,16 @@
     }
 }
 
+/* Móviles */
 @media (max-width: 767px) {
     .dashboard__nav {
         height: 3.5rem;
-        padding: 0 0.75rem;
+        padding: 0 1rem;
+        gap: 0.5rem;
+    }
+
+    .dashboard__brand-text {
+        gap: 0.5rem;
     }
 
     .dashboard__app-name {
@@ -330,15 +403,15 @@
     }
 
     .dashboard__badge {
-        display: none;
+        display: none; /* Oculta badge en móviles */
     }
 
     .dashboard__user-info {
-        display: none;
+        display: none; /* Oculta info de usuario en móviles */
     }
 
     .dashboard__main {
-        padding: 1.5rem 0;
+        padding: 1.5rem 1rem;
     }
 
     .dashboard__welcome {
@@ -369,17 +442,27 @@
     }
 }
 
+/* Móviles pequeños */
 @media (max-width: 480px) {
     .dashboard__nav {
-        padding: 0 0.5rem;
+        padding: 0 0.75rem;
     }
 
     .dashboard__app-name {
         font-size: 1rem;
+        max-width: 120px; /* Limita el ancho del nombre */
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .dashboard__logo-placeholder {
+        width: 2rem;
+        height: 2rem;
+        font-size: 1rem;
     }
 
     .dashboard__main {
-        padding: 1rem 0;
+        padding: 1rem 0.75rem;
     }
 
     .dashboard__welcome {
@@ -393,20 +476,38 @@
     .dashboard__grid {
         gap: 0.75rem;
     }
+
+    .dashboard_nav__images {
+        gap: 0.5rem;
+    }
+
+    .dashboard_nav__image {
+        width: 60px;
+        height: 60px;
+    }
 }
 
+/* Móviles muy pequeños */
 @media (max-width: 360px) {
     .dashboard__nav {
-        padding: 0 0.25rem;
+        padding: 0 0.5rem;
     }
 
     .dashboard__app-name {
         font-size: 0.875rem;
+        max-width: 100px;
     }
 
-    .dashboard__logo-placeholder {
-        width: 2rem;
-        height: 2rem;
-        font-size: 1rem;
+    .dashboard__brand {
+        gap: 0.5rem;
+    }
+
+    .dashboard__menu-toggle {
+        padding: 0.375rem;
+    }
+
+    .dashboard__menu-icon {
+        width: 1.25rem;
+        height: 1.25rem;
     }
 }

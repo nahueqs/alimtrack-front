@@ -1,38 +1,50 @@
 ﻿import React, { useState } from 'react';
-import { Input } from '../shared/Input';
-import { Button } from '../shared/Button';
-import type { RegisterRequest } from '../../types/auth';
-import './RegisterForm.css'; // ← Importar el CSS
 
 interface RegisterFormProps {
-    onRegister: (userData: RegisterRequest) => Promise<void>;
-    loading?: boolean;
+    onRegister: (userData: any) => Promise<void>;
+    loading: boolean;
     onSwitchToLogin: () => void;
-    error?: string | null;
+    error: string | null;
 }
 
 export const RegisterForm: React.FC<RegisterFormProps> = ({
     onRegister,
-    loading = false,
+    loading,
     onSwitchToLogin,
     error
 }) => {
-    const [formData, setFormData] = useState<RegisterRequest>({
-        nombre: '',
-        username: '',
+    const [userData, setUserData] = useState({
+        name: '',
         email: '',
-        password: ''
+        password: '',
+        confirmPassword: ''
     });
 
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        onRegister(formData);
+    // ✅ Manejar el submit previniendo el comportamiento por defecto
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault(); // 👈 Esto evita que la página se recargue
+
+        if (!userData.name || !userData.email || !userData.password) {
+            return;
+        }
+
+        if (userData.password !== userData.confirmPassword) {
+            // Manejar error de contraseñas que no coinciden
+            return;
+        }
+
+        try {
+            await onRegister(userData);
+        } catch (err) {
+            // El error ya se maneja en el hook useAuth
+        }
     };
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setFormData(prev => ({
+        const { name, value } = e.target;
+        setUserData(prev => ({
             ...prev,
-            [e.target.name]: e.target.value
+            [name]: value
         }));
     };
 
@@ -42,65 +54,103 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
 
             {error && (
                 <div className="register-form__error">
-                    ⚠ {error}
+                    <span>⚠️</span>
+                    {error}
                 </div>
             )}
 
-            <form onSubmit={handleSubmit} className="register-form__form">
-                <Input
-                    label="Nombre Completo"
-                    type="text"
-                    name="nombre"
-                    value={formData.nombre}
-                    onChange={handleChange}
-                    required
-                    placeholder="Juan Pérez"
+            {/* ✅ Añadir form tag y manejar onSubmit */}
+            <form className="register-form__form" onSubmit={handleSubmit}>
+                <div className="input-group">
+                    <label htmlFor="name" className="input-label">
+                        Nombre Completo
+                        <span className="input-required">*</span>
+                    </label>
+                    <input
+                        id="name"
+                        name="name"
+                        type="text"
+                        className="input-field"
+                        placeholder="Tu nombre completo"
+                        value={userData.name}
+                        onChange={handleChange}
+                        disabled={loading}
+                        required
+                    />
+                </div>
+
+                <div className="input-group">
+                    <label htmlFor="email" className="input-label">
+                        Correo Electrónico
+                        <span className="input-required">*</span>
+                    </label>
+                    <input
+                        id="email"
+                        name="email"
+                        type="email"
+                        className="input-field"
+                        placeholder="tu@email.com"
+                        value={userData.email}
+                        onChange={handleChange}
+                        disabled={loading}
+                        required
+                    />
+                </div>
+
+                <div className="input-group">
+                    <label htmlFor="password" className="input-label">
+                        Contraseña
+                        <span className="input-required">*</span>
+                    </label>
+                    <input
+                        id="password"
+                        name="password"
+                        type="password"
+                        className="input-field"
+                        placeholder="Tu contraseña"
+                        value={userData.password}
+                        onChange={handleChange}
+                        disabled={loading}
+                        required
+                    />
+                </div>
+
+                <div className="input-group">
+                    <label htmlFor="confirmPassword" className="input-label">
+                        Confirmar Contraseña
+                        <span className="input-required">*</span>
+                    </label>
+                    <input
+                        id="confirmPassword"
+                        name="confirmPassword"
+                        type="password"
+                        className="input-field"
+                        placeholder="Confirma tu contraseña"
+                        value={userData.confirmPassword}
+                        onChange={handleChange}
+                        disabled={loading}
+                        required
+                    />
+                </div>
+
+                <button
+                    type="submit"
+                    className="btn btn--primary btn--full"
                     disabled={loading}
-                />
-                <Input
-                    label="Usuario"
-                    type="text"
-                    name="username"
-                    value={formData.username}
-                    onChange={handleChange}
-                    required
-                    placeholder="juanperez"
-                    disabled={loading}
-                />
-                <Input
-                    label="Email"
-                    type="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    required
-                    placeholder="tu@email.com"
-                    disabled={loading}
-                />
-                <Input
-                    label="Contraseña"
-                    type="password"
-                    name="password"
-                    value={formData.password}
-                    onChange={handleChange}
-                    required
-                    placeholder="••••••••"
-                    minLength={6}
-                    disabled={loading}
-                />
-                <Button type="submit" loading={loading}>
-                    {loading ? 'Creando cuenta...' : 'Registrarse'}
-                </Button>
+                >
+                    {loading ? 'Creando cuenta...' : 'Crear Cuenta'}
+                </button>
             </form>
 
             <div className="register-form__switch">
+                <span>¿Ya tienes cuenta? </span>
                 <button
-                    type="button"
-                    onClick={onSwitchToLogin}
+                    type="button" // 👈 Importante: type="button" para que no envíe el form
                     className="register-form__switch-button"
+                    onClick={onSwitchToLogin}
                     disabled={loading}
                 >
-                    ¿Ya tienes cuenta? Inicia sesión
+                    Inicia sesión aquí
                 </button>
             </div>
         </div>

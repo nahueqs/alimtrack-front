@@ -1,5 +1,4 @@
-import React from 'react';
-import './Button.css';
+﻿import React from 'react';
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
     variant?: 'primary' | 'secondary';
@@ -10,12 +9,14 @@ export const Button: React.FC<ButtonProps> = ({
     children,
     variant = 'primary',
     loading = false,
+    type = 'button', 
     ...props
 }) => {
     return (
         <button
             {...props}
-            className={`btn btn-${variant} ${loading ? 'btn-loading' : ''}`}
+            type={type}
+            className={`btn btn--${variant} ${loading ? 'btn--loading' : ''} ${props.className || ''}`}
             disabled={loading || props.disabled}
         >
             {loading ? 'Cargando...' : children}

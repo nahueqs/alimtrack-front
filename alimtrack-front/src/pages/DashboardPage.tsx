@@ -1,9 +1,10 @@
-﻿import React, { useState, useEffect } from 'react';
+﻿import React, { useState} from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 import { useTheme } from '../contexts/ThemeContexts';
 import { ThemeToggle } from '../components/shared/ThemeToggle';
-import './DashboardPage.css';
+import logoCideta from '../assets/logoCideta.png';
+
 
 // Definir los iconos correctamente
 const MenuIcon = () => (
@@ -65,10 +66,8 @@ export const DashboardPage: React.FC = () => {
                 <nav className="dashboard__nav container">
                     {/* Logo y nombre */}
                     <div className="dashboard__brand">
-                        {/* Usar imágenes placeholder por ahora */}
-                        <div className="dashboard__logo-placeholder">
-                            {theme === 'light' ? '🌞' : '🌙'}
-                        </div>
+                        <img src={logoCideta} alt="logoCideta"  className="dashboard_nav__image">
+                        </img>
                         <span className="dashboard__app-name">AlimTrack</span>
                         <span className="dashboard__badge">Dashboard</span>
                     </div>

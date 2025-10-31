@@ -41,7 +41,7 @@ export const useAuth = () => {
         } catch (err: any) {
             const errorMessage = err.response?.data?.message || err.message || 'Error de conexión';
             setError(errorMessage);
-            throw new Error(errorMessage);
+            return null;
         } finally {
             setLoading(false);
         }
@@ -59,7 +59,7 @@ export const useAuth = () => {
         } catch (err: any) {
             const errorMessage = err.response?.data?.message || err.message || 'Error en el registro';
             setError(errorMessage);
-            throw new Error(errorMessage);
+            return null;
         } finally {
             setLoading(false);
         }
@@ -79,6 +79,7 @@ export const useAuth = () => {
     return {
         user,
         loading,
+        error,
         login,
         register,
         logout,
