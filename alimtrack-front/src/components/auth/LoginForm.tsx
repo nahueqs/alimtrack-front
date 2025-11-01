@@ -1,5 +1,6 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import './LoginForm.css';
+import { Input } from '../ui/input2/input2.tsx';
 
 interface LoginFormProps {
     onLogin: (credentials: any) => Promise<void>;
@@ -9,40 +10,48 @@ interface LoginFormProps {
 }
 
 export const LoginForm: React.FC<LoginFormProps> = ({
-    onLogin,
-    loading,
-    onSwitchToRegister,
-    error
-}) => {
+                                                        onLogin,
+                                                        loading,
+                                                        onSwitchToRegister,
+                                                        error
+                                                    }) => {
     const [credentials, setCredentials] = useState({
         email: '',
         password: ''
     });
 
+    const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
+
     const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault(); 
-        console.log('🔴 1. handleSubmit ejecutado - preventDefault llamado');
+        e.preventDefault();
 
         if (loading) {
-            console.log('🔴 2. Loading activo - deteniendo submit');
             return;
         }
 
-        if (!credentials.email || !credentials.password) {
-            console.log('🔴 3. Campos vacíos - deteniendo submit');
+        setValidationErrors({});
 
+        const errors: Record<string, string> = {};
+
+        if (!credentials.email.trim()) {
+            errors.email = 'El email es requerido';
+        } else if (!/\S+@\S+\.\S+/.test(credentials.email)) {
+            errors.email = 'El formato del email no es válido';
+        }
+
+        if (!credentials.password) {
+            errors.password = 'La contraseña es requerida';
+        }
+
+        if (Object.keys(errors).length > 0) {
+            setValidationErrors(errors);
             return;
         }
-        console.log('🔴 4. Llamando a onLogin...');
 
         try {
             await onLogin(credentials);
-            console.log('🔴 5. onLogin completado');
-
         } catch (err) {
             // El error ya se maneja en el hook useAuth
-            console.log('🔴 6. Error en onLogin:', err);
-
         }
     };
 
@@ -52,6 +61,13 @@ export const LoginForm: React.FC<LoginFormProps> = ({
             ...prev,
             [name]: value
         }));
+
+        if (validationErrors[name]) {
+            setValidationErrors(prev => ({
+                ...prev,
+                [name]: ''
+            }));
+        }
     };
 
     return (
@@ -65,45 +81,32 @@ export const LoginForm: React.FC<LoginFormProps> = ({
                 </div>
             )}
 
-            {/* ✅ Añadir form tag y manejar onSubmit */}
-            <form
-                className="login-form__form"
-                onSubmit={handleSubmit}>
-                <div className="input-group">
-                    <label htmlFor="email" className="input-label">
-                        Correo Electrónico
-                        <span className="input-required">*</span>
-                    </label>
-                    <input
-                        id="email"
-                        name="email"
-                        type="email"
-                        className="input-field"
-                        placeholder="email@unlu.edu.ar"
-                        value={credentials.email}
-                        onChange={handleChange}
-                        disabled={loading}
-                        required
-                    />
-                </div>
+            <form className="login-form__form" onSubmit={handleSubmit} noValidate>
+                <Input
+                    id="email"
+                    name="email"
+                    type="email"
+                    label="Correo Electrónico"
+                    value={credentials.email}
+                    onChange={handleChange}
+                    placeholder="email@unlu.edu.ar"
+                    required
+                    disabled={loading}
+                    error={validationErrors.email}
+                />
 
-                <div className="input-group">
-                    <label htmlFor="password" className="input-label">
-                        Contraseña
-                        <span className="input-required">*</span>
-                    </label>
-                    <input
-                        id="password"
-                        name="password"
-                        type="password"
-                        className="input-field"
-                        placeholder="Tu contraseña"
-                        value={credentials.password}
-                        onChange={handleChange}
-                        disabled={loading}
-                        required
-                    />
-                </div>
+                <Input
+                    id="password"
+                    name="password"
+                    type="password"
+                    label="Contraseña"
+                    value={credentials.password}
+                    onChange={handleChange}
+                    placeholder="Tu contraseña"
+                    required
+                    disabled={loading}
+                    error={validationErrors.password}
+                />
 
                 <button
                     type="submit"
@@ -117,7 +120,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
             <div className="login-form__switch">
                 <span>¿No tienes cuenta? </span>
                 <button
-                    type="button" //  Importante: type="button" para que no envíe el form
+                    type="button"
                     className="login-form__switch-button"
                     onClick={onSwitchToRegister}
                     disabled={loading}
