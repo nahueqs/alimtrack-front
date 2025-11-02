@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { LoginForm } from '../../components/auth/LoginForm.tsx';
 import { RegisterForm } from '../../components/auth/RegisterForm.tsx';
 import { useNavigate } from 'react-router-dom';
@@ -94,14 +94,14 @@ const LoginPage: React.FC = () => {
           {isLogin ? (
             <LoginForm
               onLogin={handleLogin}
-              onSwitchForm={handleSwitchForm}
+              onSwitchToRegister={handleSwitchForm}
               loading={loading}
               error={error}
             />
           ) : (
             <RegisterForm
               onRegister={handleRegister}
-              onSwitchForm={handleSwitchForm}
+              onSwitchToLogin={handleSwitchForm}
               loading={loading}
               error={error}
             />

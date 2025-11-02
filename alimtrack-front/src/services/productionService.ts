@@ -1,13 +1,29 @@
-﻿import { apiClient } from '../utils/ApiClient';
+import { apiClient } from '../utils/ApiClient';
 import type {
+  ProductionFilterRequestDTO,
   ProductionResponse,
   ProductionsResponse,
-  ProductionFilterRequestDTO,
 } from '../types/Productions.ts';
 
 class ProductionService {
   async getProductions(filters: ProductionFilterRequestDTO = {}): Promise<ProductionsResponse> {
-    return apiClient.get<ProductionsResponse>('/producciones', filters);
+    const response = await apiClient.get<any>('/producciones', filters);
+
+    // If response is an array, wrap it in the expected format
+    if (Array.isArray(response)) {
+      return { producciones: response };
+    }
+    // If response already has producciones, return as is
+    else if (response && response.producciones) {
+      return response;
+    }
+    // If it's a single production, wrap it in an array
+    else if (response && response.codigoProduccion) {
+      return { producciones: [response] };
+    }
+
+    // Default empty response if format is unexpected
+    return { producciones: [] };
   }
 
   async getProductionByCodigo(codigoProduccion: string): Promise<ProductionsResponse> {

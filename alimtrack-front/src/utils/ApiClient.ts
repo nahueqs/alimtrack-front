@@ -1,64 +1,8 @@
 class ApiClient {
   private baseURL: string;
 
-  constructor(baseURL: string = 'http://localhost:8080/api') {
+  constructor(baseURL: string = 'http://localhost:8080/api/v1') {
     this.baseURL = baseURL;
-  }
-
-  private async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
-    const token = localStorage.getItem('authToken');
-    const url = `${this.baseURL}${endpoint}`;
-
-    const headers: HeadersInit = new Headers({
-      'Content-Type': 'application/json',
-      ...(options.headers as Record<string, string>)
-    });
-
-    if (token) {
-      headers.set('Authorization', `Bearer ${token}`);
-    }
-
-    const config: RequestInit = {
-      ...options,
-      headers,
-      credentials: 'include' as RequestCredentials, // Incluye cookies y credenciales
-    };
-
-    try {
-      const response = await fetch(url, config);
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      // Para respuestas sin contenido (204 No Content)
-      if (response.status === 204) {
-        return {} as T;
-      }
-
-      return await response.json();
-    } catch (error) {
-      console.error(`API Error [${endpoint}]:`, error);
-      throw error;
-    }
-  }
-
-  private buildQueryString(params: Record<string, any>): string {
-    const searchParams = new URLSearchParams();
-
-    Object.entries(params).forEach(([key, value]) => {
-      if (value !== null && value !== undefined && value !== '') {
-        if (Array.isArray(value)) {
-          value.forEach(item => searchParams.append(key, item.toString()));
-        } else if (value instanceof Date) {
-          searchParams.append(key, value.toISOString());
-        } else {
-          searchParams.append(key, value.toString());
-        }
-      }
-    });
-
-    return searchParams.toString();
   }
 
   async get<T>(endpoint: string, params?: Record<string, any>): Promise<T> {
@@ -99,6 +43,85 @@ class ApiClient {
     });
   }
 
+  private async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
+    const token = localStorage.getItem('authToken');
+    // Ensure there's exactly one slash between baseURL and endpoint
+    const url = `${this.baseURL.replace(/\/+$/, '')}/${endpoint.replace(/^\/+/, '')}`;
+
+    const headers: HeadersInit = new Headers({
+      'Content-Type': 'application/json',
+      ...(options.headers as Record<string, string>),
+    });
+
+    if (token) {
+      headers.set('Authorization', `Bearer ${token}`);
+    }
+
+    const config: RequestInit = {
+      ...options,
+      headers,
+      credentials: 'include' as RequestCredentials,
+    };
+
+    try {
+      console.log(`Making request to: ${url}`, { config });
+      const response = await fetch(url, config);
+      let responseData;
+
+      try {
+        // Intentar parsear la respuesta como JSON, incluso si hay error
+        responseData = await response.json().catch(() => ({}));
+      } catch (e) {
+        // Si no se puede parsear como JSON, usar el texto de la respuesta
+        const text = await response.text();
+        responseData = { message: text };
+      }
+
+      if (!response.ok) {
+        const error = new Error(response.statusText || 'Error en la petición');
+        // @ts-ignore
+        error.response = {
+          status: response.status,
+          statusText: response.statusText,
+          data: responseData,
+          headers: Object.fromEntries(response.headers.entries()),
+        };
+        throw error;
+      }
+
+      // Para respuestas sin contenido (204 No Content)
+      if (response.status === 204) {
+        return {} as T;
+      }
+
+      return responseData;
+    } catch (error: any) {
+      console.error(`API Error [${endpoint}]:`, {
+        message: error.message,
+        response: error.response,
+        stack: error.stack,
+      });
+      throw error;
+    }
+  }
+
+  private buildQueryString(params: Record<string, any>): string {
+    const searchParams = new URLSearchParams();
+
+    Object.entries(params).forEach(([key, value]) => {
+      if (value !== null && value !== undefined && value !== '') {
+        if (Array.isArray(value)) {
+          value.forEach(item => searchParams.append(key, item.toString()));
+        } else if (value instanceof Date) {
+          searchParams.append(key, value.toISOString());
+        } else {
+          searchParams.append(key, value.toString());
+        }
+      }
+    });
+
+    return searchParams.toString();
+  }
 }
 
 export const apiClient = new ApiClient();

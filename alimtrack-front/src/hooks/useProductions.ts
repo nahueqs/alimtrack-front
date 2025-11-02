@@ -1,8 +1,8 @@
-﻿import { useState, useEffect } from 'react';
+﻿import { useEffect, useState } from 'react';
 import type {
+  ProductionFilterRequestDTO,
   ProductionResponse,
   ProductionsResponse,
-  ProductionFilterRequestDTO,
 } from '../types/Productions';
 import { productionService } from '../services/productionService';
 
@@ -21,8 +21,6 @@ export const useProductions = (
   const [productions, setProductions] = useState<ProductionResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [totalPaginas, setTotalPaginas] = useState(1);
-  const [totalRegistros, setTotalRegistros] = useState(0);
   const [filters, setFilters] = useState<ProductionFilterRequestDTO>(initialFilters);
 
   const refreshProductions = async (newFilters?: ProductionFilterRequestDTO) => {
@@ -38,8 +36,6 @@ export const useProductions = (
       const response: ProductionsResponse = await productionService.getProductions(currentFilters);
 
       setProductions(response.producciones);
-      setTotalPaginas(response.totalPaginas);
-      setTotalRegistros(response.total);
     } catch (err: any) {
       setError(err.message || 'Error al cargar las producciones');
       console.error('Error cargando producciones:', err);

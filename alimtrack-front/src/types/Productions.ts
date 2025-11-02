@@ -6,6 +6,7 @@
   estado: string;
   fechaInicio: string;
   fechaFin?: string;
+  observaciones?: string;
 }
 
 export interface ProductionsResponse {
