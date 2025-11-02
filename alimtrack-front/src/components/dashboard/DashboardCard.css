@@ -1,4 +1,4 @@
-﻿/* ========== CARDS STYLES ========== */
+/* ========== CARDS STYLES ========== */
 .dashboard__grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -18,9 +18,9 @@
     min-height: 180px;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
     width: 100%;
     box-sizing: border-box;
+    position: relative;
 }
 
     .dashboard__card:hover {
@@ -48,7 +48,7 @@
     gap: 0.75rem;
 }
 
-.dashboard__card-btn {
+.dashboard-card__btn {
     padding: 0.625rem 1.25rem;
     border: 1px solid var(--border-medium);
     border-radius: var(--radius-md);
@@ -62,19 +62,19 @@
     box-sizing: border-box;
 }
 
-.dashboard__card-btn--primary {
+.dashboard-card__btn--primary {
     background-color: var(--primary-500);
     color: white;
     border-color: var(--primary-500);
 }
 
-    .dashboard__card-btn--primary:hover {
+    .dashboard-card__btn--primary:hover {
         background-color: var(--secondary-600);
         border-color: var(--secondary-600);
         color: white;
     }
 
-.dashboard__card-btn:hover {
+.dashboard-card__btn:hover {
     border-color: var(--secondary-600);
     color: white;
     background-color: var(--secondary-600);

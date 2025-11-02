@@ -1,6 +1,6 @@
 // components/dashboard/cards/RecipesCard.tsx
 import React from 'react';
-import { DashboardCard } from './DashboardCard';
+import { DashboardCard } from '../DashboardCard.tsx';
 
 interface RecipesCardProps {
   onNavigate: (path: string) => void;
@@ -11,17 +11,16 @@ export const RecetasCard: React.FC<RecipesCardProps> = ({ onNavigate }) => {
     <DashboardCard
       title="Recetas"
       description="Administra las recetas y sus versiones. Crea nuevas recetas o modifica las existentes."
+      variant="elevated"
+      hoverEffect={true}
     >
       <button
-        className="dashboard__card-btn dashboard__card-btn--primary"
+        className="dashboard-card__btn dashboard-card__btn--primary"
         onClick={() => onNavigate('/recetas/nueva')}
       >
         Crear Receta
       </button>
-      <button
-        className="dashboard__card-btn"
-        onClick={() => onNavigate('/recetas')}
-      >
+      <button className="dashboard-card__btn" onClick={() => onNavigate('/recetas')}>
         Ver Listado
       </button>
     </DashboardCard>

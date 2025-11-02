@@ -1,4 +1,4 @@
-﻿.login-page {
+.login-page {
     min-height: 100dvh;
     min-height: -webkit-fill-available;
     background: linear-gradient(135deg, var(--primary-50) 0%, var(--primary-100) 100%);
@@ -67,15 +67,12 @@
     flex-shrink: 0;
 }
 
+/* Estilos para la tarjeta (ahora manejados por el componente Card) */
 .login-page__card {
-    background-color: var(--bg-primary);
-    padding: 2rem 1.5rem;
-    border-radius: var(--radius-xl);
-    box-shadow: var(--shadow-md);
-    border: 1px solid var(--border-light);
     width: 100%;
-    box-sizing: border-box;
+    max-width: 100%;
     flex-shrink: 0;
+    box-sizing: border-box;
 }
 
 .login-page__info {
@@ -136,7 +133,7 @@
     }
 
     .login-page__card {
-        padding: 2.5rem 2rem;
+        max-width: 100%;
     }
 }
 
@@ -150,8 +147,7 @@
     }
 
     .login-page__card {
-        padding: 2.5rem 2.5rem;
-        border-radius: var(--radius-2xl);
+        max-width: 100%;
     }
 }
 
@@ -194,8 +190,7 @@
     }
 
     .login-page__card {
-        padding: 1.5rem 1rem;
-        border-radius: var(--radius-lg);
+        max-width: 100%;
         margin-bottom: 0;
     }
 
@@ -224,7 +219,7 @@
     }
 
     .login-page__card {
-        padding: 1.25rem 0.75rem;
+        max-width: 100%;
     }
 
     .login-page__images {
