@@ -1,0 +1,286 @@
+/* TableActions.css */
+
+/* Status badges - Reutilizables */
+.status-badge {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 500;
+    display: inline-block;
+    text-align: center;
+    min-width: 80px;
+}
+
+.status-badge.status-finalizada {
+    background-color: var(--success);
+    color: var(--primary-50);
+}
+
+/* En Proceso: support both variants */
+.status-badge.status-enproceso,
+.status-badge.status-en_proceso {
+    background-color: var(--info);
+    color: var(--primary-50);
+}
+
+.status-badge.status-pendiente {
+    background-color: var(--warning);
+    color: var(--primary-50);
+}
+
+.status-badge.status-cancelada {
+    background-color: var(--error);
+    color: var(--primary-50);
+}
+
+.status-badge.status-activo {
+    background-color: var(--success);
+    color: var(--primary-50);
+}
+
+.status-badge.status-inactivo {
+    background-color: var(--error);
+    color: var(--primary-50);
+}
+
+/* Improve contrast for badges in dark mode using global tokens */
+[data-theme='dark'] .status-badge.status-finalizada {
+    background-color: var(--success);
+    color: var(--primary-50);
+}
+
+[data-theme='dark'] .status-badge.status-enproceso,
+[data-theme='dark'] .status-badge.status-en_proceso {
+    background-color: var(--info);
+    border-color: var(--secondary-500);
+    color: var(--primary-50);
+}
+
+[data-theme='dark'] .status-badge.status-activo {
+    background-color: var(--success);
+    color: var(--primary-50);
+}
+
+[data-theme='dark'] .status-badge.status-inactivo {
+    background-color: var(--error);
+    color: var(--primary-50);
+}
+
+/* Table Actions Container */
+.table-actions-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 32px;
+}
+
+/* Versión Desktop - visible en pantallas grandes */
+.table-actions-desktop {
+    display: flex;
+    gap: 8px;
+}
+
+.table-actions-desktop .ant-btn {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    padding: 4px 8px;
+    height: auto;
+    min-height: 24px;
+    border: 1px solid transparent;
+    transition: all 0.2s ease;
+}
+
+.table-actions-desktop .ant-btn-link {
+    color: var(--primary-500);
+    border-color: transparent;
+}
+
+.table-actions-desktop .ant-btn-link:hover {
+    color: var(--primary-600);
+    background-color: var(--primary-50);
+    border-color: var(--primary-100);
+}
+
+.table-actions-desktop .ant-btn-default {
+    color: var(--text-primary);
+    border-color: var(--border-light);
+    background: transparent;
+}
+
+.table-actions-desktop .ant-btn-default:hover {
+    color: var(--primary-500);
+    border-color: var(--primary-300);
+    background-color: var(--primary-50);
+}
+
+.table-actions-desktop .ant-btn-dangerous {
+    color: var(--error);
+    border-color: var(--error);
+    background: transparent;
+}
+
+.table-actions-desktop .ant-btn-dangerous:hover {
+    color: #fff;
+    background-color: var(--error);
+    border-color: var(--error);
+}
+
+/* Versión Mobile - oculta en pantallas grandes */
+.table-actions-mobile {
+    display: none;
+}
+
+.table-actions-mobile .ant-btn {
+    padding: 4px;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--border-light);
+    background: transparent;
+    color: var(--text-primary);
+}
+
+.table-actions-mobile .ant-btn:hover {
+    background: var(--bg-tertiary);
+    border-color: var(--primary-300);
+    color: var(--primary-500);
+}
+
+/* Dropdown menu styles */
+.table-actions-mobile .ant-dropdown-menu {
+    background: var(--bg-card);
+    border: 1px solid var(--border-light);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    border-radius: 6px;
+    padding: 4px 0;
+}
+
+.table-actions-mobile .ant-dropdown-menu-item {
+    color: var(--text-primary);
+    padding: 8px 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+}
+
+.table-actions-mobile .ant-dropdown-menu-item:hover {
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+}
+
+.table-actions-mobile .ant-dropdown-menu-item-danger {
+    color: var(--error);
+}
+
+.table-actions-mobile .ant-dropdown-menu-item-danger:hover {
+    background: var(--error);
+    color: #fff;
+}
+
+.table-actions-mobile .ant-dropdown-menu-item-disabled {
+    color: var(--text-tertiary);
+    cursor: not-allowed;
+}
+
+.table-actions-mobile .ant-dropdown-menu-item-disabled:hover {
+    background: transparent;
+    color: var(--text-tertiary);
+}
+
+/* Icon styles */
+.table-actions-desktop .ant-btn .anticon,
+.table-actions-mobile .ant-btn .anticon {
+    font-size: 14px;
+}
+
+.table-actions-mobile .ant-dropdown-menu-item .anticon {
+    font-size: 14px;
+    width: 16px;
+}
+
+/* Responsive Design for TableActions */
+
+/* Mobile (hasta 768px) - MOSTRAR DROPDOWN */
+@media (max-width: 768px) {
+    .table-actions-desktop {
+        display: none !important;
+    }
+
+    .table-actions-mobile {
+        display: flex !important;
+    }
+}
+
+/* Tablet y Desktop (más de 768px) - MOSTRAR BOTONES */
+@media (min-width: 769px) {
+    .table-actions-desktop {
+        display: flex !important;
+    }
+
+    .table-actions-mobile {
+        display: none !important;
+    }
+}
+
+/* Compact view for tables with many columns */
+@media (max-width: 1024px) {
+    .table-actions-desktop .ant-btn {
+        font-size: 11px;
+        padding: 3px 6px;
+    }
+
+    .table-actions-desktop .ant-btn .anticon {
+        font-size: 12px;
+    }
+}
+
+/* Hover effects for better UX */
+.table-actions-desktop .ant-btn:active,
+.table-actions-mobile .ant-btn:active {
+    transform: translateY(1px);
+}
+
+/* Focus states for accessibility */
+.table-actions-desktop .ant-btn:focus-visible,
+.table-actions-mobile .ant-btn:focus-visible {
+    outline: 2px solid var(--primary-300);
+    outline-offset: 1px;
+}
+
+/* Dark mode specific adjustments */
+[data-theme='dark'] .table-actions-desktop .ant-btn-link {
+    color: var(--primary-300);
+}
+
+[data-theme='dark'] .table-actions-desktop .ant-btn-link:hover {
+    color: var(--primary-200);
+    background-color: var(--primary-800);
+    border-color: var(--primary-700);
+}
+
+[data-theme='dark'] .table-actions-desktop .ant-btn-default {
+    color: var(--text-primary);
+    border-color: var(--border-light);
+}
+
+[data-theme='dark'] .table-actions-desktop .ant-btn-default:hover {
+    color: var(--primary-200);
+    border-color: var(--primary-500);
+    background-color: var(--primary-800);
+}
+
+[data-theme='dark'] .table-actions-mobile .ant-btn {
+    border-color: var(--border-light);
+    background: var(--bg-primary);
+}
+
+[data-theme='dark'] .table-actions-mobile .ant-btn:hover {
+    background: var(--bg-tertiary);
+    border-color: var(--primary-500);
+    color: var(--primary-300);
+}

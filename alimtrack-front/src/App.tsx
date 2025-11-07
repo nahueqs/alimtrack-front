@@ -1,13 +1,12 @@
-import React, { Suspense, memo } from 'react';
+import React, { memo, Suspense } from 'react';
 import { BrowserRouter as Router, useRoutes } from 'react-router-dom';
-import { AuthProvider } from './hooks/authProvider';
-import { ThemeProvider } from './contexts/ThemeContexts';
-import { routes } from './routes';
+import { AuthProvider } from './pages/Login/auth/authProvider.tsx';
+import { ThemeProvider } from './styles/ThemeContexts.tsx';
+import { routes } from './index.tsx';
 
 // Import global styles
 import './components/ui/Button/Button.css';
-import './components/shared/ThemeToggle.css';
-import './styles/App.css';
+import './styles/shared/ThemeToggle.css';
 
 // Componente de carga para Suspense
 const Loader = () => (

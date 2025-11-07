@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { LoginForm } from '../../components/auth/LoginForm.tsx';
-import { RegisterForm } from '../../components/auth/RegisterForm.tsx';
+import { LoginForm } from './Login form/LoginForm.tsx';
+import { RegisterForm } from './Register form/RegisterForm.tsx';
 import { useNavigate } from 'react-router-dom';
 import logoUnlu from '../../assets/logoUnlu.png';
 import logoCideta from '../../assets/logoCideta.png';
-import { useAuth } from '../../hooks/authProvider.tsx';
+import { useAuth } from './auth/authProvider.tsx';
 import { Card } from '../../components/ui';
 import './LoginPage.css';
 

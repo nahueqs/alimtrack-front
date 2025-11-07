@@ -1,9 +1,9 @@
 // pages/DashboardPage.tsx
-import { useAuth } from '../../hooks/authProvider.tsx';
+import { useAuth } from '../Login/auth/authProvider.tsx';
 import { useNavigate } from 'react-router-dom';
-import { ProductionsCard } from '../../components/dashboard/productions/ProductionsCard';
-import { RecetasCard } from '../../components/dashboard/recipes/RecipesCard.tsx';
-import { Header } from '../../components/dashboard/header/DashboardHeader.tsx';
+import { ProductionsCard } from './ProductionsCard.tsx';
+import { RecetasCard } from './RecipesCard.tsx';
+import { Header } from './DashboardHeader.tsx';
 import './DashboardPage.css';
 
 export const DashboardPage: React.FC = () => {
@@ -33,7 +33,6 @@ export const DashboardPage: React.FC = () => {
           <div className="dashboard__grid">
             <ProductionsCard onNavigate={handleNavigation} />
             <RecetasCard onNavigate={handleNavigation} />
-            {/* Agrega más cards según necesites */}
           </div>
         </div>
       </main>

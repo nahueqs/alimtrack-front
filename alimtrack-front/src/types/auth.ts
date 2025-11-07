@@ -1,10 +1,4 @@
-export interface User {
-  id: number;
-  username: string;
-  email: string;
-  nombre: string;
-  rol: string;
-}
+import type { User } from './User.ts';
 
 export interface LoginRequest {
   email: string;
