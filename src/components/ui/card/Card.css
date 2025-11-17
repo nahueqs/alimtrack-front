@@ -1,0 +1,178 @@
+/* Variables específicas de la tarjeta */
+:root {
+    /* Usa directamente las variables globales del tema */
+    --card-bg: var(--bg-card);
+    --card-border: var(--border-light);
+    --card-shadow: var(--shadow-md);
+    --card-radius: var(--radius-lg, 0.5rem);
+    --card-padding-sm: 1rem;
+    --card-padding-md: 1.5rem;
+    --card-padding-lg: 2rem;
+    --card-hover-shadow: var(--shadow-lg);
+}
+
+/* Estilos base de la tarjeta */
+.card {
+    background-color: var(--card-bg);
+    border-radius: var(--card-radius);
+    overflow: hidden;
+    transition: all 0.3s ease;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+
+/* Variantes de tarjeta */
+.card--default {
+    border: 1px solid var(--card-border);
+    box-shadow: var(--card-shadow);
+}
+
+.card--outlined {
+    border: 1px solid var(--card-border);
+    background-color: transparent;
+}
+
+.card--elevated {
+    border: none;
+    box-shadow: var(--card-shadow);
+}
+
+.card--filled {
+    background-color: var(--bg-secondary);
+    border: none;
+}
+
+/* Variantes específicas para el dashboard (borde izquierdo de color) */
+.card--dashboard {
+    position: relative;
+}
+.card--dashboard-default {
+    border-left: 4px solid var(--border-light);
+}
+.card--dashboard-primary {
+    border-left: 4px solid var(--primary-500);
+}
+.card--dashboard-success {
+    border-left: 4px solid var(--success);
+}
+.card--dashboard-warning {
+    border-left: 4px solid var(--warning);
+}
+.card--dashboard-danger {
+    border-left: 4px solid var(--error);
+}
+
+/* Tamaños */
+.card--sm {
+    padding: var(--card-padding-sm);
+}
+
+.card--md {
+    padding: var(--card-padding-md);
+}
+
+.card--lg {
+    padding: var(--card-padding-lg);
+}
+
+/* Efecto hover */
+.card--hoverable:hover {
+    box-shadow: var(--card-hover-shadow);
+    transform: translateY(-2px);
+    border-color: var(--primary-500);
+}
+
+/* Componentes de la tarjeta */
+.card {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.card__header {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    margin-bottom: 1rem;
+    flex-shrink: 0;
+}
+
+.card__header--bordered {
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--card-border);
+}
+
+.card__content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0; /* Permite que el contenido se desborde con scroll si es necesario */
+    margin-bottom: 1.25rem;
+}
+
+.card__footer {
+    display: flex;
+    gap: 0.75rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--card-border);
+}
+
+.card__footer--start {
+    justify-content: flex-start;
+}
+
+.card__footer--center {
+    justify-content: center;
+}
+
+.card__footer--end {
+    justify-content: flex-end;
+}
+
+.card__footer--space-between {
+    justify-content: space-between;
+}
+
+.card__title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0 0 0.5rem 0;
+}
+
+.card__description {
+    color: var(--text-secondary);
+    font-size: 0.9375rem;
+    line-height: 1.5;
+    margin: 0;
+}
+
+/* Modificadores de espaciado */
+.card--no-padding {
+    padding: 0;
+}
+
+.card--no-margin {
+    margin: 0;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .card--md {
+        padding: var(--card-padding-sm);
+    }
+
+    .card--lg {
+        padding: var(--card-padding-md);
+    }
+}
+
+/* Estilos para el modo oscuro */
+[data-theme='dark'] .card--outlined {
+    border-color: var(--border-dark);
+}
+
+[data-theme='dark'] .card--filled {
+    background-color: var(--bg-tertiary);
+}
