@@ -1,0 +1,158 @@
+﻿.login-form {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.login-form__title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 1.5rem;
+    color: var(--text-primary);
+    line-height: 1.3;
+}
+
+/* Estilos para el formulario de Ant Design */
+.login-form .ant-form-item-label > label {
+    color: var(--text-primary);
+}
+
+/*
+  Inputs de texto y password:
+  Aumentamos la especificidad para evitar el uso de !important.
+*/
+.login-form .ant-form-item-control-input-content .ant-input-affix-wrapper {
+    background-color: #ffffff;
+    border-color: var(--border-light);
+}
+
+.login-form .ant-form-item-control-input-content .ant-input {
+    color: var(--text-primary);
+}
+
+/* Modo oscuro para inputs */
+[data-theme="dark"] .login-form .ant-form-item-control-input-content .ant-input-affix-wrapper {
+    background-color: var(--bg-primary);
+    border-color: var(--border-medium);
+}
+
+.login-form .ant-input::placeholder {
+    color: var(--text-tertiary);
+}
+
+.login-form .ant-input-prefix .anticon {
+    color: var(--text-secondary);
+}
+
+/* Estilo para la selección de texto */
+.login-form .ant-input::selection,
+.login-form .ant-input-password::selection,
+.login-form .ant-input-affix-wrapper::selection {
+    background-color: var(--primary-200);
+    color: var(--text-primary);
+}
+
+/*
+  Botones:
+  Aumentamos especificidad para evitar !important.
+*/
+.login-form .ant-form-item-control-input-content .ant-btn-primary {
+    background-color: var(--primary-500);
+    border-color: var(--primary-500);
+    color: white;
+}
+
+.login-form .ant-form-item-control-input-content .ant-btn-primary:hover {
+    background-color: var(--primary-600);
+    border-color: var(--primary-600);
+}
+
+/* Mensajes de error de validación de Ant Design */
+.login-form .ant-form-item-explain-error {
+    color: var(--error-500);
+}
+
+.login-form__error {
+    background-color: var(--error-50);
+    border: 1px solid var(--error-100);
+    color: var(--error-700);
+    padding: 0.75rem 1rem;
+    border-radius: var(--radius-md);
+    margin-bottom: 1rem;
+    font-size: 0.875rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+    .login-form__error::before {
+        content: "⚠️";
+        font-size: 1rem;
+        flex-shrink: 0;
+        margin-top: 0.1rem;
+    }
+
+.login-form__switch {
+    margin-top: 1rem;
+    text-align: center;
+}
+
+.login-form__switch .ant-btn-link {
+    color: var(--primary-500);
+    font-size: 0.875rem;
+    padding: 0.5rem 1rem;
+    font-weight: 500;
+    border-radius: var(--radius-md);
+    transition: all 0.2s ease;
+}
+
+.login-form__switch .ant-btn-link:hover {
+    color: var(--primary-600);
+    background-color: var(--primary-50);
+}
+
+.login-form__switch .ant-btn-link:focus {
+    outline: 2px solid var(--primary-300);
+    outline-offset: 2px;
+}
+
+.login-form__switch .ant-btn-link:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background-color: transparent;
+}
+
+/* Responsive */
+@media (min-width: 768px) {
+    .login-form__title {
+        font-size: 1.75rem;
+        margin-bottom: 2rem;
+    }
+}
+
+@media (min-width: 1024px) {
+    .login-form__title {
+        font-size: 2rem;
+        margin-bottom: 2.5rem;
+    }
+}
+
+@media (max-width: 640px) {
+    .login-form {
+        padding: 0 0.5rem;
+    }
+
+    .login-form__title {
+        font-size: 1.25rem;
+        margin-bottom: 1.25rem;
+    }
+}
+
+@media (max-width: 360px) {
+    .login-form__title {
+        font-size: 1.125rem;
+    }
+}

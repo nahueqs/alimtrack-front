@@ -1,0 +1,21 @@
+.responsive-button .responsive-button-text {
+    display: inline-block;
+}
+
+@media (max-width: 768px) {
+    .datatable-header-actions {
+        display: flex; /* Ensure flex behavior */
+        flex-wrap: wrap; /* Allow buttons to wrap */
+        gap: 8px; /* Add space between buttons */
+        justify-content: flex-end; /* Align buttons to the right */
+        width: 100%; /* Take full width */
+    }
+
+    .responsive-button .responsive-button-text {
+        display: none;
+    }
+
+    .responsive-button .anticon {
+        margin-right: 0;
+    }
+}

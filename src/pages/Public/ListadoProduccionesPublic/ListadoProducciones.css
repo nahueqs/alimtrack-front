@@ -1,0 +1,65 @@
+/* ListadoProducciones.css */
+
+.public-dashboard-page {
+    background-color: var(--bg-secondary);
+    min-height: 100vh;
+}
+
+.public-dashboard-header {
+    background-color: var(--bg-primary);
+    padding: 1rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border-light);
+    box-shadow: var(--shadow-sm);
+    position: sticky; /* Fija el header al hacer scroll */
+    top: 0;
+    z-index: 10;
+}
+
+.public-dashboard-header__title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.public-dashboard-main {
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+}
+
+.public-dashboard__feedback {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 50vh;
+}
+
+.production-table-container {
+    background-color: var(--bg-primary);
+    padding: 1.5rem;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+}
+
+/* Estilos para que la tabla de Ant Design se vea bien con el tema */
+.production-table-container .ant-table {
+    background-color: transparent;
+}
+
+.production-table-container .ant-table-thead > tr > th {
+    background-color: var(--bg-secondary);
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+.production-table-container .ant-table-tbody > tr > td {
+    background-color: var(--bg-primary);
+    color: var(--text-secondary);
+}
+
+.production-table-container .ant-table-tbody > tr.ant-table-row:hover > td {
+    background-color: var(--bg-tertiary);
+}

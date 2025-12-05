@@ -1,0 +1,34 @@
+.filter-buttons {
+    display: flex;
+    gap: 8px;
+}
+
+.filters-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 0 16px; /* Espacio solo entre columnas */
+    width: 100%;
+    align-items: start; /* Alinea los items al inicio */
+}
+
+/* Cuando el layout es vertical, queremos una sola columna */
+.data-table-form[class*="ant-form-vertical"] .filters-grid {
+    grid-template-columns: 1fr;
+    gap: 0; /* Sin gap en layout vertical */
+}
+
+@media (max-width: 768px) {
+    .filter-buttons {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .filter-buttons .ant-btn {
+        width: 100%;
+    }
+
+    .filters-buttons-container {
+        /* Asegura que el contenedor de botones no tenga un label que ocupe espacio */
+        padding-top: 0 !important;
+    }
+}

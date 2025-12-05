@@ -1,0 +1,65 @@
+/* CustomTableRowActions.css */
+
+/* This class is applied to the fragment in CustomTableRowActions.tsx */
+/* It's used as a container for both desktop and mobile actions */
+/* No specific styling needed here as children handle their own display */
+
+/* Desktop actions container */
+.responsive-table-actions__desktop {
+    display: flex; /* Default to flex for desktop */
+    justify-content: flex-end;
+    align-items: center;
+    gap: 8px; /* Spacing between desktop buttons */
+}
+
+/* Mobile actions container */
+.responsive-table-actions__mobile {
+    display: none; /* Hidden by default, shown via media query */
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+}
+
+/* Styles for Ant Design buttons within actions */
+.responsive-table-actions__desktop .ant-btn {
+    padding: 0 8px; /* Standard padding for desktop buttons */
+    height: 30px;
+    min-width: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.responsive-table-actions__mobile .ant-btn {
+    background-color: var(--bg-elevated, white);
+    border-radius: 50%;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    border: 1px solid var(--border-light, #f0f0f0);
+    width: 40px; /* Fixed size for a circular button */
+    height: 40px;
+    min-width: 40px;
+    padding: 0; /* Remove padding for a clean circular button */
+}
+
+/* Media query for screens smaller than 769px (mobile) */
+@media (max-width: 768px) {
+    .responsive-table-actions__desktop {
+        display: none; /* Hide desktop actions on mobile */
+    }
+
+    .responsive-table-actions__mobile {
+        display: flex; /* Show mobile actions on mobile */
+    }
+}
+
+/* Media query for screens larger than 768px (desktop) */
+@media (min-width: 769px) {
+    .responsive-table-actions__desktop {
+        display: flex; /* Show desktop actions on desktop */
+    }
+
+    .responsive-table-actions__mobile {
+        display: none; /* Hide mobile actions on desktop */
+    }
+}

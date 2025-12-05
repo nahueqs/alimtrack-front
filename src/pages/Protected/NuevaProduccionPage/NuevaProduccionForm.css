@@ -1,0 +1,266 @@
+.nueva-produccion-form {
+    max-width: 800px;
+    margin: 0 auto;
+    box-shadow: var(--shadow-sm);
+    background-color: var(--bg-primary);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border-light);
+}
+
+.nueva-produccion-form__header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--text-primary);
+}
+
+.nueva-produccion-form__user-info {
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+
+.nueva-produccion-form__user-highlight {
+    color: var(--primary-500);
+}
+
+/* Estilo general para todos los labels de Form.Item dentro del formulario */
+.nueva-produccion-form .ant-form-item-label > label {
+    color: var(--text-primary); /* Asegura que todos los labels usen el color del tema */
+}
+
+.nueva-produccion-form__required-label {
+    font-weight: 500;
+    /* El color ya lo hereda de la regla general, pero mantenemos el font-weight */
+}
+
+.nueva-produccion-form__required-asterisk {
+    color: var(--error-500);
+}
+
+/* Estilos para las opciones del dropdown */
+.nueva-produccion-form__option-container {
+    padding: 8px 4px;
+}
+
+.nueva-produccion-form__option-main {
+    font-size: 14px;
+    margin-bottom: 4px;
+    color: var(--text-primary);
+}
+
+.nueva-produccion-form__option-separator {
+    color: var(--text-tertiary);
+    margin: 0 4px;
+}
+
+.nueva-produccion-form__option-description {
+    font-size: 12px;
+    color: var(--text-secondary);
+    font-style: italic;
+}
+
+.nueva-produccion-form__info-panel {
+    margin-top: 16px;
+    padding: 12px;
+    background-color: var(--bg-tertiary);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-light);
+}
+
+.nueva-produccion-form__info-text {
+    font-size: 12px;
+    color: var(--text-secondary);
+    text-align: center;
+}
+
+.nueva-produccion-form__error-text {
+    color: var(--error-500);
+    margin-top: 4px;
+}
+
+/* --- Botones de Acción Responsive --- */
+.nueva-produccion-form__action-buttons {
+    width: 100%;
+    justify-content: flex-end;
+    gap: 12px;
+}
+
+.nueva-produccion-form__submit-button {
+    min-width: 160px;
+}
+
+.nueva-produccion-form__not-found-content {
+    text-align: center;
+    padding: 8px;
+}
+
+.nueva-produccion-form__retry-button {
+    padding: 0;
+    height: auto;
+    color: var(--primary-500);
+}
+
+/* Estilos para los detalles de la versión seleccionada */
+.nueva-produccion-form__selected-version-section {
+    margin: 16px 0 24px 0;
+    animation: fadeIn 0.3s ease-in;
+}
+
+.nueva-produccion-form__version-details {
+    padding: 20px;
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-md);
+    border-left: 4px solid var(--primary-500);
+}
+
+.nueva-produccion-form__version-details-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 16px;
+    color: var(--primary-500);
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.nueva-produccion-form__version-details-content {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.nueva-produccion-form__version-detail-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border-light);
+}
+
+.nueva-produccion-form__version-detail-row:last-child {
+    border-bottom: none;
+}
+
+.nueva-produccion-form__version-detail-label {
+    font-weight: 600;
+    color: var(--text-secondary);
+    min-width: 100px;
+    font-size: 13px;
+}
+
+.nueva-produccion-form__version-detail-value {
+    color: var(--text-primary);
+    font-size: 13px;
+    flex: 1;
+    line-height: 1.4;
+}
+
+/* Animación para la aparición suave */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Estados de carga y error */
+.nueva-produccion-form__loading {
+    opacity: 0.7;
+}
+
+.nueva-produccion-form__error {
+    border-color: var(--error-500);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .nueva-produccion-form {
+        margin: 0 16px;
+    }
+
+    .nueva-produccion-form__action-buttons {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+        justify-content: center;
+    }
+
+    .nueva-produccion-form__submit-button {
+        min-width: 100%;
+    }
+
+    .nueva-produccion-form__version-detail-row {
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .nueva-produccion-form__version-detail-label {
+        min-width: auto;
+    }
+
+    .nueva-produccion-form__version-details {
+        padding: 12px;
+    }
+}
+
+/* ==========================================================================
+   ADAPTACIÓN A MODO OSCURO PARA COMPONENTES DE ANT DESIGN
+   ========================================================================== */
+
+/* Inputs de texto y textareas */
+.ant-input,
+.ant-input-affix-wrapper,
+.ant-input-affix-wrapper-focused {
+    background-color: var(--bg-secondary) !important;
+    border-color: var(--border-light) !important;
+    color: var(--text-primary) !important;
+}
+
+.ant-input::placeholder {
+    color: var(--text-tertiary) !important;
+}
+
+/* Select (desplegable de versiones) */
+.ant-select-selector {
+    background-color: var(--bg-secondary) !important;
+    border-color: var(--border-light) !important;
+    color: var(--text-primary) !important;
+}
+
+.ant-select-arrow {
+    color: var(--text-secondary) !important;
+}
+
+/* Opciones del desplegable (cuando se abre el Select) */
+.ant-select-dropdown {
+    background-color: var(--bg-primary) !important;
+    border: 1px solid var(--border-light) !important;
+    box-shadow: var(--shadow-md) !important;
+}
+
+.ant-select-item {
+    color: var(--text-primary) !important;
+}
+
+.ant-select-item-option-selected:not(.ant-select-item-option-disabled) {
+    background-color: var(--primary-100) !important;
+    color: var(--primary-700) !important;
+}
+
+.ant-select-item-option-active:not(.ant-select-item-option-disabled) {
+    background-color: var(--bg-tertiary) !important;
+}
+
+/* Spinners de carga */
+.ant-spin-dot-item {
+    background-color: var(--primary-500) !important;
+}
+
+/* Iconos de prefijo en inputs */
+.ant-input-prefix .anticon {
+    color: var(--text-secondary) !important;
+}

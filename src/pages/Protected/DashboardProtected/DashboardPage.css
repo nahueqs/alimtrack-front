@@ -1,0 +1,229 @@
+/* ==========================================================================
+   ESTRUCTURA PRINCIPAL DE LA PÁGINA
+   ========================================================================== */
+.dashboard {
+    min-height: 100vh;
+    background-color: var(--bg-secondary);
+}
+
+.dashboard__main {
+    padding: 1.5rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* ==========================================================================
+   HEADER: BASE Y LAYOUT
+   ========================================================================== */
+.header {
+    background-color: var(--bg-primary);
+    border-bottom: 1px solid var(--border-light);
+    box-shadow: var(--shadow-sm);
+    position: relative;
+    z-index: 100;
+}
+
+.header__nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 4rem;
+    padding: 0 1.5rem;
+}
+
+.header__brand {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.header__brand-logo {
+    height: 36px;
+    width: 36px;
+}
+
+.header__brand-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.header__actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+/* ==========================================================================
+   NAVEGACIÓN MÓVIL (Mobile First)
+   ========================================================================== */
+
+/* Por defecto, la navegación de escritorio está oculta */
+.header__desktop-nav {
+    display: none;
+}
+
+/* El botón de hamburguesa es visible por defecto */
+.header__hamburger {
+    background: none;
+    border: none;
+    padding: 0.5rem;
+    cursor: pointer;
+    border-radius: var(--radius-sm);
+    display: flex;
+    color: var(--text-secondary);
+}
+
+/* Contenido del menú desplegable móvil */
+.header__mobile-menu-content {
+    background-color: var(--bg-primary);
+    position: absolute;
+    top: 4rem; /* Justo debajo del header */
+    left: 0;
+    right: 0;
+    border-bottom: 1px solid var(--border-light);
+    box-shadow: var(--shadow-md);
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    
+    /* Lógica de visibilidad */
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s;
+}
+
+.header__mobile-menu-content--open {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.header__separator {
+    border: none;
+    border-top: 1px solid var(--border-light);
+    margin: 0.5rem 0;
+}
+
+.header__mobile-user-info {
+    padding: 0.5rem;
+    text-align: center;
+    border-bottom: 1px solid var(--border-light);
+    margin-bottom: 0.5rem;
+}
+
+.header__mobile-user-role {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    text-transform: capitalize;
+}
+
+/* ==========================================================================
+   NAVEGACIÓN DE ESCRITORIO (Se activa en pantallas grandes)
+   ========================================================================== */
+@media (min-width: 769px) {
+    /* Oculta el nombre de la marca en pantallas medianas para dar espacio */
+    .header__brand-title {
+        display: block;
+    }
+
+    /* Oculta la navegación móvil */
+    .header__mobile-nav {
+        display: none;
+    }
+    .header__mobile-menu-content {
+        display: none;
+    }
+
+    /* Muestra la navegación de escritorio */
+    .header__desktop-nav {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .header__nav-link {
+        padding: 0.25rem 0.5rem;
+        color: var(--text-secondary);
+        font-weight: 500;
+        cursor: pointer;
+        border-radius: var(--radius-sm);
+        transition: color 0.2s ease;
+        text-decoration: none;
+    }
+
+    .header__nav-link:hover {
+        color: var(--text-primary);
+    }
+
+    /* Menú de usuario en escritorio */
+    .header__user-menu {
+        position: relative;
+    }
+
+    .header__user-button {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        background-color: var(--bg-tertiary);
+        border: 1px solid var(--border-light);
+        padding: 0.5rem 1rem;
+        border-radius: var(--radius-full);
+        cursor: pointer;
+        color: var(--text-primary);
+        transition: background-color 0.2s ease;
+    }
+
+    .header__user-button:hover {
+        background-color: var(--bg-hover);
+    }
+
+    .header__user-dropdown {
+        display: none;
+        position: absolute;
+        top: calc(100% + 0.75rem);
+        right: 0;
+        background-color: var(--bg-primary);
+        border: 1px solid var(--border-light);
+        border-radius: var(--radius-md);
+        box-shadow: var(--shadow-lg);
+        padding: 0.5rem;
+        min-width: 180px;
+        z-index: 101;
+    }
+
+    .header__user-menu:hover .header__user-dropdown {
+        display: block;
+    }
+}
+
+/* Para pantallas muy pequeñas, ocultamos el título para asegurar espacio */
+@media (max-width: 380px) {
+    .header__brand-title {
+        display: none;
+    }
+}
+
+/* ==========================================================================
+   ESTILOS COMUNES (Dropdown items, etc.)
+   ========================================================================== */
+.header__dropdown-item {
+    display: block;
+    width: 100%;
+    padding: 0.75rem 1rem;
+    background: none;
+    border: none;
+    text-align: left;
+    color: var(--text-primary);
+    cursor: pointer;
+    border-radius: var(--radius-sm);
+    font-size: 1rem;
+    transition: background-color 0.2s ease;
+    text-decoration: none;
+}
+
+.header__dropdown-item:hover {
+    background-color: var(--bg-tertiary);
+}

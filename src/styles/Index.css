@@ -1,159 +1,267 @@
-﻿/* ========== VARIABLES CSS GLOBALES ========== */
+﻿/* ==========================================================================
+   Global Styles
+   ========================================================================== */
 :root {
-    /* Colores base */
-    --sea-green: #0d8940ff;
-    --gold-metallic: #d4b100ff;
-    --antiflash-white: #eef0f2ff;
-    --silver: #c6c7c4ff;
-    --onyx: #353b3cff;
-    /* Sistema de colores primarios */
-    --primary-50: #e8f5ed;
-    --primary-100: #c6e8d1;
-    --primary-200: #a3dbb5;
-    --primary-300: #80ce99;
-    --primary-400: #5ec17d;
-    --primary-500: #0d8940ff;
-    --primary-600: #0a6e33;
-    --primary-700: #085226;
-    --primary-800: #05371a;
-    --primary-900: #031b0d;
-    /* Sistema de colores secundarios */
-    --secondary-50: #fffce6;
-    --secondary-100: #fff6c2;
-    --secondary-200: #fff099;
-    --secondary-300: #ffea70;
-    --secondary-400: #ffe447;
-    --secondary-500: #d4b100ff;
-    --secondary-600: #aa8e00;
-    --secondary-700: #806a00;
-    --secondary-800: #554700;
-    --secondary-900: #2b2300;
-    /* Colores neutros - Modo claro */
-    --bg-primary: #ffffff;
-    --bg-secondary: #eef0f2ff;
-    --bg-tertiary: rgb(112, 109, 109);
-    --bg-card: #ffffff;
-    --text-primary: #353b3cff;
-    --text-secondary: #5a6263;
-    --text-tertiary: #7f898a;
-    --border-light: #c6c7c4ff;
-    --border-medium: #a1a2a0;
-    --border-strong: #7c7d7c;
-    --border-dark: #5a6263;
-    /* Estados y alertas */
-    --success: #0d8940ff;
-    --warning: #d4b100ff;
-    --error: #dc2626;
-    --info: #3b82f6;
-    --alert-red: #dc2626;
-    --alert-red-light: #fef2f2;
-    --alert-red-dark: #b91c1c;
-    /* Sistema de sombras */
-    --shadow-sm: 0 1px 2px 0 rgba(53, 59, 60, 0.05);
-    --shadow-md: 0 4px 6px -1px rgba(53, 59, 60, 0.1), 0 2px 4px -1px rgba(53, 59, 60, 0.06);
-    --shadow-lg: 0 10px 15px -3px rgba(53, 59, 60, 0.1), 0 4px 6px -2px rgba(53, 59, 60, 0.05);
-    --shadow-xl: 0 20px 25px -5px rgba(53, 59, 60, 0.1), 0 10px 10px -5px rgba(53, 59, 60, 0.04);
-    /* Sistema de bordes */
-    --radius-sm: 0.375rem;
-    --radius-md: 0.5rem;
-    --radius-lg: 0.75rem;
-    --radius-xl: 1rem;
-    --radius-2xl: 1.5rem;
-    /* Configuración base */
-    font-size: 14px;
-    font-weight: 400;
-    color-scheme: light dark;
-    font-synthesis: none;
-    text-rendering: optimizeLegibility;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
+  /* Light Theme Colors */
+
+  /* Primary Colors (Green) */
+  --primary-50: #e6f7ed;
+  --primary-100: #b9e6d2;
+  --primary-200: #8cd4b7;
+  --primary-300: #5fbf9c;
+  --primary-400: #32ac81;
+  --primary-500: #059966; /* Main primary green */
+  --primary-600: #048a5b;
+  --primary-700: #037a50;
+  --primary-800: #026b45;
+  --primary-900: #015c3a;
+
+  /* Secondary Colors (Red #D7263D) */
+  --secondary-50: #fde8eb;
+  --secondary-100: #fbc0c8;
+  --secondary-200: #f898a4;
+  --secondary-300: #f57080;
+  --secondary-400: #f2485c;
+  --secondary-500: #D7263D; /* Main secondary red */
+  --secondary-600: #c22237;
+  --secondary-700: #ad1e31;
+  --secondary-800: #981a2b;
+  --secondary-900: #831625;
+
+  /* Neutral Colors (Grays) */
+  --neutral-50: #ffffff; /* Pure white */
+  --neutral-100: #f5f5f5; /* Very light gray */
+  --neutral-200: #eeeeee; /* Light gray */
+  --neutral-300: #e0e0e0; /* Medium light gray */
+  --neutral-400: #bdbdbd; /* Medium gray */
+  --neutral-500: #9e9e9e; /* Medium dark gray */
+  --neutral-600: #757575; /* Dark gray */
+  --neutral-700: #616161; /* Very dark gray */
+  --neutral-800: #424242; /* Almost black */
+  --neutral-900: #212121; /* Black */
+
+  /* Backgrounds */
+  --bg-primary: var(--neutral-50); /* White for cards/main elements */
+  --bg-secondary: var(--neutral-100); /* Very light gray for page body */
+  --bg-tertiary: var(--neutral-200); /* Light gray for hover states, subtle sections */
+  --bg-hover: var(--neutral-300); /* For more pronounced hover effects */
+
+  /* Text Colors */
+  --text-primary: var(--neutral-900); /* Black for main headings/body */
+  --text-secondary: var(--neutral-700); /* Dark gray for descriptions */
+  --text-tertiary: var(--neutral-500); /* Medium dark gray for placeholders/hints */
+
+  /* Borders */
+  --border-light: var(--neutral-300);
+  --border-medium: var(--neutral-400);
+  --border-dark: var(--neutral-500);
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+
+  /* Error Colors */
+  --error-50: #fef2f2;
+  --error-100: #fee2e2;
+  --error-500: #ef4444; /* Main error red */
+  --error-700: #b91c1c;
+
+  /* Success Colors */
+  --success-50: #ecfdf5;
+  --success-100: #d1fae5;
+  --success-500: #10b981; /* Main success green */
+  --success-700: #047857;
+
+  /* Warning Colors (Orange) */
+  --warning-50: #fff7ed;
+  --warning-100: #ffedd5;
+  --warning-500: #f97316; /* Main warning orange */
+  --warning-700: #c2410c;
+
+  /* Radius */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-full: 9999px;
 }
 
-/* ========== RESET Y ESTILOS BASE ========== */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+[data-theme='dark'] {
+  /* Dark Theme Colors */
+
+  /* Primary Colors (Green - adjusted for dark background) */
+  --primary-50: #015c3a;
+  --primary-100: #026b45;
+  --primary-200: #037a50;
+  --primary-300: #048a5b;
+  --primary-400: #059966;
+  --primary-500: #32ac81; /* Main primary green */
+  --primary-600: #5fbf9c;
+  --primary-700: #8cd4b7;
+  --primary-800: #b9e6d2;
+  --primary-900: #e6f7ed;
+
+  /* Secondary Colors (Red #D7263D - adjusted for dark background) */
+  --secondary-50: #831625;
+  --secondary-100: #981a2b;
+  --secondary-200: #ad1e31;
+  --secondary-300: #c22237;
+  --secondary-400: #D7263D;
+  --secondary-500: #f2485c; /* Main secondary red */
+  --secondary-600: #f57080;
+  --secondary-700: #f898a4;
+  --secondary-800: #fbc0c8;
+  --secondary-900: #fde8eb;
+
+  /* Neutral Colors (Darker grays for the dark theme) */
+  --neutral-50: #1a1a1a; /* Very dark gray */
+  --neutral-100: #212121; /* Dark gray */
+  --neutral-200: #303030; /* Medium dark gray */
+  --neutral-300: #424242; /* Medium gray */
+  --neutral-400: #616161; /* Medium light gray */
+  --neutral-500: #9e9e9e; /* Light gray */
+  --neutral-600: #bdbdbd; /* Very light gray */
+  --neutral-700: #e0e0e0; /* Almost white */
+  --neutral-800: #f5f5f5; /* Off-white */
+  --neutral-900: #ffffff; /* Pure white */
+
+  /* Backgrounds */
+  --bg-primary: var(--neutral-100); /* Dark gray for cards/main elements */
+  --bg-secondary: var(--neutral-50); /* Very dark gray for page body */
+  --bg-tertiary: var(--neutral-200); /* Medium dark gray for hover states, subtle sections */
+  --bg-hover: var(--neutral-300); /* For more pronounced hover effects */
+
+  /* Text Colors */
+  --text-primary: var(--neutral-900); /* Pure white for main headings/body */
+  --text-secondary: var(--neutral-700); /* Almost white for descriptions */
+  --text-tertiary: var(--neutral-500); /* Light gray for placeholders/hints */
+
+  /* Borders */
+  --border-light: var(--neutral-300);
+  --border-medium: var(--neutral-400);
+  --border-dark: var(--neutral-500);
+
+  /* Shadows (adjusted for dark mode) */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -2px rgba(0, 0, 0, 0.3);
+
+  /* Error Colors (adjusted for dark background) */
+  --error-50: #b91c1c;
+  --error-100: #ef4444;
+  --error-500: #f87171;
+  --error-700: #fecaca;
+
+  /* Success Colors (adjusted for dark background) */
+  --success-50: #047857;
+  --success-100: #10b981;
+  --success-500: #34d399;
+  --success-700: #a7f3d0;
+
+  /* Warning Colors (adjusted for dark background) */
+  --warning-50: #c2410c;
+  --warning-100: #f97316;
+  --warning-500: #fbbf24;
+  --warning-700: #fde68a;
 }
 
-html {
-    width: 100%;
-    height: 100%;
-    font-size: 14px;
-}
-
-/* Escalado responsive de fuente */
-@media (min-width: 768px) {
-    html {
-        font-size: 15px;
-    }
-}
-
-@media (min-width: 1024px) {
-    html {
-        font-size: 16px;
-    }
-}
-
-@media (min-width: 1440px) {
-    html {
-        font-size: 17px;
-    }
-}
-
+/* Base styles */
 body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
-    color: var(--text-primary);
-    background-color: var(--bg-secondary);
-    line-height: 1.5;
-    font-weight: 400;
-    margin: 0;
-    padding: 0;
-    width: 100%;
-    min-height: 100vh;
-    min-height: 100dvh;
-    display: flex;
-    flex-direction: column;
+  font-family: 'Montserrat', sans-serif; /* Set Montserrat as the primary font */
+  margin: 0;
+  padding: 0;
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-/* ========== ESTRUCTURA PRINCIPAL ========== */
-#root {
-    width: 100%;
-    min-height: 100vh;
-    min-height: 100dvh;
-    display: flex;
-    flex-direction: column;
-    flex-grow: 1;
+/* Container for main content */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
 }
 
-/* ========== MODO OSCURO ========== */
-[data-theme="dark"] {
-    --bg-primary: #0f172a;
-    --bg-secondary: #1e293b;
-    --bg-tertiary: #a0a19f;
-    --bg-card: #1e293b;
-    --text-primary: #f1f5f9;
-    --text-secondary: #cbd5e1;
-    --text-tertiary: #94a3b8;
-    --border-light: #334155;
-    --border-medium: #475569;
-    --border-strong: #64748b;
-    --border-dark: #475569;
-    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.4);
-    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -1px rgba(0, 0, 0, 0.4);
-    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -2px rgba(0, 0, 0, 0.4);
-    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 10px 10px -5px rgba(0, 0, 0, 0.4);
+/* Utility classes for flexbox */
+.flex {
+  display: flex;
 }
 
-/* ========== UTILIDADES ========== */
-.sr-only {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    white-space: nowrap;
-    border: 0;
+.items-center {
+  align-items: center;
+}
+
+.justify-center {
+  justify-content: center;
+}
+
+.min-h-screen {
+  min-height: 100vh;
+}
+
+/* Utility classes for text */
+.text-center {
+  text-align: center;
+}
+
+.text-xl {
+  font-size: 1.25rem;
+}
+
+.font-bold {
+  font-weight: 700;
+}
+
+.text-red-600 {
+  color: var(--error-500);
+}
+
+/* Utility classes for spacing */
+.p-4 {
+  padding: 1rem;
+}
+
+.mt-2 {
+  margin-top: 0.5rem;
+}
+
+/* Utility classes for buttons */
+.px-4 {
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+.py-2 {
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+
+.bg-blue-500 {
+  background-color: var(--primary-500);
+}
+
+.text-white {
+  color: white;
+}
+
+.rounded {
+  border-radius: var(--radius-sm);
+}
+
+.hover\:bg-blue-600:hover {
+  background-color: var(--primary-600);
+}
+
+/* Animation for loading spinner */
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }

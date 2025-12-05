@@ -1,0 +1,122 @@
+/* CustomTable.css */
+
+.data-table-card .ant-card-body {
+    padding: 0;
+}
+
+.data-table-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 24px;
+    background-color: var(--bg-primary);
+    border-bottom: 1px solid var(--border-light);
+    flex-wrap: wrap; /* Permite que los elementos se envuelvan */
+    overflow: visible !important; /* Ensure content is not clipped */
+}
+
+.data-table-title {
+    margin: 0 !important;
+    color: var(--text-primary);
+    flex-grow: 1; /* El título toma el espacio disponible */
+    margin-bottom: 8px !important; /* Espacio por si se apila */
+}
+
+.datatable-header-actions {
+    /* Este contenedor ya no se superpone, es parte del flexbox */
+    overflow: visible !important; /* Ensure content is not clipped */
+}
+
+.data-table-filters-container {
+    background-color: var(--bg-primary);
+    padding: 24px;
+    border-bottom: 1px solid var(--border-light);
+    max-height: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-out, padding 0.3s ease-out;
+}
+
+.data-table-filters-container.visible {
+    max-height: 2000px;
+    padding-top: 24px;
+    padding-bottom: 24px;
+    margin-bottom: 16px; /* Added margin for separation */
+    transition: max-height 0.4s ease-in, padding 0.4s ease-in;
+}
+
+.data-table-content {
+    padding: 0;
+    background-color: var(--bg-primary);
+}
+
+/* Estilo para los encabezados de la tabla */
+.data-table-content .ant-table-thead > tr > th {
+    background-color: var(--bg-secondary, #f0f2f5) !important; /* Fondo gris claro */
+    color: var(--text-secondary, #595959); /* Color de texto más suave */
+    font-weight: 600; /* Un poco más de peso para los títulos */
+}
+
+/* Estilo para las filas de la tabla (Zebra Striping) */
+.data-table-content .ant-table-tbody > tr:nth-child(odd) > td {
+    background-color: var(--bg-primary, #ffffff);
+}
+
+.data-table-content .ant-table-tbody > tr:nth-child(even) > td {
+    background-color: var(--bg-secondary, #fafafa);
+}
+
+/* Fix para el fondo de las celdas en modo oscuro */
+.data-table-content .ant-table-cell {
+    background: transparent !important;
+}
+
+/* Media Query para pantallas pequeñas */
+@media (max-width: 768px) {
+    .data-table-header {
+        flex-direction: column;
+        align-items: flex-start;
+        padding-bottom: 16px !important; /* Add padding to ensure space for wrapped buttons */
+    }
+
+    .data-table-title {
+        margin-bottom: 16px !important; /* Más espacio cuando está apilado */
+    }
+
+    .datatable-header-actions {
+        display: flex !important; /* Ensure flex behavior */
+        flex-wrap: wrap !important; /* Allow actions to wrap on small screens */
+        justify-content: flex-start; /* Align actions to the start */
+        width: 100%; /* Take full width */
+        margin-top: 8px; /* Add some top margin to separate from title */
+        min-height: 40px; /* Ensure it has a minimum height */
+    }
+
+    /* Hide the actions title text on mobile */
+    .actions-title-text {
+        display: none;
+    }
+
+    /* Consolidated styles for both header (th) and body (td) cells of the actions column */
+    .ant-table-cell.actions-column {
+        width: 50px !important; /* Adjusted width */
+        min-width: 50px !important; /* Adjusted min-width */
+        padding: 0 !important; /* Remove all padding from the cell */
+        border: none !important;
+        background: transparent !important; /* Ensure body cells are transparent */
+        position: sticky !important;
+        right: 0;
+        z-index: 1;
+        box-shadow: none !important;
+    }
+
+    /* Specific rule for the HEADER of the actions column to ensure transparency */
+    .data-table-content .ant-table-thead > tr > th.actions-column {
+        background: transparent !important;
+    }
+
+    .ant-table-cell-fix-right.actions-column::after {
+        box-shadow: none !important;
+    }
+}

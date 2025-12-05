@@ -1,0 +1,271 @@
+.login-page {
+    min-height: 100dvh;
+    min-height: -webkit-fill-available;
+    display: flex;
+    flex-direction: column;
+    justify-content: safe center;
+    align-items: center;
+    padding: 2rem 1rem;
+    width: 100%;
+    box-sizing: border-box;
+    overflow: hidden; /* Oculta el desbordamiento de los fondos animados */
+    position: relative; /* Necesario para que el z-index funcione correctamente en el contenedor */
+}
+
+/* --- ESTILOS PARA EL FONDO DINÁMICO --- */
+.bg {
+    animation: slide 3s ease-in-out infinite alternate;
+    /* Gradiente con transiciones abruptas (hard stops) para líneas marcadas */
+    /* Verde hasta 45%, Blanco de 45% a 55%, Rojo desde 55% */
+    background-image: linear-gradient(
+        -60deg,
+        var(--primary-500) 25%,    /* Verde desde el inicio */
+        var(--primary-500) 45%,   /* Verde hasta el 45% */
+        var(--neutral-50) 45%,    /* Blanco empieza abruptamente en 45% */
+        var(--neutral-50) 55%,    /* Blanco termina en 55% */
+        var(--primary-500) 25%, /* Rojo empieza abruptamente en 55% */
+        rgb(248 225 17) 100% /* amarillo hasta el final */
+    );
+    bottom: 0;
+    left: -50%;
+    opacity: .5;
+    position: fixed; /* Fija el fondo a la ventana */
+    right: -50%;
+    top: 0;
+    z-index: -1; /* Lo envía al fondo */
+}
+
+.bg2 {
+    animation-direction: alternate-reverse;
+    animation-duration: 20s;
+}
+
+.bg3 {
+    animation-duration: 20s;
+}
+
+@keyframes slide {
+    0% {
+        transform: translateX(-25%);
+    }
+    100% {
+        transform: translateX(25%);
+    }
+}
+/* --- FIN ESTILOS FONDO DINÁMICO --- */
+
+
+.login-page__container {
+    width: 100%;
+    max-width: 28rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 0 auto;
+    flex-shrink: 0;
+    gap: 1.5rem;
+    position: relative; /* Asegura que el contenido esté por encima del fondo */
+    z-index: 1; /* Mayor que el z-index del fondo */
+}
+
+.login-page__header {
+    text-align: center;
+    margin-bottom: 0;
+    width: 100%;
+    flex-shrink: 0;
+}
+
+.login-page__title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+    width: 100%;
+    line-height: 1.2;
+    flex-shrink: 0;
+}
+
+.login-page__subtitle {
+    font-size: 1.125rem;
+    color: var(--text-primary);
+    width: 100%;
+    line-height: 1.4;
+    flex-shrink: 0;
+}
+
+/* Estilos para la tarjeta (ahora manejados por el componente Card) */
+.login-page__card {
+    width: 100%;
+    max-width: 100%;
+    flex-shrink: 0;
+    box-sizing: border-box;
+    background-color: var(--bg-primary);
+}
+
+.login-page__info {
+    margin-top: 2rem;
+    text-align: center;
+    width: 100%;
+    flex-shrink: 0;
+}
+
+.login-page__info-text {
+    font-size: 0.875rem;
+    color: var(--text-tertiary);
+    width: 100%;
+    flex-shrink: 0;
+}
+
+.login-page__images {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    width: 100%;
+    flex-shrink: 0;
+    margin-bottom: 1rem;
+}
+
+.login-page__image {
+    width: 80px;
+    height: 80px;
+    border-radius: var(--radius-lg);
+    object-fit: cover;
+    border: 2px solid var(--border-light);
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    flex-shrink: 0;
+}
+
+    .login-page__image:hover {
+        transform: scale(1.05);
+        box-shadow: var(--shadow-md);
+    }
+
+/* ========== BREAKPOINTS CORREGIDOS ========== */
+@media (min-width: 768px) {
+    .login-page {
+        padding: 2rem 1.5rem;
+    }
+
+    .login-page__container {
+        max-width: 32rem;
+    }
+
+    .login-page__title {
+        font-size: 2.25rem;
+    }
+
+    .login-page__card {
+        max-width: 100%;
+    }
+}
+
+@media (min-width: 1024px) {
+    .login-page__container {
+        max-width: 38rem;
+    }
+
+    .login-page__title {
+        font-size: 2.5rem;
+    }
+
+    .login-page__card {
+        max-width: 100%;
+    }
+}
+
+@media (min-width: 1440px) {
+    .login-page__container {
+        max-width: 42rem;
+    }
+
+    .login-page__title {
+        font-size: 2.75rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .login-page {
+        padding: 1rem 0.5rem;
+        justify-content: safe flex-start;
+        min-height: 100dvh;
+        overflow-y: auto;
+    }
+
+        .login-page::before,
+        .login-page::after {
+            display: none;
+        }
+
+    .login-page__container {
+        margin: 0 auto;
+        gap: 1rem;
+    }
+
+    .login-page__title {
+        font-size: 1.75rem;
+        margin-bottom: 0.25rem;
+    }
+
+    .login-page__subtitle {
+        font-size: 1rem;
+        margin-bottom: 0;
+    }
+
+    .login-page__card {
+        max-width: 100%;
+        margin-bottom: 0;
+    }
+
+    .login-page__images {
+        margin-bottom: 1.5rem;
+        gap: 0.75rem;
+    }
+
+    .login-page__image {
+        width: 70px;
+        height: 70px;
+    }
+}
+
+@media (max-width: 360px) {
+    .login-page {
+        padding: 0.5rem;
+    }
+
+    .login-page__title {
+        font-size: 1.5rem;
+    }
+
+    .login-page__subtitle {
+        font-size: 0.875rem;
+    }
+
+    .login-page__card {
+        max-width: 100%;
+    }
+
+    .login-page__images {
+        margin-bottom: 1rem;
+        gap: 0.5rem;
+    }
+
+    .login-page__image {
+        width: 60px;
+        height: 60px;
+    }
+}
+
+/* Fallback para navegadores que no soportan safe alignment */
+@supports not (justify-content: safe center) {
+    .login-page {
+        justify-content: center;
+    }
+
+    @media (max-width: 480px) {
+        .login-page {
+            justify-content: flex-start;
+            padding-top: 2rem;
+        }
+    }
+}

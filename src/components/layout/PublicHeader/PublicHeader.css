@@ -1,0 +1,19 @@
+.public-dashboard-header {
+    background-color: var(--bg-primary);
+    padding: 1rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border-light);
+    box-shadow: var(--shadow-sm);
+    position: sticky; /* Fija el header al hacer scroll */
+    top: 0;
+    z-index: 10;
+}
+
+.public-dashboard-header__title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+}
