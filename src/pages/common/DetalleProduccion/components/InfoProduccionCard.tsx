@@ -1,10 +1,11 @@
-import React from 'react';
-import { Card, Descriptions, Tag, Button, Space } from 'antd';
+import React, { useState, useEffect } from 'react';
+import { Card, Descriptions, Tag, Button, Space, Input } from 'antd';
 import { CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons';
 import type {
     ProduccionPublicMetadataDTO,
     ProduccionProtectedResponseDTO,
-    EstructuraProduccionDTO
+    EstructuraProduccionDTO,
+    ProduccionMetadataModifyRequestDTO,
 } from '../types/Productions';
 import { useElapsedTime } from '../../../../hooks/useElapsedTime';
 import '../DetalleProduccionPage.css';
@@ -14,11 +15,28 @@ type ProduccionInfo = ProduccionPublicMetadataDTO | ProduccionProtectedResponseD
 interface ProductionHeaderProps {
     produccion: ProduccionInfo;
     versionReceta: EstructuraProduccionDTO;
+    isEditable?: boolean;
     onCambioEstado?: (nuevoEstado: 'FINALIZADA' | 'CANCELADA') => void;
+    onMetadataChange?: (data: ProduccionMetadataModifyRequestDTO) => void;
 }
 
-export const InfoProduccionCard: React.FC<ProductionHeaderProps> = ({ produccion, versionReceta, onCambioEstado }) => {
+export const InfoProduccionCard: React.FC<ProductionHeaderProps> = ({ produccion, versionReceta, isEditable, onCambioEstado, onMetadataChange }) => {
     const elapsedTime = useElapsedTime(produccion.fechaInicio, produccion.fechaFin);
+    const [lote, setLote] = useState(produccion.lote);
+    const [encargado, setEncargado] = useState((produccion as ProduccionProtectedResponseDTO).encargado);
+    const [observaciones, setObservaciones] = useState((produccion as ProduccionProtectedResponseDTO).observaciones);
+
+    useEffect(() => {
+        setLote(produccion.lote);
+        setEncargado((produccion as ProduccionProtectedResponseDTO).encargado);
+        setObservaciones((produccion as ProduccionProtectedResponseDTO).observaciones);
+    }, [produccion]);
+
+    const handleBlur = () => {
+        if (onMetadataChange) {
+            onMetadataChange({ lote, encargado, observaciones });
+        }
+    };
 
     const formatDate = (dateString: string | null) => {
         if (!dateString) return 'N/A';
@@ -35,7 +53,6 @@ export const InfoProduccionCard: React.FC<ProductionHeaderProps> = ({ produccion
     };
 
     const metadata = versionReceta.metadata;
-    // Check if 'encargado' property exists to determine if it's a protected DTO
     const isProtected = (produccion as ProduccionProtectedResponseDTO).encargado !== undefined;
     const enProceso = produccion.estado === 'EN_PROCESO';
 
@@ -59,44 +76,52 @@ export const InfoProduccionCard: React.FC<ProductionHeaderProps> = ({ produccion
         </div>
     );
 
-    // Define responsive span values for items
-    // For 3-column layouts (xxl), span 1 means 1/3, span 2 means 2/3, span 3 means full
-    // For 2-column layouts (xl, lg, md), span 1 means 1/2, span 2 means full
-    // For 1-column layouts (sm, xs), span 1 means full
-    const spanOneThirdOrOneHalf = { xxl: 1, xl: 1, lg: 1, md: 1, sm: 1, xs: 1 }; // Takes 1/3 on xxl, 1/2 on xl/lg/md
-    const spanTwoThirdsOrOneHalf = { xxl: 2, xl: 1, lg: 1, md: 1, sm: 1, xs: 1 }; // Takes 2/3 on xxl, 1/2 on xl/lg/md
-    const spanFullRow = { xxl: 3, xl: 2, lg: 2, md: 2, sm: 1, xs: 1 }; // Takes full row on all breakpoints
+    const spanOneThirdOrOneHalf = { xxl: 1, xl: 1, lg: 1, md: 1, sm: 1, xs: 1 };
+    const spanTwoThirdsOrOneHalf = { xxl: 2, xl: 1, lg: 1, md: 1, sm: 1, xs: 1 };
+    const spanFullRow = { xxl: 3, xl: 2, lg: 2, md: 2, sm: 1, xs: 1 };
 
     return (
         <Card className="production-info-card" title={cardTitle}>
-            <Descriptions bordered column={{ xxl: 3, xl: 2, lg: 2, md: 2, sm: 1, xs: 1 }}> {/* Changed xl to 2 */}
-                {/* Row 1: Código Producción, Lote, Estado */}
+            <Descriptions bordered column={{ xxl: 3, xl: 2, lg: 2, md: 2, sm: 1, xs: 1 }}>
                 <Descriptions.Item label="Código Producción" {...spanOneThirdOrOneHalf}>{produccion.codigoProduccion}</Descriptions.Item>
-                <Descriptions.Item label="Lote" {...spanOneThirdOrOneHalf}>{produccion.lote || 'N/A'}</Descriptions.Item>
+                <Descriptions.Item label="Lote" {...spanOneThirdOrOneHalf}>
+                    {isEditable ? (
+                        <Input value={lote || ''} onChange={e => setLote(e.target.value)} onBlur={handleBlur} />
+                    ) : (
+                        produccion.lote || 'N/A'
+                    )}
+                </Descriptions.Item>
                 <Descriptions.Item label="Estado" {...spanOneThirdOrOneHalf}>{getStatusTag(produccion.estado)}</Descriptions.Item>
                 
-                {/* Row 2: Encargado, Fecha de Inicio, Fecha de Finalización */}
                 <Descriptions.Item label="Encargado" {...spanOneThirdOrOneHalf}>
-                    {isProtected ? ((produccion as ProduccionProtectedResponseDTO).encargado || 'No asignado') : 'N/A'}
+                    {isEditable && isProtected ? (
+                        <Input value={encargado || ''} onChange={e => setEncargado(e.target.value)} onBlur={handleBlur} />
+                    ) : (
+                        isProtected ? ((produccion as ProduccionProtectedResponseDTO).encargado || 'No asignado') : 'N/A'
+                    )}
                 </Descriptions.Item>
                 <Descriptions.Item label="Fecha de Inicio" {...spanOneThirdOrOneHalf}>{formatDate(produccion.fechaInicio)}</Descriptions.Item>
                 <Descriptions.Item label="Fecha de Finalización" {...spanOneThirdOrOneHalf}>
                     {produccion.estado !== 'EN_PROCESO' ? formatDate(produccion.fechaFin) : 'N/A'}
                 </Descriptions.Item>
 
-                {/* Row 3: Tiempo en Ejecución / Duración Total - always takes a full row */}
                 <Descriptions.Item label={enProceso ? 'Tiempo en Ejecución' : 'Duración Total'} {...spanFullRow}>
                     <span className="elapsed-time">{elapsedTime}</span>
                 </Descriptions.Item>
 
-                {/* Row 4: Código Versión, Nombre Versión */}
-                {/* For xl, lg, md (2 columns), these two items will each take span 1, making them 1/2 each */}
                 <Descriptions.Item label="Código Versión" {...spanOneThirdOrOneHalf}>{metadata.codigoVersionReceta}</Descriptions.Item>
                 <Descriptions.Item label="Nombre Versión" {...spanTwoThirdsOrOneHalf}>{metadata.nombre}</Descriptions.Item>
 
-                {/* Row 5: Receta Padre - always takes a full row */}
                 <Descriptions.Item label="Receta Padre" {...spanFullRow}>
                     {metadata.nombreRecetaPadre} ({metadata.codigoRecetaPadre})
+                </Descriptions.Item>
+
+                <Descriptions.Item label="Observaciones" {...spanFullRow}>
+                    {isEditable && isProtected ? (
+                        <Input.TextArea value={observaciones || ''} onChange={e => setObservaciones(e.target.value)} onBlur={handleBlur} autoSize={{ minRows: 2, maxRows: 6 }} />
+                    ) : (
+                        isProtected ? ((produccion as ProduccionProtectedResponseDTO).observaciones || 'N/A') : 'N/A'
+                    )}
                 </Descriptions.Item>
             </Descriptions>
         </Card>

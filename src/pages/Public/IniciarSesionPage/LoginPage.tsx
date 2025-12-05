@@ -17,28 +17,23 @@ const LoginPage: React.FC = () => {
 
     useEffect(() => {
         if (isAuthenticated && user && !loading) {
-            console.log('[LoginPage] Usuario autenticado, redirigiendo a /dashboard...');
             navigate('/dashboard', {replace: true});
         }
     }, [isAuthenticated, user, loading, navigate]);
 
     const handleLogin = async (credentials: any) => {
-        console.log('[LoginPage] handleLogin llamado. Pasando credenciales a AuthProvider...');
         try {
             await login(credentials);
         } catch (err) {
-            console.log('[LoginPage] Capturado error de login. Re-lanzando para que el formulario lo sepa.');
-            throw err; // Re-lanzar el error
+            throw err;
         }
     };
 
     const handleRegister = async (userData: any) => {
-        console.log('[LoginPage] handleRegister llamado. Pasando datos a AuthProvider...');
         try {
             await register(userData);
         } catch (err) {
-            console.log('[LoginPage] Capturado error de registro. Re-lanzando para que el formulario lo sepa.');
-            throw err; // Re-lanzar el error
+            throw err;
         }
     };
 
@@ -75,14 +70,14 @@ const LoginPage: React.FC = () => {
                             onLogin={handleLogin}
                             onSwitchToRegister={handleSwitchForm}
                             loading={loading}
-                            error={error} // Corregido: pasar la prop 'error'
+                            error={error}
                         />
                     ) : (
                         <RegisterForm
                             onRegister={handleRegister}
                             onSwitchToLogin={handleSwitchForm}
                             loading={loading}
-                            error={error} // Corregido: pasar la prop 'error'
+                            error={error}
                         />
                     )}
                     <Button

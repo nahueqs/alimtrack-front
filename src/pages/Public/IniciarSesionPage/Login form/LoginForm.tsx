@@ -8,30 +8,27 @@ interface LoginFormProps {
     onLogin: (credentials: LoginRequest) => Promise<void>;
     loading: boolean;
     onSwitchToRegister: () => void;
-    error: string | null; // Cambiado a string | null
+    error: string | null;
 }
 
 export const LoginForm: React.FC<LoginFormProps> = ({
                                                         onLogin,
                                                         loading,
                                                         onSwitchToRegister,
-                                                        error, // Usando el string de error
+                                                        error,
                                                     }) => {
     const [form] = Form.useForm();
 
     const onFinish = async (values: LoginRequest) => {
-        console.log('[LoginForm] Formulario enviado. Llamando a onLogin...');
         try {
             await onLogin(values);
-            console.log('[LoginForm] onLogin completado sin errores.');
             message.success('¡Bienvenido de nuevo!');
         } catch (err) {
-            console.log('[LoginForm] onLogin lanzó un error que fue capturado aquí.');
+            // Error is handled by the parent component
         }
     };
 
     const onFinishFailed = (errorInfo: any) => {
-        console.log('[LoginForm] Falló la validación del formulario:', errorInfo);
         message.error('Por favor, corrige los errores en el formulario.');
     };
 
@@ -39,10 +36,9 @@ export const LoginForm: React.FC<LoginFormProps> = ({
         <div className={`login-form ${loading ? 'login-form--loading' : ''}`}>
             <h2 className="login-form__title">Iniciar Sesión</h2>
 
-            {error && ( // Si hay un string de error, lo muestra
+            {error && (
                 <div className="login-form__error">
-                    {/* El emoji se renderiza a través de CSS con ::before */}
-                    {error} {/* Muestra el mensaje de error real */}
+                    {error}
                 </div>
             )}
 

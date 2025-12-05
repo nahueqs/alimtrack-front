@@ -1,4 +1,4 @@
-import {useCallback, useState} from 'react';
+import {useCallback, useState, useEffect} from 'react';
 import {publicService} from './PublicService';
 import type {
     ProduccionPublicMetadataDTO,
@@ -8,32 +8,11 @@ import type {
     RespuestaCampoDTO,
     RespuestaTablaDTO,
     ProgresoProduccionResponseDTO,
+    ProductionMetadataUpdatedPayload,
+    FieldUpdatePayload,
+    TableCellUpdatePayload,
+    ProductionStateUpdatePayload,
 } from '@/pages/common/DetalleProduccion/types/Productions';
-
-interface FieldUpdatePayload {
-    idCampo: number;
-    valor: string;
-}
-
-interface TableCellUpdatePayload {
-    idTabla: number;
-    idFila: number;
-    idColumna: number;
-    valor: string;
-}
-
-interface ProductionStateUpdatePayload {
-    estado: 'EN_PROCESO' | 'FINALIZADA' | 'CANCELADA';
-    fechaFin?: string | null;
-}
-
-interface ProductionMetadataUpdatePayload {
-    codigoVersion?: string;
-    lote?: string | null;
-    fechaInicio?: string;
-    fechaFin?: string | null;
-}
-
 
 interface UsePublicServiceReturn {
     loading: boolean;
@@ -49,18 +28,15 @@ interface UsePublicServiceReturn {
     updateFieldResponse: (update: FieldUpdatePayload & { timestamp: string }) => void;
     updateTableCellResponse: (update: TableCellUpdatePayload & { timestamp: string }) => void;
     updateProductionState: (update: ProductionStateUpdatePayload & { timestamp: string }) => void;
-    updateProductionMetadata: (update: ProductionMetadataUpdatePayload & { timestamp: string }) => void;
-    updateProductionStateInList: (codigoProduccion: string, update: ProductionStateUpdatePayload & { timestamp: string }) => void; // New function
+    updateProductionMetadata: (update: ProductionMetadataUpdatedPayload & { timestamp: string }) => void;
+    updateProductionStateInList: (codigoProduccion: string, update: ProductionStateUpdatePayload & { timestamp: string }) => void;
 }
 
-// Helper function to recalculate progress
 const recalculateProgreso = (
     estructura: EstructuraProduccionDTO,
     respuestasCampos: RespuestaCampoDTO[],
     respuestasTablas: RespuestaTablaDTO[]
 ): ProgresoProduccionResponseDTO => {
-    // console.log("[recalculateProgreso] Inputs:", { estructura, respuestasCampos, respuestasTablas }); // Removed log
-
     const totalCampos = estructura.totalCampos;
     const totalCeldasTablas = estructura.totalCeldas;
 
@@ -81,7 +57,7 @@ const recalculateProgreso = (
 
     const porcentajeCompletado = totalElementos > 0 ? (elementosRespondidos * 100.0) / totalElementos : 0.0;
 
-    const progreso = {
+    return {
         totalCampos,
         camposRespondidos,
         totalCeldasTablas,
@@ -90,10 +66,7 @@ const recalculateProgreso = (
         elementosRespondidos,
         porcentajeCompletado,
     };
-    // console.log("[recalculateProgreso] Calculated progress:", progreso); // Removed log
-    return progreso;
 };
-
 
 export const usePublicService = (): UsePublicServiceReturn => {
     const [producciones, setProducciones] = useState<ProduccionPublicMetadataDTO[]>([]);
@@ -102,6 +75,13 @@ export const usePublicService = (): UsePublicServiceReturn => {
     const [ultimaModificacion, setUltimaModificacion] = useState<UltimaModificacionDTO | null>(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+
+    useEffect(() => {
+        if (estructura && respuestas) {
+            const newProgreso = recalculateProgreso(estructura, respuestas.respuestasCampos, respuestas.respuestasTablas);
+            setRespuestas(prevRespuestas => prevRespuestas ? {...prevRespuestas, progreso: newProgreso} : null);
+        }
+    }, [estructura, respuestas?.respuestasCampos, respuestas?.respuestasTablas]);
 
     const getProduccionesPublicas = useCallback(async () => {
         setLoading(true);
@@ -160,12 +140,8 @@ export const usePublicService = (): UsePublicServiceReturn => {
     }, []);
 
     const updateFieldResponse = useCallback((update: FieldUpdatePayload & { timestamp: string }) => {
-        // console.log("[usePublicService] updateFieldResponse called with:", update); // Removed log
         setRespuestas(prevRespuestas => {
-            if (!prevRespuestas || !estructura) { // Ensure estructura is available
-                // console.log("[usePublicService] updateFieldResponse: No previous responses or estructura, returning null."); // Removed log
-                return null;
-            }
+            if (!prevRespuestas) return null;
 
             const newRespuestasCampos = prevRespuestas.respuestasCampos.map(campo =>
                 campo.idCampo === update.idCampo
@@ -174,35 +150,25 @@ export const usePublicService = (): UsePublicServiceReturn => {
             );
 
             if (!newRespuestasCampos.some(campo => campo.idCampo === update.idCampo)) {
-                console.warn(`[usePublicService] Field ${update.idCampo} not found in current responses. Adding as new. idRespuesta will be placeholder.`);
                 newRespuestasCampos.push({
-                    idRespuesta: Date.now(), // Placeholder ID
+                    idRespuesta: Date.now(),
                     idCampo: update.idCampo,
                     valor: update.valor,
                     timestamp: update.timestamp
                 });
             }
 
-            const newProgreso = recalculateProgreso(estructura, newRespuestasCampos, prevRespuestas.respuestasTablas);
-
-            const newState = {
+            return {
                 ...prevRespuestas,
                 respuestasCampos: newRespuestasCampos,
-                progreso: newProgreso, // Update progreso
                 timestampConsulta: new Date().toISOString(),
             };
-            // console.log("[usePublicService] updateFieldResponse: New state for respuestas:", newState); // Removed log
-            return newState;
         });
-    }, [estructura]); // Add estructura to dependencies
+    }, []);
 
     const updateTableCellResponse = useCallback((update: TableCellUpdatePayload & { timestamp: string }) => {
-        // console.log("[usePublicService] updateTableCellResponse called with:", update); // Removed log
         setRespuestas(prevRespuestas => {
-            if (!prevRespuestas || !estructura) { // Ensure estructura is available
-                // console.log("[usePublicService] updateTableCellResponse: No previous responses or estructura, returning null."); // Removed log
-                return null;
-            }
+            if (!prevRespuestas) return null;
 
             const newRespuestasTablas = prevRespuestas.respuestasTablas.map(celda =>
                 celda.idTabla === update.idTabla && celda.idFila === update.idFila && celda.idColumna === update.idColumna
@@ -211,40 +177,30 @@ export const usePublicService = (): UsePublicServiceReturn => {
             );
 
             if (!newRespuestasTablas.some(celda => celda.idTabla === update.idTabla && celda.idFila === update.idFila && celda.idColumna === update.idColumna)) {
-                console.warn(`[usePublicService] Table cell (T:${update.idTabla}, F:${update.idFila}, C:${update.idColumna}) not found in current responses. Adding as new with partial metadata.`);
                 newRespuestasTablas.push({
                     idTabla: update.idTabla,
                     idFila: update.idFila,
                     idColumna: update.idColumna,
                     valor: update.valor,
                     timestampRespuesta: update.timestamp,
-                    tipoDatoColumna: 'TEXTO', // Placeholder
-                    nombreFila: `Fila ${update.idFila}`, // Placeholder
-                    nombreColumna: `Columna ${update.idColumna}`, // Placeholder
+                    tipoDatoColumna: 'TEXTO',
+                    nombreFila: `Fila ${update.idFila}`,
+                    nombreColumna: `Columna ${update.idColumna}`,
                 });
             }
 
-            const newProgreso = recalculateProgreso(estructura, prevRespuestas.respuestasCampos, newRespuestasTablas);
-
-            const newState = {
+            return {
                 ...prevRespuestas,
                 respuestasTablas: newRespuestasTablas,
-                progreso: newProgreso, // Update progreso
                 timestampConsulta: new Date().toISOString(),
             };
-            // console.log("[usePublicService] updateTableCellResponse: New state for respuestas:", newState); // Removed log
-            return newState;
         });
-    }, [estructura]); // Add estructura to dependencies
+    }, []);
 
     const updateProductionState = useCallback((update: ProductionStateUpdatePayload & { timestamp: string }) => {
-        // console.log("[usePublicService] updateProductionState called with:", update); // Removed log
         setRespuestas(prevRespuestas => {
-            if (!prevRespuestas) {
-                // console.log("[usePublicService] updateProductionState: No previous responses, returning null."); // Removed log
-                return null;
-            }
-            const newState = {
+            if (!prevRespuestas) return null;
+            return {
                 ...prevRespuestas,
                 produccion: {
                     ...prevRespuestas.produccion,
@@ -253,31 +209,20 @@ export const usePublicService = (): UsePublicServiceReturn => {
                 },
                 timestampConsulta: new Date().toISOString(),
             };
-            // console.log("[usePublicService] updateProductionState: New state for respuestas:", newState); // Removed log
-            return newState;
         });
     }, []);
 
-    const updateProductionMetadata = useCallback((update: ProductionMetadataUpdatePayload & { timestamp: string }) => {
-        // console.log("[usePublicService] updateProductionMetadata called with:", update); // Removed log
+    const updateProductionMetadata = useCallback((update: ProductionMetadataUpdatedPayload & { timestamp: string }) => {
         setRespuestas(prevRespuestas => {
-            if (!prevRespuestas) {
-                // console.log("[usePublicService] updateProductionMetadata: No previous responses, returning null."); // Removed log
-                return null;
-            }
-            const newState = {
+            if (!prevRespuestas) return null;
+            return {
                 ...prevRespuestas,
                 produccion: {
                     ...prevRespuestas.produccion,
-                    codigoVersion: update.codigoVersion || prevRespuestas.produccion.codigoVersion,
                     lote: update.lote !== undefined ? update.lote : prevRespuestas.produccion.lote,
-                    fechaInicio: update.fechaInicio || prevRespuestas.produccion.fechaInicio,
-                    fechaFin: update.fechaFin !== undefined ? update.fechaFin : prevRespuestas.produccion.fechaFin,
                 },
                 timestampConsulta: new Date().toISOString(),
             };
-            // console.log("[usePublicService] updateProductionMetadata: New state for respuestas:", newState); // Removed log
-            return newState;
         });
     }, []);
 
@@ -285,26 +230,20 @@ export const usePublicService = (): UsePublicServiceReturn => {
         codigoProduccion: string,
         update: ProductionStateUpdatePayload & { timestamp: string }
     ) => {
-        // console.log(`[usePublicService] updateProductionStateInList called for ${codigoProduccion} with state:`, update.estado); // Removed log
         setProducciones(prevProducciones => {
             if (!prevProducciones) return [];
-
-            const updatedProducciones = prevProducciones.map(prod => {
-                if (prod.codigoProduccion === codigoProduccion) {
-                    return {
+            return prevProducciones.map(prod =>
+                prod.codigoProduccion === codigoProduccion
+                    ? {
                         ...prod,
                         estado: update.estado,
                         fechaFin: update.fechaFin !== undefined ? update.fechaFin : prod.fechaFin,
-                        fechaModificacion: update.timestamp, // Update last modification time
-                    };
-                }
-                return prod;
-            });
-            // console.log("[usePublicService] updateProductionStateInList: New list of productions:", updatedProducciones); // Removed log
-            return updatedProducciones;
+                        fechaModificacion: update.timestamp,
+                    }
+                    : prod
+            );
         });
     }, []);
-
 
     return {
         loading,
@@ -321,6 +260,6 @@ export const usePublicService = (): UsePublicServiceReturn => {
         updateTableCellResponse,
         updateProductionState,
         updateProductionMetadata,
-        updateProductionStateInList, // Export new function
+        updateProductionStateInList,
     };
 };

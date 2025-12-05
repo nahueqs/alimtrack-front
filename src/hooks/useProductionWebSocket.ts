@@ -1,105 +1,143 @@
-import { useEffect, useState } from 'react';
-import { notificationService } from '@/services/notificationService';
-import type { EstadoActualProduccionResponseDTO } from '@/pages/common/DetalleProduccion/types/Productions';
-
-interface FieldUpdatePayload {
-    idCampo: number;
-    valor: string;
-    timestamp: string;
-}
-
-interface TableCellUpdatePayload {
-    idTabla: number;
-    idFila: number;
-    idColumna: number;
-    valor: string;
-    timestamp: string;
-}
-
-interface ProductionStateUpdatePayload {
-    estado: 'EN_PROCESO' | 'FINALIZADA' | 'CANCELADA';
-    fechaFin?: string | null;
-    timestamp: string;
-}
-
-interface ProductionMetadataUpdatePayload {
-    codigoVersion?: string;
-    lote?: string | null;
-    encargado?: string | null;
-    emailCreador?: string;
-    observaciones?: string | null;
-    fechaInicio?: string;
-    fechaFin?: string | null;
-    fechaModificacion?: string | null;
-    timestamp: string;
-}
+import {useEffect, useState, useCallback} from 'react';
+import {notificationService} from '@/services/notificaciones/notificationService.ts';
+import type {
+    EstadoActualProduccionResponseDTO,
+    EstructuraProduccionDTO,
+    FieldUpdatePayload,
+    TableCellUpdatePayload,
+    ProductionStateUpdatePayload,
+    ProductionMetadataUpdatedPayload,
+} from '@/pages/common/DetalleProduccion/types/Productions';
 
 interface UseProductionWebSocketProps {
     codigoProduccion: string | undefined;
     estadoActual: EstadoActualProduccionResponseDTO | null;
+    estructura: EstructuraProduccionDTO | null;
     getUltimasRespuestas: (codigo: string) => Promise<void>;
     updateFieldResponse: (update: FieldUpdatePayload) => void;
     updateTableCellResponse: (update: TableCellUpdatePayload) => void;
     updateProductionState: (update: ProductionStateUpdatePayload) => void;
-    updateProductionMetadata: (update: ProductionMetadataUpdatePayload) => void;
+    updateProductionMetadata: (update: ProductionMetadataUpdatedPayload) => void;
 }
 
 export const useProductionWebSocket = ({
-    codigoProduccion,
-    estadoActual,
-    getUltimasRespuestas,
-    updateFieldResponse,
-    updateTableCellResponse,
-    updateProductionState,
-    updateProductionMetadata,
-}: UseProductionWebSocketProps) => {
+                                           codigoProduccion,
+                                           estadoActual,
+                                           estructura,
+                                           getUltimasRespuestas,
+                                           updateFieldResponse,
+                                           updateTableCellResponse,
+                                           updateProductionState,
+                                           updateProductionMetadata,
+                                       }: UseProductionWebSocketProps) => {
     const [isConnected, setIsConnected] = useState(false);
 
-    // Effect for managing WebSocket connection lifecycle
     useEffect(() => {
-        // console.log("[useProductionWebSocket] WebSocket connection effect triggered."); // Removed log
         notificationService.connect(() => {
             setIsConnected(true);
-            console.log("[useProductionWebSocket] WebSocket connected successfully.");
         });
 
         return () => {
             notificationService.disconnect();
             setIsConnected(false);
-            console.log("[useProductionWebSocket] WebSocket disconnected on cleanup.");
         };
     }, []);
 
-    // Effect for WebSocket subscription
     useEffect(() => {
-        // console.log(`[useProductionWebSocket] WebSocket subscription effect triggered. codigoProduccion: ${codigoProduccion}, isConnected: ${isConnected}, current state: ${estadoActual?.produccion.estado}`); // Removed log
+        if (!("Notification" in window)) {
+        } else if (Notification.permission !== "granted" && Notification.permission !== "denied") {
+            Notification.requestPermission();
+        }
+    }, []);
 
+    const getChangedItemDetails = useCallback((id: number, type: 'campo' | 'tabla') => {
+        if (!estructura) return {
+            sectionTitle: undefined,
+            itemTitle: undefined,
+            itemType: undefined,
+            groupTitle: undefined
+        };
+
+        for (const seccion of estructura.estructura) {
+            if (type === 'campo') {
+                const campoDirecto = seccion.camposSimples.find(campo => campo.id === id);
+                if (campoDirecto) {
+                    return {
+                        sectionTitle: seccion.titulo,
+                        itemTitle: campoDirecto.nombre,
+                        itemType: 'Campo Simple',
+                        groupTitle: undefined
+                    };
+                }
+
+                for (const grupo of seccion.gruposCampos || []) {
+                    const campoEnGrupo = grupo.campos.find(campo => campo.id === id);
+                    if (campoEnGrupo) {
+                        return {
+                            sectionTitle: seccion.titulo,
+                            itemTitle: campoEnGrupo.nombre,
+                            itemType: 'Campo Agrupado',
+                            groupTitle: grupo.subtitulo
+                        };
+                    }
+                }
+            }
+
+            if (type === 'tabla') {
+                const tabla = seccion.tablas.find(t => t.id === id);
+                if (tabla) {
+                    return {
+                        sectionTitle: seccion.titulo,
+                        itemTitle: tabla.nombre,
+                        itemType: 'Tabla',
+                        groupTitle: undefined
+                    };
+                }
+            }
+        }
+        return {sectionTitle: undefined, itemTitle: undefined, itemType: undefined, groupTitle: undefined};
+    }, [estructura]);
+
+    useEffect(() => {
         let unsubscribe: (() => void) | undefined;
 
         if (codigoProduccion && isConnected) {
             const isFinalState = estadoActual?.produccion.estado === 'FINALIZADA' || estadoActual?.produccion.estado === 'CANCELADA';
 
             if (!isFinalState) {
-                // console.log(`[useProductionWebSocket] Attempting to subscribe to AutoSave updates for ${codigoProduccion}.`); // Removed log
                 unsubscribe = notificationService.subscribeToAutoSave(codigoProduccion, (message: any) => {
-                    console.log(`[useProductionWebSocket] AutoSave update received for ${codigoProduccion}:`, message);
+                    const showDesktopNotification = (title: string, body: string) => {
+                        if (Notification.permission === "granted") {
+                            new Notification(title, {body});
+                        }
+                    };
 
                     switch (message.type) {
-                        case 'FIELD_UPDATED':
-                            // console.log(`[useProductionWebSocket] Dispatching FIELD_UPDATED for field ${message.payload.idCampo}.`); // Removed log
+                        case 'FIELD_UPDATED': {
                             updateFieldResponse(message.payload);
+                            const {sectionTitle, itemTitle} = getChangedItemDetails(message.payload.idCampo, 'campo');
+                            const body = itemTitle && sectionTitle
+                                ? `Cambio en campo "${itemTitle}" de sección "${sectionTitle}".`
+                                : `Cambio en un campo de la producción ${codigoProduccion}.`;
+                            showDesktopNotification(`Producción ${codigoProduccion} Actualizada`, body);
                             break;
-                        case 'TABLE_CELL_UPDATED':
-                            // console.log(`[useProductionWebSocket] Dispatching TABLE_CELL_UPDATED for table cell (T:${message.payload.idTabla}, F:${message.payload.idFila}, C:${message.payload.idColumna}).`); // Removed log
+                        }
+                        case 'TABLE_CELL_UPDATED': {
                             updateTableCellResponse(message.payload);
+                            const {sectionTitle, itemTitle} = getChangedItemDetails(message.payload.idTabla, 'tabla');
+                            const body = itemTitle && sectionTitle
+                                ? `Cambio en tabla "${itemTitle}" de sección "${sectionTitle}".`
+                                : `Cambio en una celda de tabla de la producción ${codigoProduccion}.`;
+                            showDesktopNotification(`Producción ${codigoProduccion} Actualizada`, body);
                             break;
+                        }
                         case 'STATE_CHANGED':
-                            // console.log(`[useProductionWebSocket] Dispatching STATE_CHANGED to new state ${message.payload.estado}.`); // Removed log
                             updateProductionState(message.payload);
+                            showDesktopNotification(`Producción ${codigoProduccion} - Estado Actualizado`, `El estado ha cambiado a: ${message.payload.estado}`);
                             break;
                         case 'PRODUCTION_METADATA_UPDATED':
-                            // console.log(`[useProductionWebSocket] Dispatching PRODUCTION_METADATA_UPDATED.`); // Removed log
                             updateProductionMetadata(message.payload);
+                            showDesktopNotification(`Producción ${codigoProduccion} - Metadatos Actualizados`, `Se han actualizado los metadatos de la producción.`);
                             break;
                         default:
                             console.warn(`[useProductionWebSocket] Unknown update type '${message.type}'. Re-fetching all data.`);
@@ -107,15 +145,11 @@ export const useProductionWebSocket = ({
                             break;
                     }
                 });
-            } else if (isFinalState) {
-                console.log(`[useProductionWebSocket] Production ${codigoProduccion} is in a final state (${estadoActual?.produccion.estado}). Not subscribing to updates.`);
             }
         }
 
-        // Cleanup subscription on component unmount or if dependencies change
         return () => {
             if (unsubscribe) {
-                // console.log(`[useProductionWebSocket] Unsubscribing from AutoSave updates for ${codigoProduccion}.`); // Removed log
                 unsubscribe();
             }
         };
@@ -128,7 +162,8 @@ export const useProductionWebSocket = ({
         updateTableCellResponse,
         updateProductionState,
         updateProductionMetadata,
+        getChangedItemDetails,
     ]);
 
-    return { isConnected };
+    return {isConnected};
 };

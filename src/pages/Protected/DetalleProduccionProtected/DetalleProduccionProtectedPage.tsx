@@ -11,7 +11,6 @@ import { SavingIndicator } from '@/components/SavingIndicator';
 const DetalleProduccionProtectedPage: React.FC = () => {
     const {codigoProduccion} = useParams<{ codigoProduccion: string }>();
 
-    // Use the custom hook for data fetching and state management
     const {
         loading: loadingData,
         error: errorData,
@@ -22,16 +21,17 @@ const DetalleProduccionProtectedPage: React.FC = () => {
         guardarRespuestaCampo,
         guardarRespuestaCeldaTabla,
         cambiarEstadoProduccion,
+        guardarMetadata,
         updateFieldResponse,
         updateTableCellResponse,
         updateProductionState,
         updateProductionMetadata,
     } = useProductionData(codigoProduccion);
 
-    // Use the custom hook for WebSocket management
     useProductionWebSocket({
         codigoProduccion,
         estadoActual,
+        estructura,
         getUltimasRespuestas,
         updateFieldResponse,
         updateTableCellResponse,
@@ -39,23 +39,21 @@ const DetalleProduccionProtectedPage: React.FC = () => {
         updateProductionMetadata,
     });
 
-    // Use the custom hook for production actions
     const {
         debouncedCampoChange,
         debouncedTablaChange,
+        debouncedMetadataChange,
         handleCambioEstado,
     } = useProductionActions({
         isSaving,
         guardarRespuestaCampo,
         guardarRespuestaCeldaTabla,
         cambiarEstadoProduccion,
+        guardarMetadata,
         estadoActual,
         estructura,
     });
 
-    // Removed: console.log("[DetalleProduccionProtectedPage] Component rendered.");
-
-    // Determine if the production is editable based on its status
     const isProductionEditable = estadoActual?.produccion.estado === 'EN_PROCESO';
 
     return (
@@ -72,6 +70,7 @@ const DetalleProduccionProtectedPage: React.FC = () => {
                 isEditable={isProductionEditable}
                 onCampoChange={debouncedCampoChange}
                 onTablaChange={debouncedTablaChange}
+                onMetadataChange={debouncedMetadataChange}
                 onCambioEstado={handleCambioEstado}
                 HeaderComponent={AppHeader}
             />

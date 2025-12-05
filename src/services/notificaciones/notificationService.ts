@@ -1,34 +1,29 @@
 import { Client, type IMessage } from '@stomp/stompjs';
-import SockJS from 'sockjs-client'; // Import SockJS
+import SockJS from 'sockjs-client';
 
 class NotificationService {
   private stompClient: Client | null = null;
-  // The endpoint for SockJS should be an HTTP(S) URL, not WS(S)
-  // SockJS will handle the actual WebSocket/HTTP fallback
-  private readonly websocketEndpoint: string = 'http://localhost:8080/ws'; // Changed to HTTP endpoint for SockJS
+  private readonly websocketEndpoint: string = 'http://localhost:8080/ws';
   private onConnectCallback: (() => void) | null = null;
 
   constructor() {
     this.stompClient = new Client({
-      brokerURL: '_', // Set to a dummy value when webSocketFactory is used
+      brokerURL: '_',
       reconnectDelay: 5000,
       heartbeatIncoming: 4000,
       heartbeatOutgoing: 4000,
       onConnect: () => {
-        console.log('Connected to WebSocket');
         if (this.onConnectCallback) {
           this.onConnectCallback();
         }
       },
       onDisconnect: () => {
-        console.log('Disconnected from WebSocket');
         this.onConnectCallback = null;
       },
       onStompError: (frame) => {
         console.error('Broker reported error: ' + frame.headers['message']);
         console.error('Additional details: ' + frame.body);
       },
-      // Use SockJS as the WebSocket factory
       webSocketFactory: () => new SockJS(this.websocketEndpoint),
     });
   }
@@ -61,7 +56,6 @@ class NotificationService {
     return () => {};
   }
 
-  // New method for subscribing to production created events
   public subscribeToProductionCreated(callback: (message: any) => void): () => void {
     const destination = `/topic/produccion/created`;
     if (this.stompClient && this.stompClient.active) {
@@ -74,7 +68,6 @@ class NotificationService {
     return () => {};
   }
 
-  // New method for subscribing to global production state changes
   public subscribeToProductionStateChanges(callback: (message: any) => void): () => void {
     const destination = `/topic/producciones/state-changed`;
     if (this.stompClient && this.stompClient.active) {

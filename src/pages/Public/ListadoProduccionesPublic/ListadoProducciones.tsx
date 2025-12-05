@@ -5,7 +5,7 @@ import {Alert, Spin, Table} from 'antd';
 import {getColumns} from './ListadoProduccionesColumns.tsx';
 import type {ProduccionPublicMetadataDTO} from '@/pages/common/DetalleProduccion/types/Productions.ts';
 import {PublicHeader} from '@/components/layout/PublicHeader/PublicHeader.tsx';
-import {notificationService} from '@/services/notificationService'; // Import notificationService
+import {notificationService} from '@/services/notificaciones/notificationService.ts'; // Import notificationService
 import './ListadoProducciones.css';
 
 export const ListadoProducciones: React.FC = () => {

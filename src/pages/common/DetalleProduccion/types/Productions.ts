@@ -171,14 +171,6 @@ export interface ProduccionCambioEstadoRequestDTO {
 
 
 // --- Otros Tipos ---
-
-// Aligned with backend's EstadoProduccionPublicoResponseDTO
-export interface ProduccionStatusResponseDTO {
-    codigoProduccion: string; // Added from backend DTO
-    estado: string; // Changed from union type to string
-    ultimaModificacion: string; // Renamed from fechaUltimaModificacion
-}
-
 // Aligned with backend's EstadoProduccionPublicoResponseDTO.ultimaModificacion
 export interface UltimaModificacionDTO {
     ultimaModificacion: string; // Renamed from fechaModificacion
@@ -201,4 +193,46 @@ export interface ProduccionCreateRequestDTO {
     lote: string;
     encargado: string;
     observaciones?: string;
+}
+
+export interface ProduccionMetadataModifyRequestDTO {
+    lote?: string | null;
+    encargado?: string | null;
+    observaciones?: string | null;
+}
+
+// --- WebSocket Payloads ---
+
+export interface FieldUpdatePayload {
+    idCampo: number;
+    valor: string;
+    timestamp: string;
+}
+
+export interface TableCellUpdatePayload {
+    idTabla: number;
+    idFila: number;
+    idColumna: number;
+    valor: string;
+    timestamp: string;
+}
+
+export interface ProductionStateUpdatePayload {
+    estado: 'EN_PROCESO' | 'FINALIZADA' | 'CANCELADA';
+    fechaFin?: string | null;
+    timestamp: string;
+}
+
+export interface ProductionMetadataCreatedPayload {
+    codigoVersion?: string;
+    lote?: string | null;
+    fechaInicio?: string;
+    fechaFin?: string | null;
+}
+
+export interface ProductionMetadataUpdatedPayload {
+    codigoProduccion: string;
+    lote: string;
+    encargado: string;
+    observaciones: string;
 }

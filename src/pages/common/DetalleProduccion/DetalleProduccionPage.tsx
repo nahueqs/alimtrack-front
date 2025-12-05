@@ -9,6 +9,7 @@ import type {
     EstructuraProduccionDTO,
     RespuestasProduccionPublicDTO,
     RespuestasProduccionProtectedDTO,
+    ProduccionMetadataModifyRequestDTO,
 } from './types/Productions';
 // import { PublicHeader } from "@/components/layout/PublicHeader/PublicHeader.tsx"; // Removed direct import
 
@@ -20,6 +21,7 @@ interface ProductionDisplayProps {
     isEditable?: boolean;
     onCampoChange?: (idCampo: number, valor: string) => void;
     onTablaChange?: (idTabla: number, idFila: number, idColumna: number, valor: string) => void;
+    onMetadataChange?: (data: ProduccionMetadataModifyRequestDTO) => void;
     onCambioEstado?: (nuevoEstado: 'FINALIZADA' | 'CANCELADA') => void;
     HeaderComponent: React.ElementType; // New prop for the header component
 }
@@ -32,6 +34,7 @@ export const DetalleProduccionPage: React.FC<ProductionDisplayProps> = ({
                                                                             isEditable = false,
                                                                             onCampoChange = noOp,
                                                                             onTablaChange = noOp,
+                                                                            onMetadataChange = noOp,
                                                                             onCambioEstado,
                                                                             HeaderComponent, // Destructure the new prop
                                                                         }) => {
@@ -59,7 +62,9 @@ export const DetalleProduccionPage: React.FC<ProductionDisplayProps> = ({
                         <InfoProduccionCard
                             produccion={respuestas.produccion}
                             versionReceta={estructura}
+                            isEditable={isEditable}
                             onCambioEstado={onCambioEstado}
+                            onMetadataChange={onMetadataChange}
                         />
                     </Col>
                     <Col xs={24} lg={8}>

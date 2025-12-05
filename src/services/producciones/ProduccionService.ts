@@ -8,6 +8,7 @@ import type {
     RespuestaCampoDTO,
     RespuestaTablaDTO,
     ProduccionCambioEstadoRequestDTO,
+    ProduccionMetadataModifyRequestDTO,
 } from '@/pages/common/DetalleProduccion/types/Productions';
 
 type ProduccionListResponse = ProduccionProtectedResponseDTO[];
@@ -40,6 +41,11 @@ class ProduccionService {
     async cambiarEstado(codigoProduccion: string, data: ProduccionCambioEstadoRequestDTO): Promise<void> {
         if (!codigoProduccion) throw new Error('El código de producción es requerido.');
         return apiClient.put<void>(`/producciones/${encodeURIComponent(codigoProduccion)}/cambiar-estado`, data);
+    }
+
+    async guardarMetadata(codigoProduccion: string, data: ProduccionMetadataModifyRequestDTO): Promise<void> {
+        if (!codigoProduccion) throw new Error('El código de producción es requerido.');
+        return apiClient.put<void>(`/producciones/${encodeURIComponent(codigoProduccion)}/metadata`, data);
     }
 
     async createProduction(productionData: any): Promise<ProduccionProtectedResponseDTO> {
