@@ -1,7 +1,5 @@
-import React, {useState, useEffect} from 'react';
-import type {
-    ProduccionCreateRequestDTO
-} from '@/pages/common/DetalleProduccion/types/Productions.ts';
+import React, {useEffect, useState} from 'react';
+import type {ProduccionCreateRequestDTO} from '@/pages/common/DetalleProduccion/types/Productions.ts';
 import {NuevaProduccionForm} from './NuevaProduccionForm.tsx';
 import {message, Spin} from 'antd';
 import {useAuth} from '@/services/auth/authProvider/authProvider.tsx';

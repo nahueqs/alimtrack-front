@@ -4,32 +4,29 @@ import type {TipoDatoCampo} from '@/pages/Protected/VersionRecetas/types/TipoDat
 export interface ProduccionProtectedResponseDTO {
     codigoProduccion: string;
     codigoVersion: string;
-    encargado: string | null; // Aligned nullability
+    encargado: string | null;
     emailCreador: string;
-    lote: string | null; // Aligned nullability
-    estado: string; // Changed from union type to string
+    lote: string | null;
+    estado: string;
     fechaInicio: string;
-    fechaFin: string | null; // Aligned nullability
-    observaciones: string | null; // Aligned nullability
-    fechaModificacion: string | null; // Changed from optional to string | null
+    fechaFin: string | null;
+    observaciones: string | null;
+    fechaModificacion: string | null;
 }
 
-// Renamed from ProduccionPublicResponseDTO to ProduccionPublicMetadataDTO
-// Aligned with backend's MetadataProduccionPublicaResponseDTO
 export interface ProduccionPublicMetadataDTO {
     codigoProduccion: string;
     codigoVersion: string;
-    lote: string | null; // Backend is String, assuming can be null
-    estado: string; // Backend is String, allowing for more flexibility than union type
+    lote: string | null;
+    estado: string;
     fechaInicio: string;
-    fechaFin: string | null; // Backend is LocalDateTime, assuming can be null
-    fechaModificacion: string | null; // Changed from optional to string | null
-    // Removed encargado, emailCreador, observaciones as they are not in backend's public metadata
+    fechaFin: string | null;
+    fechaModificacion: string | null;
 }
 
 // --- DTOs de Respuestas (Público vs. Protegido) ---
 export interface RespuestasProduccionPublicDTO {
-    produccion: ProduccionPublicMetadataDTO; // Updated to use new metadata type
+    produccion: ProduccionPublicMetadataDTO;
     respuestasCampos: RespuestaCampoDTO[];
     respuestasTablas: RespuestaTablaDTO[];
     progreso: ProgresoProduccionResponseDTO;
@@ -95,8 +92,7 @@ export interface VersionRecetaMetadataResponseDTO {
     codigoRecetaPadre: string;
     nombreRecetaPadre: string;
     nombre: string;
-    descripcion: string | null; // Added from backend
-    // Removed creadaPor
+    descripcion: string | null;
     fechaCreacion: string;
 }
 
@@ -155,12 +151,23 @@ export interface FilaTablaResponseDTO {
 // --- DTOs de Request ---
 
 export interface RespuestaCampoRequestDTO {
-    valor: string;
+    idCampo: number;
+    valorTexto?: string | null;
+    valorNumerico?: number | null;
+    valorFecha?: string | null;
+    valorBooleano?: boolean | null;
     emailCreador: string;
 }
 
 export interface RespuestaCeldaTablaRequestDTO {
-    valor: string;
+    // Campos opcionales para validación en backend (aunque se pasan por path variable)
+    idTabla?: number;
+    idFila?: number;
+    idColumna?: number;
+    valorTexto?: string | null;
+    valorNumerico?: number | null;
+    valorFecha?: string | null;
+    valorBooleano?: boolean | null;
     emailCreador: string;
 }
 
@@ -171,9 +178,8 @@ export interface ProduccionCambioEstadoRequestDTO {
 
 
 // --- Otros Tipos ---
-// Aligned with backend's EstadoProduccionPublicoResponseDTO.ultimaModificacion
 export interface UltimaModificacionDTO {
-    ultimaModificacion: string; // Renamed from fechaModificacion
+    ultimaModificacion: string;
 }
 
 export interface ProduccionFilterRequestDTO {

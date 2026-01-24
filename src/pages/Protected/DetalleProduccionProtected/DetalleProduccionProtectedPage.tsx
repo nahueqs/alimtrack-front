@@ -1,12 +1,12 @@
 import React from 'react';
 import {useParams} from 'react-router-dom';
 import {DetalleProduccionPage} from '@/pages/common/DetalleProduccion/DetalleProduccionPage';
-import { AppHeader } from "@/components/AppHeader/AppHeader.tsx";
-import { useProductionData } from '@/hooks/useProductionData';
-import { useProductionWebSocket } from '@/hooks/useProductionWebSocket';
-import { useProductionActions } from '@/hooks/useProductionActions';
-import { ProductionStatusDisplay } from '@/components/ProductionStatusDisplay';
-import { SavingIndicator } from '@/components/SavingIndicator';
+import {AppHeader} from "@/components/AppHeader/AppHeader.tsx";
+import {useProductionData} from '@/hooks/useProductionData';
+import {useProductionWebSocket} from '@/hooks/useProductionWebSocket';
+import {useProductionActions} from '@/hooks/useProductionActions';
+import {ProductionStatusDisplay} from '@/components/ProductionStatusDisplay';
+import {SavingIndicator} from '@/components/SavingIndicator';
 
 const DetalleProduccionProtectedPage: React.FC = () => {
     const {codigoProduccion} = useParams<{ codigoProduccion: string }>();
@@ -63,7 +63,7 @@ const DetalleProduccionProtectedPage: React.FC = () => {
             estructura={estructura}
             estadoActual={estadoActual}
         >
-            <SavingIndicator isSaving={isSaving} />
+            <SavingIndicator isSaving={isSaving}/>
             <DetalleProduccionPage
                 estructura={estructura!}
                 respuestas={estadoActual!}

@@ -1,12 +1,12 @@
-import {useEffect, useState, useCallback} from 'react';
+import {useCallback, useEffect, useRef, useState} from 'react';
 import {notificationService} from '@/services/notificaciones/notificationService.ts';
 import type {
     EstadoActualProduccionResponseDTO,
     EstructuraProduccionDTO,
     FieldUpdatePayload,
-    TableCellUpdatePayload,
-    ProductionStateUpdatePayload,
     ProductionMetadataUpdatedPayload,
+    ProductionStateUpdatePayload,
+    TableCellUpdatePayload,
 } from '@/pages/common/DetalleProduccion/types/Productions';
 
 interface UseProductionWebSocketProps {
@@ -31,24 +31,92 @@ export const useProductionWebSocket = ({
                                            updateProductionMetadata,
                                        }: UseProductionWebSocketProps) => {
     const [isConnected, setIsConnected] = useState(false);
+    const isPageVisible = useRef(true);
+
+    // Referencias para el batching (agrupamiento)
+    const pendingFieldUpdates = useRef<FieldUpdatePayload[]>([]);
+    const pendingTableUpdates = useRef<TableCellUpdatePayload[]>([]);
+    const batchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+    // Detectar visibilidad de la página
+    useEffect(() => {
+        const handleVisibilityChange = () => {
+            isPageVisible.current = document.visibilityState === 'visible';
+            console.log('[WebSocket] Visibilidad cambiada:', isPageVisible.current ? 'VISIBLE' : 'OCULTO');
+        };
+        // Inicializar valor correcto
+        isPageVisible.current = document.visibilityState === 'visible';
+
+        document.addEventListener('visibilitychange', handleVisibilityChange);
+        return () => {
+            document.removeEventListener('visibilitychange', handleVisibilityChange);
+        };
+    }, []);
 
     useEffect(() => {
         notificationService.connect(() => {
             setIsConnected(true);
+            console.log('[WebSocket] Conectado');
         });
 
         return () => {
-            notificationService.disconnect();
-            setIsConnected(false);
+            // notificationService.disconnect(); 
         };
     }, []);
 
     useEffect(() => {
         if (!("Notification" in window)) {
+            console.warn('[WebSocket] Este navegador no soporta notificaciones de escritorio');
         } else if (Notification.permission !== "granted" && Notification.permission !== "denied") {
-            Notification.requestPermission();
+            Notification.requestPermission().then(permission => {
+                console.log('[WebSocket] Permiso de notificaciones:', permission);
+            });
+        } else {
+            console.log('[WebSocket] Estado de permisos de notificación:', Notification.permission);
         }
     }, []);
+
+    // Función para procesar el lote de actualizaciones acumuladas
+    const processBatch = useCallback(() => {
+        if (pendingFieldUpdates.current.length > 0) {
+            pendingFieldUpdates.current.forEach(update => updateFieldResponse(update));
+            pendingFieldUpdates.current = [];
+        }
+
+        if (pendingTableUpdates.current.length > 0) {
+            pendingTableUpdates.current.forEach(update => updateTableCellResponse(update));
+            pendingTableUpdates.current = [];
+        }
+
+        batchTimeoutRef.current = null;
+    }, [updateFieldResponse, updateTableCellResponse]);
+
+    // Función para encolar actualizaciones
+    const queueUpdate = useCallback((type: 'FIELD' | 'TABLE', payload: any) => {
+        if (type === 'FIELD') {
+            const index = pendingFieldUpdates.current.findIndex(u => u.idCampo === payload.idCampo);
+            if (index !== -1) {
+                pendingFieldUpdates.current[index] = payload;
+            } else {
+                pendingFieldUpdates.current.push(payload);
+            }
+        } else {
+            const index = pendingTableUpdates.current.findIndex(u =>
+                u.idTabla === payload.idTabla &&
+                u.idFila === payload.idFila &&
+                u.idColumna === payload.idColumna
+            );
+            if (index !== -1) {
+                pendingTableUpdates.current[index] = payload;
+            } else {
+                pendingTableUpdates.current.push(payload);
+            }
+        }
+
+        if (!batchTimeoutRef.current) {
+            batchTimeoutRef.current = setTimeout(processBatch, 100);
+        }
+    }, [processBatch]);
 
     const getChangedItemDetails = useCallback((id: number, type: 'campo' | 'tabla') => {
         if (!estructura) return {
@@ -106,38 +174,59 @@ export const useProductionWebSocket = ({
 
             if (!isFinalState) {
                 unsubscribe = notificationService.subscribeToAutoSave(codigoProduccion, (message: any) => {
-                    const showDesktopNotification = (title: string, body: string) => {
-                        if (Notification.permission === "granted") {
-                            new Notification(title, {body});
+
+                    const tryShowNotification = (title: string, body: string) => {
+                        console.log('[WebSocket] Intentando mostrar notificación:', {
+                            visible: isPageVisible.current,
+                            permission: Notification.permission,
+                            title
+                        });
+
+                        if (!isPageVisible.current && Notification.permission === "granted") {
+                            try {
+                                const notif = new Notification(title, {
+                                    body,
+                                    tag: 'alimtrack-update',
+                                    icon: '/vite.svg' // Opcional: icono de la app
+                                });
+                                notif.onclick = () => {
+                                    window.focus();
+                                    notif.close();
+                                };
+                            } catch (e) {
+                                console.error('[WebSocket] Error al crear notificación:', e);
+                            }
                         }
                     };
 
                     switch (message.type) {
                         case 'FIELD_UPDATED': {
-                            updateFieldResponse(message.payload);
+                            queueUpdate('FIELD', message.payload);
+
                             const {sectionTitle, itemTitle} = getChangedItemDetails(message.payload.idCampo, 'campo');
                             const body = itemTitle && sectionTitle
                                 ? `Cambio en campo "${itemTitle}" de sección "${sectionTitle}".`
                                 : `Cambio en un campo de la producción ${codigoProduccion}.`;
-                            showDesktopNotification(`Producción ${codigoProduccion} Actualizada`, body);
+                            tryShowNotification(`Producción Actualizada`, body);
                             break;
                         }
                         case 'TABLE_CELL_UPDATED': {
-                            updateTableCellResponse(message.payload);
+                            queueUpdate('TABLE', message.payload);
+
                             const {sectionTitle, itemTitle} = getChangedItemDetails(message.payload.idTabla, 'tabla');
                             const body = itemTitle && sectionTitle
                                 ? `Cambio en tabla "${itemTitle}" de sección "${sectionTitle}".`
                                 : `Cambio en una celda de tabla de la producción ${codigoProduccion}.`;
-                            showDesktopNotification(`Producción ${codigoProduccion} Actualizada`, body);
+                            tryShowNotification(`Producción Actualizada`, body);
                             break;
                         }
                         case 'STATE_CHANGED':
                             updateProductionState(message.payload);
-                            showDesktopNotification(`Producción ${codigoProduccion} - Estado Actualizado`, `El estado ha cambiado a: ${message.payload.estado}`);
+                            tryShowNotification(`Estado Actualizado`, `El estado ha cambiado a: ${message.payload.estado}`);
                             break;
                         case 'PRODUCTION_METADATA_UPDATED':
                             updateProductionMetadata(message.payload);
-                            showDesktopNotification(`Producción ${codigoProduccion} - Metadatos Actualizados`, `Se han actualizado los metadatos de la producción.`);
+                            tryShowNotification(`Metadatos Actualizados`, `Se han actualizado los metadatos de la producción.`);
                             break;
                         default:
                             console.warn(`[useProductionWebSocket] Unknown update type '${message.type}'. Re-fetching all data.`);
@@ -152,17 +241,19 @@ export const useProductionWebSocket = ({
             if (unsubscribe) {
                 unsubscribe();
             }
+            if (batchTimeoutRef.current) {
+                clearTimeout(batchTimeoutRef.current);
+            }
         };
     }, [
         codigoProduccion,
         isConnected,
         estadoActual?.produccion.estado,
         getUltimasRespuestas,
-        updateFieldResponse,
-        updateTableCellResponse,
         updateProductionState,
         updateProductionMetadata,
         getChangedItemDetails,
+        queueUpdate
     ]);
 
     return {isConnected};

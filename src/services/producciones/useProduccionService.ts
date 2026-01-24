@@ -1,43 +1,21 @@
-﻿import { useCallback, useState } from 'react';
-import { productionService } from './ProduccionService';
+﻿import {useCallback, useState} from 'react';
+import {productionService} from './ProduccionService';
+import {useProductionState} from '@/hooks/useProductionState';
 import type {
     EstadoActualProduccionResponseDTO,
-    ProduccionFilterRequestDTO,
-    ProduccionProtectedResponseDTO,
-    RespuestaCampoRequestDTO,
-    RespuestaCeldaTablaRequestDTO,
+    EstructuraProduccionDTO,
+    FieldUpdatePayload,
     ProduccionCambioEstadoRequestDTO,
     ProduccionCreateRequestDTO,
-    RespuestaCampoDTO,
-    RespuestaTablaDTO,
-    ProgresoProduccionResponseDTO,
-    EstructuraProduccionDTO,
+    ProduccionFilterRequestDTO,
     ProduccionMetadataModifyRequestDTO,
+    ProduccionProtectedResponseDTO,
+    ProductionMetadataUpdatedPayload,
+    ProductionStateUpdatePayload,
+    RespuestaCampoRequestDTO,
+    RespuestaCeldaTablaRequestDTO,
+    TableCellUpdatePayload,
 } from '@/pages/common/DetalleProduccion/types/Productions';
-
-interface FieldUpdatePayload {
-    idCampo: number;
-    valor: string;
-}
-
-interface TableCellUpdatePayload {
-    idTabla: number;
-    idFila: number;
-    idColumna: number;
-    valor: string;
-}
-
-interface ProductionStateUpdatePayload {
-    estado: 'EN_PROCESO' | 'FINALIZADA' | 'CANCELADA';
-    fechaFin?: string | null;
-}
-
-interface ProductionMetadataCreationPayload {
-    codigoVersion?: string;
-    lote?: string | null;
-    fechaInicio?: string;
-    fechaFin?: string | null;
-}
 
 interface ProductionMetadataUpdatePayload {
     codigoVersion: string;
@@ -45,7 +23,6 @@ interface ProductionMetadataUpdatePayload {
     encargado: string;
     observaciones: string;
 }
-
 
 interface UseProduccionesReturn {
     loading: boolean;
@@ -68,49 +45,22 @@ interface UseProduccionesReturn {
     setEstructura: (estructura: EstructuraProduccionDTO) => void;
 }
 
-const recalculateProgreso = (
-    estructura: EstructuraProduccionDTO,
-    respuestasCampos: RespuestaCampoDTO[],
-    respuestasTablas: RespuestaTablaDTO[]
-): ProgresoProduccionResponseDTO => {
-    const totalCampos = estructura.totalCampos;
-    const totalCeldasTablas = estructura.totalCeldas;
-
-    const camposRespondidos = new Set(
-        respuestasCampos
-            .filter(rc => rc.valor !== null && rc.valor.trim() !== '')
-            .map(rc => rc.idCampo)
-    ).size;
-
-    const celdasRespondidas = new Set(
-        respuestasTablas
-            .filter(rt => rt.valor !== null && rt.valor.trim() !== '')
-            .map(rt => `${rt.idTabla}-${rt.idFila}-${rt.idColumna}`)
-    ).size;
-
-    const totalElementos = totalCampos + totalCeldasTablas;
-    const elementosRespondidos = camposRespondidos + celdasRespondidas;
-
-    const porcentajeCompletado = totalElementos > 0 ? (elementosRespondidos * 100.0) / totalElementos : 0.0;
-
-    return {
-        totalCampos,
-        camposRespondidos,
-        totalCeldasTablas,
-        celdasRespondidas,
-        totalElementos,
-        elementosRespondidos,
-        porcentajeCompletado,
-    };
-};
-
-
 export const useProduccionService = (): UseProduccionesReturn => {
     const [producciones, setProducciones] = useState<ProduccionProtectedResponseDTO[]>([]);
-    const [estadoActual, setEstadoActual] = useState<EstadoActualProduccionResponseDTO | null>(null);
     const [loading, setLoading] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
     const [error, setError] = useState(false);
+
+    // Usamos el hook genérico para manejar el estado de la producción
+    const {
+        state: estadoActual,
+        setState: setEstadoActual,
+        updateField,
+        updateTable,
+        updateProductionStatus,
+        updateMetadata: updateStateMetadata,
+        recalculateProgreso
+    } = useProductionState<EstadoActualProduccionResponseDTO>();
 
     const getProducciones = useCallback(async (filters: ProduccionFilterRequestDTO = {}) => {
         setLoading(true);
@@ -152,16 +102,16 @@ export const useProduccionService = (): UseProduccionesReturn => {
         } finally {
             setLoading(false);
         }
-    }, []);
+    }, [setEstadoActual]);
 
     const guardarRespuestaCampo = useCallback(async (codigoProduccion: string, idCampo: number, data: RespuestaCampoRequestDTO) => {
         setIsSaving(true);
-        setError(false);
+        // NO reseteamos error global aquí para no afectar la vista general
         try {
             await productionService.guardarRespuestaCampo(codigoProduccion, idCampo, data);
         } catch (err) {
-            setError(true);
-            throw err;
+            // NO seteamos error global (setError(true)) porque es un error de validación local
+            throw err; // Relanzamos para que el componente lo maneje
         } finally {
             setIsSaving(false);
         }
@@ -169,11 +119,9 @@ export const useProduccionService = (): UseProduccionesReturn => {
 
     const guardarRespuestaCeldaTabla = useCallback(async (codigoProduccion: string, idTabla: number, idFila: number, idColumna: number, data: RespuestaCeldaTablaRequestDTO) => {
         setIsSaving(true);
-        setError(false);
         try {
             await productionService.guardarRespuestaCeldaTabla(codigoProduccion, idTabla, idFila, idColumna, data);
         } catch (err) {
-            setError(true);
             throw err;
         } finally {
             setIsSaving(false);
@@ -186,20 +134,19 @@ export const useProduccionService = (): UseProduccionesReturn => {
         try {
             await productionService.cambiarEstado(codigoProduccion, data);
         } catch (err) {
-            setError(true);
+            setError(true); // Aquí sí puede ser relevante un error global
             throw err;
         } finally {
             setIsSaving(false);
         }
     }, []);
-    
+
     const guardarMetadata = useCallback(async (codigoProduccion: string, data: ProduccionMetadataModifyRequestDTO) => {
         setIsSaving(true);
-        setError(false);
+        // Metadata suele ser global, pero si falla, mejor manejarlo localmente en el formulario de metadata
         try {
             await productionService.guardarMetadata(codigoProduccion, data);
         } catch (err) {
-            setError(true);
             throw err;
         } finally {
             setIsSaving(false);
@@ -220,114 +167,22 @@ export const useProduccionService = (): UseProduccionesReturn => {
         }
     }, []);
 
+    // Delegamos las actualizaciones al hook genérico
     const updateFieldResponse = useCallback((update: FieldUpdatePayload & { timestamp: string }) => {
-        setEstadoActual(prevEstadoActual => {
-            if (!prevEstadoActual) {
-                return null;
-            }
-            if (!prevEstadoActual.estructura) {
-                return prevEstadoActual;
-            }
-
-            const newRespuestasCampos = prevEstadoActual.respuestasCampos.map(campo =>
-                campo.idCampo === update.idCampo
-                    ? {...campo, valor: update.valor, timestamp: update.timestamp}
-                    : campo
-            );
-
-            if (!newRespuestasCampos.some(campo => campo.idCampo === update.idCampo)) {
-                newRespuestasCampos.push({
-                    idRespuesta: Date.now(),
-                    idCampo: update.idCampo,
-                    valor: update.valor,
-                    timestamp: update.timestamp
-                });
-            }
-
-            const newProgreso = recalculateProgreso(prevEstadoActual.estructura, newRespuestasCampos, prevEstadoActual.respuestasTablas);
-
-            return {
-                ...prevEstadoActual,
-                respuestasCampos: newRespuestasCampos,
-                progreso: newProgreso,
-                timestampConsulta: new Date().toISOString(),
-            };
-        });
-    }, []);
+        updateField(update, null);
+    }, [updateField]);
 
     const updateTableCellResponse = useCallback((update: TableCellUpdatePayload & { timestamp: string }) => {
-        setEstadoActual(prevEstadoActual => {
-            if (!prevEstadoActual) {
-                return null;
-            }
-            if (!prevEstadoActual.estructura) {
-                return prevEstadoActual;
-            }
-
-            const newRespuestasTablas = prevEstadoActual.respuestasTablas.map(celda =>
-                celda.idTabla === update.idTabla && celda.idFila === update.idFila && celda.idColumna === update.idColumna
-                    ? {...celda, valor: update.valor, timestampRespuesta: update.timestamp}
-                    : celda
-            );
-
-            if (!newRespuestasTablas.some(celda => celda.idTabla === update.idTabla && celda.idFila === update.idFila && celda.idColumna === update.idColumna)) {
-                newRespuestasTablas.push({
-                    idTabla: update.idTabla,
-                    idFila: update.idFila,
-                    idColumna: update.idColumna,
-                    valor: update.valor,
-                    timestampRespuesta: update.timestamp,
-                    tipoDatoColumna: 'TEXTO',
-                    nombreFila: `Fila ${update.idFila}`,
-                    nombreColumna: `Columna ${update.idColumna}`,
-                });
-            }
-
-            const newProgreso = recalculateProgreso(prevEstadoActual.estructura, prevEstadoActual.respuestasCampos, newRespuestasTablas);
-
-            return {
-                ...prevEstadoActual,
-                respuestasTablas: newRespuestasTablas,
-                progreso: newProgreso,
-                timestampConsulta: new Date().toISOString(),
-            };
-        });
-    }, []);
+        updateTable(update, null);
+    }, [updateTable]);
 
     const updateProductionState = useCallback((update: ProductionStateUpdatePayload & { timestamp: string }) => {
-        setEstadoActual(prevEstadoActual => {
-            if (!prevEstadoActual) {
-                return null;
-            }
-            return {
-                ...prevEstadoActual,
-                produccion: {
-                    ...prevEstadoActual.produccion,
-                    estado: update.estado,
-                    fechaFin: update.fechaFin || null,
-                },
-                timestampConsulta: new Date().toISOString(),
-            };
-        });
-    }, []);
+        updateProductionStatus(update);
+    }, [updateProductionStatus]);
 
-    const updateProductionMetadata = useCallback((update: ProductionMetadataUpdatePayload & { timestamp: string }) => {
-        setEstadoActual(prevEstadoActual => {
-            if (!prevEstadoActual) {
-                return null;
-            }
-            return {
-                ...prevEstadoActual,
-                produccion: {
-                    ...prevEstadoActual.produccion,
-                    lote: update.lote,
-                    encargado: update.encargado,
-                    observaciones: update.observaciones,
-                },
-                timestampConsulta: new Date().toISOString(),
-            };
-        });
-    }, []);
+    const updateProductionMetadata = useCallback((update: ProductionMetadataUpdatedPayload & { timestamp: string }) => {
+        updateStateMetadata(update);
+    }, [updateStateMetadata]);
 
     const setEstructura = useCallback((estructura: EstructuraProduccionDTO) => {
         setEstadoActual(prevEstadoActual => {
@@ -347,7 +202,7 @@ export const useProduccionService = (): UseProduccionesReturn => {
                 timestampConsulta: new Date().toISOString(),
             };
         });
-    }, []);
+    }, [setEstadoActual, recalculateProgreso]);
 
 
     return {

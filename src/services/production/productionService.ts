@@ -1,7 +1,7 @@
-import {apiClient} from '../apiClient';
+import {apiClient} from '@/services/ApiClient.ts';
 import type {
-    ProduccionMetadataModifyRequestDTO,
-    ProduccionCambioEstadoRequestDTO
+    ProduccionCambioEstadoRequestDTO,
+    ProduccionMetadataModifyRequestDTO
 } from '@/pages/common/DetalleProduccion/types/Productions';
 
 const updateMetadata = async (codigoProduccion: string, data: ProduccionMetadataModifyRequestDTO): Promise<void> => {

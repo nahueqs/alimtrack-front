@@ -1,14 +1,14 @@
-import { apiClient } from '../ApiClient';
+import {apiClient} from '../ApiClient';
 import type {
     EstadoActualProduccionResponseDTO,
+    ProduccionCambioEstadoRequestDTO,
     ProduccionFilterRequestDTO,
+    ProduccionMetadataModifyRequestDTO,
     ProduccionProtectedResponseDTO,
+    RespuestaCampoDTO,
     RespuestaCampoRequestDTO,
     RespuestaCeldaTablaRequestDTO,
-    RespuestaCampoDTO,
     RespuestaTablaDTO,
-    ProduccionCambioEstadoRequestDTO,
-    ProduccionMetadataModifyRequestDTO,
 } from '@/pages/common/DetalleProduccion/types/Productions';
 
 type ProduccionListResponse = ProduccionProtectedResponseDTO[];

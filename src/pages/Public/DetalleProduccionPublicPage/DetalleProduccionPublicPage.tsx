@@ -1,6 +1,6 @@
 import React, {useEffect} from 'react';
 import {useParams} from 'react-router-dom';
-import {Spin, Alert} from 'antd';
+import {Alert, Spin} from 'antd';
 import {DetalleProduccionPage} from '@/pages/common/DetalleProduccion/DetalleProduccionPage';
 import {usePublicService} from '@/services/public/usePublicService';
 import {PublicHeader} from "@/components/layout/PublicHeader/PublicHeader.tsx";

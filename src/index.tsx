@@ -6,7 +6,8 @@ import LoginPage from './pages/Public/IniciarSesionPage/LoginPage.tsx';
 import {NuevaProduccionPage} from "./pages/Protected/NuevaProduccionPage/NuevaProduccionPage.tsx";
 import ProductionsResultPage from "./pages/Protected/ListadoProduccionesProtected/ProduccionesPage.tsx"
 import DetalleProduccionPublicPage from "@/pages/Public/DetalleProduccionPublicPage/DetalleProduccionPublicPage.tsx";
-import DetalleProduccionProtectedPage from "@/pages/Protected/DetalleProduccionProtected/DetalleProduccionProtectedPage.tsx";
+import DetalleProduccionProtectedPage
+    from "@/pages/Protected/DetalleProduccionProtected/DetalleProduccionProtectedPage.tsx";
 import {ListadoProducciones} from './pages/Public/ListadoProduccionesPublic/ListadoProducciones.tsx';
 import {VersionRecetasPage} from '@/pages/Protected/VersionRecetas/listado/VersionRecetasPage.tsx';
 import type {ProduccionFilterRequestDTO} from '@/pages/common/DetalleProduccion/types/Productions.ts';

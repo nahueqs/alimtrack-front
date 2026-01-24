@@ -1,8 +1,8 @@
 import {apiClient} from '../ApiClient';
 import type {
-    ProduccionPublicMetadataDTO, // Changed from ProduccionResponseDTO
     EstructuraProduccionDTO,
-    RespuestasProduccionPublicDTO, // Changed from RespuestasProduccionDTO
+    ProduccionPublicMetadataDTO,
+    RespuestasProduccionPublicDTO,
     UltimaModificacionDTO
 } from '@/pages/common/DetalleProduccion/types/Productions.ts'; // All types now from common/DetalleProduccion/types/Productions.ts
 
@@ -14,7 +14,7 @@ class PublicService {
      */
     async getProduccionesPublicas(): Promise<ProduccionListResponse> {
         // Add a cache-busting timestamp to the request
-        return apiClient.get<ProduccionListResponse>('public/producciones', { _t: Date.now() });
+        return apiClient.get<ProduccionListResponse>('public/producciones', {_t: Date.now()});
     }
 
     /**

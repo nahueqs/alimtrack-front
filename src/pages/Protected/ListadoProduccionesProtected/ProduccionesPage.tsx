@@ -1,7 +1,10 @@
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import {Col, DatePicker, Form, Input, message, Select} from 'antd';
 import type {TablePaginationConfig} from 'antd/es/table';
-import type {ProduccionFilterRequestDTO, ProduccionProtectedResponseDTO} from '@/pages/common/DetalleProduccion/types/Productions';
+import type {
+    ProduccionFilterRequestDTO,
+    ProduccionProtectedResponseDTO
+} from '@/pages/common/DetalleProduccion/types/Productions';
 import {useProduccionService} from '@/services/producciones/useProduccionService.ts';
 import {CustomTable} from '@/components/ui/CustomTable';
 import {getProductionColumns} from './ProduccionesColumns.tsx';

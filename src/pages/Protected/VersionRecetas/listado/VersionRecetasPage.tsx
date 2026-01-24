@@ -5,12 +5,8 @@ import {Button} from '@/components/ui';
 import {ArrowLeftIcon} from 'lucide-react';
 import {CustomTable} from '@/components/ui/CustomTable';
 import {getColumns} from './ListadoVersionRecetaColumnas.tsx';
-import type {
-    VersionRecetaMetadataResponseDTO, // Keep import from common types
-} from '@/pages/common/DetalleProduccion/types/Productions.ts';
-import type {
-    VersionRecetaFilterRequestDTO, // Import from specific types
-} from '@/pages/Protected/VersionRecetas/types/RecipeVersions.ts';
+import type {VersionRecetaMetadataResponseDTO,} from '@/pages/common/DetalleProduccion/types/Productions.ts';
+import type {VersionRecetaFilterRequestDTO,} from '@/pages/Protected/VersionRecetas/types/RecipeVersions.ts';
 import {useVersionRecetaService} from '@/services/recetas/useVersionRecetaService.ts';
 import {Col, DatePicker, Form, Input, message} from 'antd';
 import type {TablePaginationConfig} from 'antd/es/table';

@@ -1,17 +1,15 @@
-import {useCallback, useState, useEffect} from 'react';
+import {useCallback, useState} from 'react';
 import {publicService} from './PublicService';
+import {useProductionState} from '@/hooks/useProductionState';
 import type {
-    ProduccionPublicMetadataDTO,
     EstructuraProduccionDTO,
-    RespuestasProduccionPublicDTO,
-    UltimaModificacionDTO,
-    RespuestaCampoDTO,
-    RespuestaTablaDTO,
-    ProgresoProduccionResponseDTO,
-    ProductionMetadataUpdatedPayload,
     FieldUpdatePayload,
-    TableCellUpdatePayload,
+    ProduccionPublicMetadataDTO,
+    ProductionMetadataUpdatedPayload,
     ProductionStateUpdatePayload,
+    RespuestasProduccionPublicDTO,
+    TableCellUpdatePayload,
+    UltimaModificacionDTO,
 } from '@/pages/common/DetalleProduccion/types/Productions';
 
 interface UsePublicServiceReturn {
@@ -29,59 +27,27 @@ interface UsePublicServiceReturn {
     updateTableCellResponse: (update: TableCellUpdatePayload & { timestamp: string }) => void;
     updateProductionState: (update: ProductionStateUpdatePayload & { timestamp: string }) => void;
     updateProductionMetadata: (update: ProductionMetadataUpdatedPayload & { timestamp: string }) => void;
-    updateProductionStateInList: (codigoProduccion: string, update: ProductionStateUpdatePayload & { timestamp: string }) => void;
+    updateProductionStateInList: (codigoProduccion: string, update: ProductionStateUpdatePayload & {
+        timestamp: string
+    }) => void;
 }
-
-const recalculateProgreso = (
-    estructura: EstructuraProduccionDTO,
-    respuestasCampos: RespuestaCampoDTO[],
-    respuestasTablas: RespuestaTablaDTO[]
-): ProgresoProduccionResponseDTO => {
-    const totalCampos = estructura.totalCampos;
-    const totalCeldasTablas = estructura.totalCeldas;
-
-    const camposRespondidos = new Set(
-        respuestasCampos
-            .filter(rc => rc.valor !== null && rc.valor.trim() !== '')
-            .map(rc => rc.idCampo)
-    ).size;
-
-    const celdasRespondidas = new Set(
-        respuestasTablas
-            .filter(rt => rt.valor !== null && rt.valor.trim() !== '')
-            .map(rt => `${rt.idTabla}-${rt.idFila}-${rt.idColumna}`)
-    ).size;
-
-    const totalElementos = totalCampos + totalCeldasTablas;
-    const elementosRespondidos = camposRespondidos + celdasRespondidas;
-
-    const porcentajeCompletado = totalElementos > 0 ? (elementosRespondidos * 100.0) / totalElementos : 0.0;
-
-    return {
-        totalCampos,
-        camposRespondidos,
-        totalCeldasTablas,
-        celdasRespondidas,
-        totalElementos,
-        elementosRespondidos,
-        porcentajeCompletado,
-    };
-};
 
 export const usePublicService = (): UsePublicServiceReturn => {
     const [producciones, setProducciones] = useState<ProduccionPublicMetadataDTO[]>([]);
     const [estructura, setEstructura] = useState<EstructuraProduccionDTO | null>(null);
-    const [respuestas, setRespuestas] = useState<RespuestasProduccionPublicDTO | null>(null);
     const [ultimaModificacion, setUltimaModificacion] = useState<UltimaModificacionDTO | null>(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-    useEffect(() => {
-        if (estructura && respuestas) {
-            const newProgreso = recalculateProgreso(estructura, respuestas.respuestasCampos, respuestas.respuestasTablas);
-            setRespuestas(prevRespuestas => prevRespuestas ? {...prevRespuestas, progreso: newProgreso} : null);
-        }
-    }, [estructura, respuestas?.respuestasCampos, respuestas?.respuestasTablas]);
+    // Usamos el hook genérico para manejar el estado de las respuestas
+    const {
+        state: respuestas,
+        setState: setRespuestas,
+        updateField,
+        updateTable,
+        updateProductionStatus,
+        updateMetadata: updateStateMetadata,
+    } = useProductionState<RespuestasProduccionPublicDTO>();
 
     const getProduccionesPublicas = useCallback(async () => {
         setLoading(true);
@@ -123,7 +89,7 @@ export const usePublicService = (): UsePublicServiceReturn => {
         } finally {
             setLoading(false);
         }
-    }, []);
+    }, [setRespuestas]);
 
     const getUltimaModificacionProduccion = useCallback(async (codigo: string) => {
         setLoading(true);
@@ -139,92 +105,23 @@ export const usePublicService = (): UsePublicServiceReturn => {
         }
     }, []);
 
+    // Delegamos las actualizaciones al hook genérico
+    // Aquí pasamos explícitamente la estructura que tenemos en el estado local
     const updateFieldResponse = useCallback((update: FieldUpdatePayload & { timestamp: string }) => {
-        setRespuestas(prevRespuestas => {
-            if (!prevRespuestas) return null;
-
-            const newRespuestasCampos = prevRespuestas.respuestasCampos.map(campo =>
-                campo.idCampo === update.idCampo
-                    ? {...campo, valor: update.valor, timestamp: update.timestamp}
-                    : campo
-            );
-
-            if (!newRespuestasCampos.some(campo => campo.idCampo === update.idCampo)) {
-                newRespuestasCampos.push({
-                    idRespuesta: Date.now(),
-                    idCampo: update.idCampo,
-                    valor: update.valor,
-                    timestamp: update.timestamp
-                });
-            }
-
-            return {
-                ...prevRespuestas,
-                respuestasCampos: newRespuestasCampos,
-                timestampConsulta: new Date().toISOString(),
-            };
-        });
-    }, []);
+        updateField(update, estructura);
+    }, [updateField, estructura]);
 
     const updateTableCellResponse = useCallback((update: TableCellUpdatePayload & { timestamp: string }) => {
-        setRespuestas(prevRespuestas => {
-            if (!prevRespuestas) return null;
-
-            const newRespuestasTablas = prevRespuestas.respuestasTablas.map(celda =>
-                celda.idTabla === update.idTabla && celda.idFila === update.idFila && celda.idColumna === update.idColumna
-                    ? {...celda, valor: update.valor, timestampRespuesta: update.timestamp}
-                    : celda
-            );
-
-            if (!newRespuestasTablas.some(celda => celda.idTabla === update.idTabla && celda.idFila === update.idFila && celda.idColumna === update.idColumna)) {
-                newRespuestasTablas.push({
-                    idTabla: update.idTabla,
-                    idFila: update.idFila,
-                    idColumna: update.idColumna,
-                    valor: update.valor,
-                    timestampRespuesta: update.timestamp,
-                    tipoDatoColumna: 'TEXTO',
-                    nombreFila: `Fila ${update.idFila}`,
-                    nombreColumna: `Columna ${update.idColumna}`,
-                });
-            }
-
-            return {
-                ...prevRespuestas,
-                respuestasTablas: newRespuestasTablas,
-                timestampConsulta: new Date().toISOString(),
-            };
-        });
-    }, []);
+        updateTable(update, estructura);
+    }, [updateTable, estructura]);
 
     const updateProductionState = useCallback((update: ProductionStateUpdatePayload & { timestamp: string }) => {
-        setRespuestas(prevRespuestas => {
-            if (!prevRespuestas) return null;
-            return {
-                ...prevRespuestas,
-                produccion: {
-                    ...prevRespuestas.produccion,
-                    estado: update.estado,
-                    fechaFin: update.fechaFin || null,
-                },
-                timestampConsulta: new Date().toISOString(),
-            };
-        });
-    }, []);
+        updateProductionStatus(update);
+    }, [updateProductionStatus]);
 
     const updateProductionMetadata = useCallback((update: ProductionMetadataUpdatedPayload & { timestamp: string }) => {
-        setRespuestas(prevRespuestas => {
-            if (!prevRespuestas) return null;
-            return {
-                ...prevRespuestas,
-                produccion: {
-                    ...prevRespuestas.produccion,
-                    lote: update.lote !== undefined ? update.lote : prevRespuestas.produccion.lote,
-                },
-                timestampConsulta: new Date().toISOString(),
-            };
-        });
-    }, []);
+        updateStateMetadata(update);
+    }, [updateStateMetadata]);
 
     const updateProductionStateInList = useCallback((
         codigoProduccion: string,

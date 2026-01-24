@@ -1,6 +1,9 @@
 import React from 'react';
-import { Spin, Alert } from 'antd';
-import type { EstructuraProduccionDTO, EstadoActualProduccionResponseDTO } from '@/pages/common/DetalleProduccion/types/Productions';
+import {Alert, Spin} from 'antd';
+import type {
+    EstadoActualProduccionResponseDTO,
+    EstructuraProduccionDTO
+} from '@/pages/common/DetalleProduccion/types/Productions';
 
 interface ProductionStatusDisplayProps {
     loading: boolean;
@@ -11,16 +14,16 @@ interface ProductionStatusDisplayProps {
 }
 
 export const ProductionStatusDisplay: React.FC<ProductionStatusDisplayProps> = ({
-    loading,
-    error,
-    estructura,
-    estadoActual,
-    children,
-}) => {
+                                                                                    loading,
+                                                                                    error,
+                                                                                    estructura,
+                                                                                    estadoActual,
+                                                                                    children,
+                                                                                }) => {
     if (loading) {
         return (
-            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-                <Spin size="large" tip="Cargando datos..." />
+            <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh'}}>
+                <Spin size="large" tip="Cargando datos..."/>
             </div>
         );
     }

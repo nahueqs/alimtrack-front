@@ -1,17 +1,18 @@
-import { useEffect, useState, useCallback } from 'react';
-import { productionService } from '@/services/production/productionService';
-import { useVersionRecetaService } from '@/services/recetas/useVersionRecetaService';
+import {useCallback, useEffect, useState} from 'react';
+import {productionService} from '@/services/production/productionService';
+import {useVersionRecetaService} from '@/services/recetas/useVersionRecetaService';
 import type {
-    EstructuraProduccionDTO,
     EstadoActualProduccionResponseDTO,
-    ProduccionMetadataModifyRequestDTO,
+    EstructuraProduccionDTO,
     FieldUpdatePayload,
-    TableCellUpdatePayload,
-    ProductionStateUpdatePayload,
-    ProductionMetadataUpdatedPayload,
     ProduccionCambioEstadoRequestDTO,
+    ProduccionMetadataModifyRequestDTO,
+    ProductionMetadataUpdatedPayload,
+    ProductionStateUpdatePayload,
+    RespuestaCampoRequestDTO,
+    TableCellUpdatePayload,
 } from '@/pages/common/DetalleProduccion/types/Productions';
-import { useProduccionService } from '@/services/producciones/useProduccionService';
+import {useProduccionService} from '@/services/producciones/useProduccionService';
 
 interface UseProductionDataReturn {
     loading: boolean;
@@ -20,7 +21,7 @@ interface UseProductionDataReturn {
     estructura: EstructuraProduccionDTO | null;
     isSaving: boolean;
     getUltimasRespuestas: (codigo: string) => Promise<void>;
-    guardarRespuestaCampo: (codigoProduccion: string, idCampo: number, data: any) => Promise<void>;
+    guardarRespuestaCampo: (codigoProduccion: string, idCampo: number, data: RespuestaCampoRequestDTO) => Promise<void>;
     guardarRespuestaCeldaTabla: (codigoProduccion: string, idTabla: number, idFila: number, idColumna: number, data: any) => Promise<void>;
     cambiarEstadoProduccion: (codigoProduccion: string, data: ProduccionCambioEstadoRequestDTO) => Promise<void>;
     guardarMetadata: (codigoProduccion: string, data: ProduccionMetadataModifyRequestDTO) => Promise<void>;

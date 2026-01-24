@@ -1,5 +1,3 @@
-import {message} from 'antd';
-
 let onUnauthorized: (() => void) | null = null;
 
 export const setOnUnauthorizedHandler = (callback: () => void) => {
@@ -77,12 +75,22 @@ class ApiClient {
 
             if (contentType && contentType.includes('application/json')) {
                 const responseText = await response.text();
-                data = responseText ? JSON.parse(responseText) : {};
+                try {
+                    data = responseText ? JSON.parse(responseText) : {};
+                } catch (e) {
+                    console.warn('[ApiClient] Error parsing JSON response:', e);
+                    // Si falla el parseo pero el status es error, intentamos usar el texto como mensaje
+                    if (!response.ok) {
+                        data = {message: responseText};
+                    }
+                }
             } else {
                 // If not JSON, read as text and include in error message if not ok
                 const responseText = await response.text();
                 if (!response.ok) {
-                    data = { message: `Server responded with non-JSON content: ${responseText.substring(0, 100)}...` };
+                    // Limitar longitud para no ensuciar logs si es HTML gigante
+                    const msg = responseText.length > 200 ? responseText.substring(0, 200) + '...' : responseText;
+                    data = {message: msg || `Error ${response.status}`};
                 }
             }
 
@@ -104,10 +112,10 @@ class ApiClient {
             if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
                 console.log('[ApiClient] Interpretado como: Error de Red.');
                 friendlyError = new Error('Error de Conexión: No se pudo comunicar con el servidor.');
-                message.error(friendlyError.message);
+                // message.error(friendlyError.message); // Opcional: comentar si el componente lo maneja
             } else if (error.response) {
                 const status = error.response.status;
-                const apiMessage = error.message; // El mensaje de la API ya está en error.message
+                const apiMessage = error.message;
                 console.log(`[ApiClient] Interpretado como: Error HTTP ${status}.`);
 
                 switch (status) {
@@ -134,20 +142,20 @@ class ApiClient {
                         friendlyError = new Error('Error del Servidor: Problema inesperado. Intente más tarde.');
                         break;
                     default:
-                        friendlyError = error; // Usar el error original para códigos no manejados explícitamente
+                        friendlyError = error;
                         break;
                 }
-                message.error(friendlyError.message);
+                // message.error(friendlyError.message); // Opcional: comentar si el componente lo maneja
             } else if (error instanceof SyntaxError) {
                 console.log('[ApiClient] Interpretado como: Error de parseo JSON.');
                 friendlyError = new Error('Error de Respuesta: El formato de la respuesta del servidor no es válido.');
-                message.error(friendlyError.message);
+                // message.error(friendlyError.message);
             } else {
-                friendlyError = error; // Error inesperado, lo pasamos tal cual
+                friendlyError = error;
             }
 
             console.groupEnd();
-            throw friendlyError; // Lanzamos el error amigable
+            throw friendlyError;
         }
     }
 
