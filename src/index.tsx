@@ -1,6 +1,6 @@
 import { Navigate, type RouteObject } from 'react-router-dom';
-import { ProtectedRoute } from '@/services/auth/authProvider/ProtectedRoute.tsx';
-import { PublicRoute } from '@/services/auth/authProvider/PublicRoute.tsx';
+import { ProtectedRoute } from '@/context/auth/ProtectedRoute.tsx';
+import { PublicRoute } from '@/context/auth/PublicRoute.tsx';
 import { DashboardPage } from '@/pages/Protected/DashboardProtected/DashboardPage.tsx';
 import LoginPage from '@/pages/Public/IniciarSesionPage/LoginPage.tsx';
 import { NuevaProduccionPage } from '@/pages/Protected/NuevaProduccionPage/NuevaProduccionPage.tsx';
@@ -9,10 +9,15 @@ import DetalleProduccionPublicPage from '@/pages/Public/DetalleProduccionPublicP
 import DetalleProduccionProtectedPage from '@/pages/Protected/DetalleProduccionProtected/DetalleProduccionProtectedPage.tsx';
 import { ListadoProducciones } from '@/pages/Public/ListadoProduccionesPublic/ListadoProducciones.tsx';
 import { VersionRecetasPage } from '@/pages/Protected/VersionRecetas/listado/VersionRecetasPage.tsx';
-import type { ProduccionFilterRequestDTO } from '@/pages/common/DetalleProduccion/types/Productions.ts';
+import type { ProduccionFilterRequestDTO } from '@/types/production';
+import { ProductionState } from '@/constants/ProductionStates';
 
-const produccionesActivasFilters: ProduccionFilterRequestDTO = { estado: 'EN_PROCESO' };
-const produccionesFinalizadasFilters: ProduccionFilterRequestDTO = { estado: 'FINALIZADA' };
+const produccionesActivasFilters: ProduccionFilterRequestDTO = {
+  estado: ProductionState.EN_PROCESO,
+};
+const produccionesFinalizadasFilters: ProduccionFilterRequestDTO = {
+  estado: ProductionState.FINALIZADA,
+};
 
 export const routes: RouteObject[] = [
   // --- Rutas Públicas ---

@@ -1,162 +1,213 @@
-import React, {useCallback, useEffect, useMemo, useState} from 'react';
-import {Card, Form, Table, Typography} from 'antd';
-import type {ColumnsType} from 'antd/es/table';
-import {debounce} from 'lodash';
-import {useRespuestas} from '../context/RespuestasContext';
-import {DebouncedInput} from './form/DebouncedInput';
-import type {GrupoCamposResponseDTO, SeccionResponseDTO, TablaResponseDTO,} from '../types/Productions';
-import {useIsMobile} from '@/hooks/useIsMobile';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { Card, Form, Table, Typography } from 'antd';
+import type { ColumnsType } from 'antd/es/table';
+import { debounce } from 'lodash';
+import { useRespuestas } from '../context/RespuestasContext';
+import { DebouncedInput } from './form/DebouncedInput';
+import type {
+  GrupoCamposResponseDTO,
+  SeccionResponseDTO,
+  TablaResponseDTO,
+} from '@/types/production';
+import { useIsMobile } from '@/hooks/useIsMobile';
 import '../DetalleProduccionPage.css';
 
-const {Title} = Typography;
+const { Title } = Typography;
 
-const GrupoDeCampos: React.FC<{ grupo: GrupoCamposResponseDTO; isEditable: boolean; }> = React.memo(({
-                                                                                                         grupo,
-                                                                                                         isEditable
-                                                                                                     }) => {
-    const {respuestasCampos, onCampoChange} = useRespuestas();
+const GrupoDeCampos: React.FC<{ grupo: GrupoCamposResponseDTO; isEditable: boolean }> = React.memo(
+  ({ grupo, isEditable }) => {
+    const { respuestasCampos, onCampoChange } = useRespuestas();
     return (
-        <div className="group-card">
-            <Title level={5} className="group-title">{grupo.subtitulo}</Title>
-            {grupo.campos.map(campo => (
-                <Form.Item key={`campo-${campo.id}`} label={campo.nombre}>
-                    <DebouncedInput
-                        value={respuestasCampos[campo.id] || ''}
-                        onChange={(valor) => onCampoChange(campo.id, valor, campo.tipoDato)}
-                        placeholder={`Ingrese ${campo.nombre.toLowerCase()}`}
-                        disabled={!isEditable}
-                        tipoDato={campo.tipoDato}
-                    />
-                </Form.Item>
-            ))}
-        </div>
+      <div className="group-card">
+        <Title level={5} className="group-title">
+          {grupo.subtitulo}
+        </Title>
+        {grupo.campos.map((campo) => (
+          <Form.Item key={`campo-${campo.id}`} label={campo.nombre}>
+            <DebouncedInput
+              value={respuestasCampos[campo.id] || ''}
+              onChange={(valor) => onCampoChange(campo.id, valor, campo.tipoDato)}
+              placeholder={`Ingrese ${campo.nombre.toLowerCase()}`}
+              disabled={!isEditable}
+              tipoDato={campo.tipoDato}
+            />
+          </Form.Item>
+        ))}
+      </div>
     );
-});
+  }
+);
 
-type DataType = { key: number; idFila: number; nombreFila: string; };
+type DataType = { key: number; idFila: number; nombreFila: string };
 
-const TablaProduccion: React.FC<{ tabla: TablaResponseDTO; isEditable: boolean; }> = React.memo(({
-                                                                                                     tabla,
-                                                                                                     isEditable
-                                                                                                 }) => {
+const TablaProduccion: React.FC<{ tabla: TablaResponseDTO; isEditable: boolean }> = React.memo(
+  ({ tabla, isEditable }) => {
     const isMobile = useIsMobile();
-    const {respuestasTablas, onTablaChange} = useRespuestas();
-    const dataSource: DataType[] = tabla.filas?.map(fila => ({
+    const { respuestasTablas, onTablaChange } = useRespuestas();
+    const dataSource: DataType[] =
+      tabla.filas?.map((fila) => ({
         key: fila.id,
         idFila: fila.id,
-        nombreFila: fila.nombre
-    })) || [];
+        nombreFila: fila.nombre,
+      })) || [];
 
     const columns: ColumnsType<DataType> = [
-        {
-            title: 'Concepto',
-            dataIndex: 'nombreFila',
-            key: 'nombreFila',
-            render: (text: string) => <strong>{text}</strong>,
-            fixed: !isMobile ? 'left' : false,
-            width: 150
+      {
+        title: 'Concepto',
+        dataIndex: 'nombreFila',
+        key: 'nombreFila',
+        render: (text: string) => <strong>{text}</strong>,
+        fixed: !isMobile ? 'left' : false,
+        width: 150,
+      },
+      ...(tabla.columnas?.map((col) => ({
+        title: col.nombre,
+        dataIndex: col.id.toString(),
+        key: `col-${col.id}`,
+        render: (_: any, record: DataType) => {
+          const valor =
+            respuestasTablas.find(
+              (c) => c.idFila === record.idFila && c.idColumna === col.id
+            )?.valor || '';
+          return (
+            <DebouncedInput
+              value={valor}
+              onChange={(nuevoValor) =>
+                onTablaChange(tabla.id, record.idFila, col.id, nuevoValor, col.tipoDato)
+              }
+              placeholder={col.nombre}
+              disabled={!isEditable}
+              tipoDato={col.tipoDato}
+            />
+          );
         },
-        ...(tabla.columnas?.map(col => ({
-            title: col.nombre,
-            dataIndex: col.id.toString(),
-            key: `col-${col.id}`,
-            render: (_: any, record: DataType) => {
-                const valor = respuestasTablas.find(c => c.idFila === record.idFila && c.idColumna === col.id)?.valor || '';
-                return (
-                    <DebouncedInput
-                        value={valor}
-                        onChange={(nuevoValor) => onTablaChange(tabla.id, record.idFila, col.id, nuevoValor, col.tipoDato)}
-                        placeholder={col.nombre}
-                        disabled={!isEditable}
-                        tipoDato={col.tipoDato}
-                    />
-                );
-            },
-        })) || []),
+      })) || []),
     ];
 
     return (
-        <div className="production-table-container">
-            <h5 className="production-table-title">{tabla.nombre}</h5>
-            {tabla.descripcion && <p className="production-table-description">{tabla.descripcion}</p>}
-            <Table columns={columns} dataSource={dataSource} pagination={false} bordered size="small"
-                   scroll={{x: 'max-content'}}/>
-        </div>
+      <div className="production-table-container">
+        <h5 className="production-table-title">{tabla.nombre}</h5>
+        {tabla.descripcion && (
+          <p className="production-table-description">{tabla.descripcion}</p>
+        )}
+        <Table
+          columns={columns}
+          dataSource={dataSource}
+          pagination={false}
+          bordered
+          size="small"
+          scroll={{ x: 'max-content' }}
+        />
+      </div>
     );
-});
+  }
+);
 
 interface SeccionProduccionProps {
-    seccion: SeccionResponseDTO;
-    numeroSeccion: number;
-    isEditable: boolean;
+  seccion: SeccionResponseDTO;
+  numeroSeccion: number;
+  isEditable: boolean;
 }
 
-const SeccionProduccion: React.FC<SeccionProduccionProps> = React.memo(({seccion, numeroSeccion, isEditable}) => {
-    const {respuestasCampos, respuestasTablas, onCampoChange} = useRespuestas();
-    const [progreso, setProgreso] = useState({respondidos: 0, total: 0});
+const SeccionProduccion: React.FC<SeccionProduccionProps> = React.memo(
+  ({ seccion, numeroSeccion, isEditable }) => {
+    const { respuestasCampos, respuestasTablas, onCampoChange } = useRespuestas();
+    const [progreso, setProgreso] = useState({ respondidos: 0, total: 0 });
 
     const recalcularProgresoSeccion = useCallback(() => {
-        const camposSimplesTotal = seccion.camposSimples.length;
-        const camposSimplesRespondidos = seccion.camposSimples.filter(c => respuestasCampos[c.id]?.trim()).length;
+      const camposSimplesTotal = seccion.camposSimples.length;
+      const camposSimplesRespondidos = seccion.camposSimples.filter((c) =>
+        respuestasCampos[c.id]?.trim()
+      ).length;
 
-        const camposEnGruposTotal = seccion.gruposCampos.reduce((sum, g) => sum + g.campos.length, 0);
-        const camposEnGruposRespondidos = seccion.gruposCampos.reduce((sum, g) => sum + g.campos.filter(c => respuestasCampos[c.id]?.trim()).length, 0);
+      const camposEnGruposTotal = seccion.gruposCampos.reduce(
+        (sum, g) => sum + g.campos.length,
+        0
+      );
+      const camposEnGruposRespondidos = seccion.gruposCampos.reduce(
+        (sum, g) => sum + g.campos.filter((c) => respuestasCampos[c.id]?.trim()).length,
+        0
+      );
 
-        const celdasTotal = seccion.tablas.reduce((sum, t) => sum + (t.filas?.length || 0) * (t.columnas?.length || 0), 0);
-        const celdasRespondidas = seccion.tablas.reduce((sum, t) => sum + respuestasTablas.filter(rt => rt.idTabla === t.id && rt.valor?.trim()).length, 0);
+      const celdasTotal = seccion.tablas.reduce(
+        (sum, t) => sum + (t.filas?.length || 0) * (t.columnas?.length || 0),
+        0
+      );
+      const celdasRespondidas = seccion.tablas.reduce(
+        (sum, t) =>
+          sum +
+          respuestasTablas.filter((rt) => rt.idTabla === t.id && rt.valor?.trim()).length,
+        0
+      );
 
-        setProgreso({
-            total: camposSimplesTotal + camposEnGruposTotal + celdasTotal,
-            respondidos: camposSimplesRespondidos + camposEnGruposRespondidos + celdasRespondidas,
-        });
+      setProgreso({
+        total: camposSimplesTotal + camposEnGruposTotal + celdasTotal,
+        respondidos: camposSimplesRespondidos + camposEnGruposRespondidos + celdasRespondidas,
+      });
     }, [seccion, respuestasCampos, respuestasTablas]);
 
-    const debouncedRecalcular = useMemo(() => debounce(recalcularProgresoSeccion, 500), [recalcularProgresoSeccion]);
+    const debouncedRecalcular = useMemo(
+      () => debounce(recalcularProgresoSeccion, 500),
+      [recalcularProgresoSeccion]
+    );
 
     useEffect(() => {
-        debouncedRecalcular();
-        return () => debouncedRecalcular.cancel();
+      debouncedRecalcular();
+      return () => debouncedRecalcular.cancel();
     }, [respuestasCampos, respuestasTablas, debouncedRecalcular]);
 
     return (
-        <Card className="section-card">
-            <Title level={4} className="section-title">
-                <span className="section-number">{numeroSeccion}</span>
-                {seccion.titulo}
-                {progreso.total > 0 &&
-                    <span className="section-progress-text">({progreso.respondidos} / {progreso.total})</span>}
-            </Title>
-            <Form layout="vertical">
-                {seccion.camposSimples.map(campo => (
-                    <Form.Item key={`campo-${campo.id}`} label={campo.nombre}>
-                        <DebouncedInput
-                            value={respuestasCampos[campo.id] || ''}
-                            onChange={(valor) => onCampoChange(campo.id, valor, campo.tipoDato)}
-                            placeholder={`Ingrese ${campo.nombre.toLowerCase()}`}
-                            disabled={!isEditable}
-                            tipoDato={campo.tipoDato}
-                        />
-                    </Form.Item>
-                ))}
-                {seccion.gruposCampos.map(grupo => <GrupoDeCampos key={`grupo-${grupo.id}`} grupo={grupo}
-                                                                  isEditable={isEditable}/>)}
-                {seccion.tablas.map(tabla => <TablaProduccion key={`tabla-${tabla.id}`} tabla={tabla}
-                                                              isEditable={isEditable}/>)}
-            </Form>
-        </Card>
+      <Card className="section-card">
+        <Title level={4} className="section-title">
+          <span className="section-number">{numeroSeccion}</span>
+          {seccion.titulo}
+          {progreso.total > 0 && (
+            <span className="section-progress-text">
+              ({progreso.respondidos} / {progreso.total})
+            </span>
+          )}
+        </Title>
+        <Form layout="vertical">
+          {seccion.camposSimples.map((campo) => (
+            <Form.Item key={`campo-${campo.id}`} label={campo.nombre}>
+              <DebouncedInput
+                value={respuestasCampos[campo.id] || ''}
+                onChange={(valor) => onCampoChange(campo.id, valor, campo.tipoDato)}
+                placeholder={`Ingrese ${campo.nombre.toLowerCase()}`}
+                disabled={!isEditable}
+                tipoDato={campo.tipoDato}
+              />
+            </Form.Item>
+          ))}
+          {seccion.gruposCampos.map((grupo) => (
+            <GrupoDeCampos key={`grupo-${grupo.id}`} grupo={grupo} isEditable={isEditable} />
+          ))}
+          {seccion.tablas.map((tabla) => (
+            <TablaProduccion key={`tabla-${tabla.id}`} tabla={tabla} isEditable={isEditable} />
+          ))}
+        </Form>
+      </Card>
     );
-});
+  }
+);
 
 interface EstructuraProduccionProps {
-    estructura: SeccionResponseDTO[];
-    isEditable?: boolean;
+  estructura: SeccionResponseDTO[];
+  isEditable?: boolean;
 }
 
-export const EstructuraProduccion: React.FC<EstructuraProduccionProps> = ({estructura, isEditable = false}) => (
-    <div className="production-structure">
-        {estructura.map((seccion, index) => (
-            <SeccionProduccion key={`seccion-${seccion.id}`} seccion={seccion} numeroSeccion={index + 1}
-                               isEditable={isEditable}/>
-        ))}
-    </div>
+export const EstructuraProduccion: React.FC<EstructuraProduccionProps> = ({
+  estructura,
+  isEditable = false,
+}) => (
+  <div className="production-structure">
+    {estructura.map((seccion, index) => (
+      <SeccionProduccion
+        key={`seccion-${seccion.id}`}
+        seccion={seccion}
+        numeroSeccion={index + 1}
+        isEditable={isEditable}
+      />
+    ))}
+  </div>
 );

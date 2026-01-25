@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import type { ProduccionCreateRequestDTO } from '@/pages/common/DetalleProduccion/types/Productions.ts';
+import type { ProduccionCreateRequestDTO } from '@/types/production';
 import { NuevaProduccionForm } from './NuevaProduccionForm.tsx';
 import { message, Spin } from 'antd';
 import { useAuth } from '@/services/auth/authProvider/authProvider.tsx';
-import { useProduccionService } from '@/services/producciones/useProduccionService.ts';
+import { useProductionService } from '@/services/production/useProductionService.ts';
 import { useVersionRecetaService } from '@/services/recetas/useVersionRecetaService.ts';
 import { AppHeader } from '@/components/AppHeader/AppHeader.tsx';
 import { useNavigate } from 'react-router-dom';
@@ -13,7 +13,7 @@ import { Button } from '@/components/ui';
 export const NuevaProduccionPage: React.FC = () => {
   const [loadingSubmit, setLoadingSubmit] = useState(false);
   const { user } = useAuth();
-  const { createProduction } = useProduccionService();
+  const { createProduction } = useProductionService();
   const navigate = useNavigate();
 
   const {

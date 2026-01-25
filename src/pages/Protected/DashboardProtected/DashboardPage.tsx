@@ -1,5 +1,5 @@
 import React from 'react';
-import { useAuth } from '@/services/auth/authProvider/authProvider.tsx';
+import { useAuth } from '@/context/auth/AuthProvider.tsx';
 import { useNavigate } from 'react-router-dom';
 import { ProductionsCard } from './ProductionsCard.tsx';
 import { RecetasCard } from './RecipesCard.tsx';

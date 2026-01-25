@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button, Spin } from 'antd';
 import { BarcodeOutlined, FieldNumberOutlined, UserOutlined } from '@ant-design/icons';
-import type { VersionRecetaMetadataResponseDTO } from '@/pages/common/DetalleProduccion/types/Productions.ts';
+import type { VersionRecetaMetadataResponseDTO } from '@/types/production';
 import { VersionDetails } from './VersionDetails.tsx';
 
 export interface FormFieldConfig {

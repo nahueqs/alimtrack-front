@@ -1,6 +1,6 @@
 import React from 'react';
 import { InfoCircleOutlined } from '@ant-design/icons';
-import type { VersionRecetaMetadataResponseDTO } from '@/pages/common/DetalleProduccion/types/Productions.ts';
+import type { VersionRecetaMetadataResponseDTO } from '@/types/production';
 import './NuevaProduccionForm.css'; // Asumiendo que los estilos están aquí
 
 interface VersionDetailsProps {

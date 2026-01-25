@@ -1,41 +1,38 @@
 import React from 'react';
-import {Card, Col, Progress, Row, Statistic} from 'antd';
-import type {ProgresoProduccionResponseDTO} from '../types/Productions';
-import {CheckCircleOutlined} from '@ant-design/icons';
+import { Card, Progress, Statistic, Typography } from 'antd';
+import type { ProgresoProduccionResponseDTO } from '@/types/production';
+
+const { Title } = Typography;
 
 interface ProgresoProduccionCardProps {
-    progreso: ProgresoProduccionResponseDTO;
+  progreso: ProgresoProduccionResponseDTO;
 }
 
-export const ProgresoProduccionCard: React.FC<ProgresoProduccionCardProps> = ({progreso}) => {
-    // console.log("[ProgresoProduccionCard] Received progreso prop:", progreso); // Removed debug log
-
-    return (
-        <Card title="Progreso de la Producción" className="progress-info-card">
-            <Row gutter={[16, 24]} align="middle">
-                <Col xs={24} sm={12} style={{textAlign: 'center'}}>
-                    <Progress
-                        type="dashboard"
-                        percent={Math.round(progreso.porcentajeCompletado)}
-                        format={(percent) => `${percent}%`}
-                    />
-                </Col>
-                <Col xs={24} sm={12}>
-                    <Statistic
-                        title="Campos Respondidos"
-                        value={progreso.elementosRespondidos}
-                        formatter={() => (
-                            <span>
-                                {progreso.elementosRespondidos} / {progreso.totalElementos}
-                                <span className="statistic-percentage">
-                                    ({Math.round(progreso.porcentajeCompletado)}%)
-                                </span>
-                            </span>
-                        )}
-                        prefix={<CheckCircleOutlined/>}
-                    />
-                </Col>
-            </Row>
-        </Card>
-    );
+export const ProgresoProduccionCard: React.FC<ProgresoProduccionCardProps> = ({ progreso }) => {
+  return (
+    <Card className="progress-card">
+      <Title level={4} className="progress-card-title">
+        Progreso
+      </Title>
+      <div style={{ textAlign: 'center', marginBottom: 24 }}>
+        <Progress
+          type="circle"
+          percent={Math.round(progreso.porcentajeCompletado)}
+          format={(percent) => `${percent}%`}
+        />
+      </div>
+      <div style={{ display: 'flex', justifyContent: 'space-around' }}>
+        <Statistic
+          title="Campos"
+          value={progreso.camposRespondidos}
+          suffix={`/ ${progreso.totalCampos}`}
+        />
+        <Statistic
+          title="Tablas"
+          value={progreso.celdasRespondidas}
+          suffix={`/ ${progreso.totalCeldasTablas}`}
+        />
+      </div>
+    </Card>
+  );
 };

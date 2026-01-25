@@ -1,150 +1,91 @@
-import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
-import {useNavigate} from 'react-router-dom';
-import {AppHeader} from '@/components/AppHeader/AppHeader.tsx';
-import {Button} from '@/components/ui';
-import {ArrowLeftIcon} from 'lucide-react';
-import {CustomTable} from '@/components/ui/CustomTable';
-import {getColumns} from './ListadoVersionRecetaColumnas.tsx';
-import type {VersionRecetaMetadataResponseDTO,} from '@/pages/common/DetalleProduccion/types/Productions.ts';
-import type {VersionRecetaFilterRequestDTO,} from '@/pages/Protected/VersionRecetas/types/RecipeVersions.ts';
-import {useVersionRecetaService} from '@/services/recetas/useVersionRecetaService.ts';
-import {Col, DatePicker, Form, Input, message} from 'antd';
-import type {TablePaginationConfig} from 'antd/es/table';
-import {useIsMobile} from '@/hooks/useIsMobile.ts';
-
-const {RangePicker} = DatePicker;
-
+import React, { useEffect, useState } from 'react';
+import { AppHeader } from '@/components/AppHeader/AppHeader.tsx';
+import { CustomTable } from '@/components/ui/CustomTable/CustomTable.tsx';
+import { getColumns } from './ListadoVersionRecetaColumnas.tsx';
+import { useNavigate } from 'react-router-dom';
+import { useVersionRecetaService } from '@/services/recetas/useVersionRecetaService.ts';
+import type { VersionRecetaMetadataResponseDTO } from '@/types/production';
+import { useIsMobile } from '@/hooks/useIsMobile.ts';
 
 export const VersionRecetasPage: React.FC = () => {
-    const navigate = useNavigate();
-    const [form] = Form.useForm();
-    const fetchInitiated = useRef(false);
-    const isMobile = useIsMobile();
+  const { versiones, loading, error, getAllVersiones } = useVersionRecetaService();
+  const navigate = useNavigate();
+  const isMobile = useIsMobile();
+  const [searchTerm, setSearchTerm] = useState('');
 
-    const {versiones: fetchedVersiones, loading, getAllVersiones} = useVersionRecetaService();
-    const [activeFilters, setActiveFilters] = useState<VersionRecetaFilterRequestDTO>({});
-    const [pagination, setPagination] = useState<TablePaginationConfig>({
-        current: 1,
-        pageSize: 10,
-        total: 0,
-    });
+  useEffect(() => {
+    getAllVersiones();
+  }, [getAllVersiones]);
 
-    useEffect(() => {
-        if (!fetchInitiated.current) {
-            fetchInitiated.current = true;
-            getAllVersiones();
-        }
-    }, [getAllVersiones]);
+  const handleView = (record: VersionRecetaMetadataResponseDTO) => {
+    navigate(`/recetas/versiones/${record.codigoVersionReceta}`);
+  };
 
-    const sortedVersiones = useMemo(() => {
-        if (!fetchedVersiones) return [];
-        return [...fetchedVersiones].sort((a, b) => {
-            // Compare dates in descending order
-            return new Date(b.fechaCreacion).getTime() - new Date(a.fechaCreacion).getTime();
-        });
-    }, [fetchedVersiones]);
+  const handleEdit = (record: VersionRecetaMetadataResponseDTO) => {
+    navigate(`/recetas/versiones/editar/${record.codigoVersionReceta}`);
+  };
 
-    useEffect(() => {
-        setPagination(prev => ({...prev, total: sortedVersiones.length})); // Use sortedVersiones length
-    }, [sortedVersiones]);
+  const handleDelete = (id: string) => {
+    console.log('Eliminar versión', id);
+    // Implementar lógica de eliminación
+  };
 
-    const handleBackToDashboard = useCallback(() => navigate('/dashboard'), [navigate]);
-    const handleView = useCallback((record: VersionRecetaMetadataResponseDTO) => navigate(`/recetas/ver/${record.codigoVersionReceta}`), [navigate]);
-    const handleEdit = useCallback((record: VersionRecetaMetadataResponseDTO) => navigate(`/recetas/editar/${record.codigoVersionReceta}`), [navigate]);
-    const handleDelete = useCallback((id: string) => {
-        if (import.meta.env.DEV) console.log('Delete record with id:', id);
-        message.info('Funcionalidad de eliminación pendiente.');
-    }, []);
-    const handleExport = useCallback((filters: any) => {
-        if (import.meta.env.DEV) console.log('Exportar versiones con filtros:', filters);
-        message.info('Funcionalidad de exportación pendiente.');
-    }, []);
-    const handleAdd = useCallback(() => navigate('/recetas/nueva'), [navigate]);
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(e.target.value);
+  };
 
-    const handleSearch = (values: any) => {
-        const filters: VersionRecetaFilterRequestDTO = {
-            codigoReceta: values.codigoReceta?.trim() || undefined,
-            codigoVersionReceta: values.codigoVersionReceta?.trim() || undefined,
-            ...(values.fechaRango && {
-                fechaInicio: values.fechaRango[0]?.format('YYYY-MM-DD'),
-                fechaFin: values.fechaRango[1]?.format('YYYY-MM-DD'),
-            }),
-        };
-        Object.keys(filters).forEach(key => {
-            if (filters[key as keyof VersionRecetaFilterRequestDTO] === undefined || filters[key as keyof VersionRecetaFilterRequestDTO] === '') {
-                delete filters[key as keyof VersionRecetaFilterRequestDTO];
-            }
-        });
-        setActiveFilters(filters);
-        getAllVersiones();
-        setPagination(prev => ({...prev, current: 1}));
-    };
+  const filteredVersiones = versiones.filter(
+    (v) =>
+      v.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      v.codigoVersionReceta.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      v.codigoRecetaPadre.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
-    const handleReset = () => {
-        form.resetFields();
-        setActiveFilters({});
-        getAllVersiones();
-        setPagination(prev => ({...prev, current: 1}));
-    };
+  const columns = getColumns({
+    onView: handleView,
+    onEdit: handleEdit,
+    onDelete: handleDelete,
+    isMobile,
+  });
 
-    const columns = getColumns({onView: handleView, onEdit: handleEdit, onDelete: handleDelete, isMobile});
-
-    const filterContent = (
-        <>
-            <Col xs={24} sm={12} md={8} lg={6}>
-                <Form.Item name="codigoReceta" label="Código de Receta">
-                    <Input placeholder="Buscar por código de receta"/>
-                </Form.Item>
-            </Col>
-            <Col xs={24} sm={12} md={8} lg={6}>
-                <Form.Item name="codigoVersionReceta" label="Código de Versión">
-                    <Input placeholder="Buscar por código de versión"/>
-                </Form.Item>
-            </Col>
-            <Col xs={24} sm={12} md={8} lg={6}>
-                <Form.Item name="fechaRango" label="Rango de Fechas">
-                    <RangePicker style={{width: '100%'}}/>
-                </Form.Item>
-            </Col>
-        </>
-    );
-
-    return (
-        <div className="recipe-versions-page">
-            <AppHeader title="AlimTrack"/>
-            <div className="recipe-versions-page__content container">
-                <div className="recipe-versions-page__header">
-                    <Button icon={<ArrowLeftIcon/>} onClick={handleBackToDashboard} variant={'secondary'}>
-                        Volver al Dashboard
-                    </Button>
-                </div>
-                <div className="recipe-versions-page__body">
-                    <CustomTable<VersionRecetaMetadataResponseDTO>
-                        title="Versiones de Recetas"
-                        onAdd={handleAdd}
-                        onExport={handleExport ? () => handleExport(activeFilters) : undefined} // Conditional onExport
-                        exportButton={!!handleExport} // Conditional exportButton
-                        // exportButtonText="Exportar Versiones" // Removed for consistency
-
-                        filterForm={form}
-                        onFilterSearch={handleSearch}
-                        onFilterReset={handleReset}
-                        filterLoading={loading}
-                        filterContent={filterContent}
-                        dataSource={sortedVersiones} // Use sorted data
-
-                        columns={columns}
-                        loading={loading}
-                        rowKey="codigoVersionReceta"
-                        pagination={pagination}
-                        onChange={setPagination}
-                        scroll={{x: 'max-content'}}
-                        className="recipe-versions-page__table"
-                    />
-                </div>
-            </div>
+  return (
+    <div className="dashboard">
+      <AppHeader title="AlimTrack" />
+      <main className="dashboard__main container">
+        <div className="productions-list__header">
+          <h1 className="productions-list__title">Versiones de Recetas</h1>
+          {/* Aquí podrías agregar un botón de "Nueva Versión" si fuera necesario */}
         </div>
-    );
-};
 
-export default VersionRecetasPage;
+        {/* Barra de búsqueda simple */}
+        <div style={{ marginBottom: '1rem' }}>
+          <input
+            type="text"
+            placeholder="Buscar por nombre o código..."
+            value={searchTerm}
+            onChange={handleSearch}
+            style={{
+              padding: '0.5rem',
+              width: '100%',
+              maxWidth: '400px',
+              borderRadius: '4px',
+              border: '1px solid #ccc',
+            }}
+          />
+        </div>
+
+        <div className="productions-list__content">
+          <CustomTable
+            columns={columns}
+            dataSource={filteredVersiones}
+            loading={loading}
+            rowKey="codigoVersionReceta"
+            locale={{
+              emptyText: error ? 'Error al cargar las versiones' : 'No se encontraron versiones',
+            }}
+          />
+        </div>
+      </main>
+    </div>
+  );
+};

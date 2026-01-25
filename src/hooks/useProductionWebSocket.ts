@@ -6,7 +6,8 @@ import type {
   ProductionMetadataUpdatedPayload,
   ProductionStateUpdatePayload,
   TableCellUpdatePayload,
-} from '@/pages/common/DetalleProduccion/types/Productions';
+} from '@/types/production';
+import { findItemInStructure } from '@/utils/production/structureUtils';
 
 // Definimos un tipo compatible con DTOs públicos y protegidos que tengan la info de estado
 interface ProductionStateSource {
@@ -133,63 +134,6 @@ export const useProductionWebSocket = ({
     [processBatch]
   );
 
-  const getChangedItemDetails = useCallback(
-    (id: number, type: 'campo' | 'tabla') => {
-      if (!estructura)
-        return {
-          sectionTitle: undefined,
-          itemTitle: undefined,
-          itemType: undefined,
-          groupTitle: undefined,
-        };
-
-      for (const seccion of estructura.estructura) {
-        if (type === 'campo') {
-          const campoDirecto = seccion.camposSimples.find((campo) => campo.id === id);
-          if (campoDirecto) {
-            return {
-              sectionTitle: seccion.titulo,
-              itemTitle: campoDirecto.nombre,
-              itemType: 'Campo Simple',
-              groupTitle: undefined,
-            };
-          }
-
-          for (const grupo of seccion.gruposCampos || []) {
-            const campoEnGrupo = grupo.campos.find((campo) => campo.id === id);
-            if (campoEnGrupo) {
-              return {
-                sectionTitle: seccion.titulo,
-                itemTitle: campoEnGrupo.nombre,
-                itemType: 'Campo Agrupado',
-                groupTitle: grupo.subtitulo,
-              };
-            }
-          }
-        }
-
-        if (type === 'tabla') {
-          const tabla = seccion.tablas.find((t) => t.id === id);
-          if (tabla) {
-            return {
-              sectionTitle: seccion.titulo,
-              itemTitle: tabla.nombre,
-              itemType: 'Tabla',
-              groupTitle: undefined,
-            };
-          }
-        }
-      }
-      return {
-        sectionTitle: undefined,
-        itemTitle: undefined,
-        itemType: undefined,
-        groupTitle: undefined,
-      };
-    },
-    [estructura]
-  );
-
   useEffect(() => {
     let unsubscribe: (() => void) | undefined;
 
@@ -228,7 +172,8 @@ export const useProductionWebSocket = ({
             case 'FIELD_UPDATED': {
               queueUpdate('FIELD', message.payload);
 
-              const { sectionTitle, itemTitle } = getChangedItemDetails(
+              const { sectionTitle, itemTitle } = findItemInStructure(
+                estructura,
                 message.payload.idCampo,
                 'campo'
               );
@@ -242,7 +187,8 @@ export const useProductionWebSocket = ({
             case 'TABLE_CELL_UPDATED': {
               queueUpdate('TABLE', message.payload);
 
-              const { sectionTitle, itemTitle } = getChangedItemDetails(
+              const { sectionTitle, itemTitle } = findItemInStructure(
+                estructura,
                 message.payload.idTabla,
                 'tabla'
               );
@@ -298,7 +244,7 @@ export const useProductionWebSocket = ({
     getUltimasRespuestas,
     updateProductionState,
     updateProductionMetadata,
-    getChangedItemDetails,
+    estructura,
     queueUpdate,
   ]);
 

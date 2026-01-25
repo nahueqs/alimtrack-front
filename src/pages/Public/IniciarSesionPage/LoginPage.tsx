@@ -4,7 +4,7 @@ import { RegisterForm } from './Register form/RegisterForm.tsx';
 import { useNavigate } from 'react-router-dom';
 import logoUnlu from '@/assets/logoUnlu.png';
 import logoCideta from '@/assets/logoCideta.png';
-import { useAuth } from '@/services/auth/authProvider/authProvider.tsx';
+import { useAuth } from '@/context/auth/AuthProvider.tsx';
 import { Card } from '@/components/ui';
 import './LoginPage.css';
 import { ScheduleOutlined } from '@ant-design/icons';

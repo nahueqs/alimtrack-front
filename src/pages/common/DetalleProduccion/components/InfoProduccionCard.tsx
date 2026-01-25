@@ -1,152 +1,162 @@
-import React, {useEffect, useState} from 'react';
-import {Button, Card, Descriptions, Input, Space, Tag} from 'antd';
-import {CheckCircleOutlined, CloseCircleOutlined} from '@ant-design/icons';
+import React, { useState } from 'react';
+import { Button, Card, Descriptions, Form, Input, Modal, Select, Tag, Typography } from 'antd';
+import { EditOutlined, SaveOutlined } from '@ant-design/icons';
 import type {
-    EstructuraProduccionDTO,
-    ProduccionMetadataModifyRequestDTO,
-    ProduccionProtectedResponseDTO,
-    ProduccionPublicMetadataDTO,
-} from '../types/Productions';
-import {useElapsedTime} from '../../../../hooks/useElapsedTime';
-import '../DetalleProduccionPage.css';
+  EstructuraProduccionDTO,
+  ProduccionMetadataModifyRequestDTO,
+  ProduccionProtectedResponseDTO,
+  ProduccionPublicMetadataDTO,
+} from '@/types/production';
+import {
+  PRODUCTION_STATE_COLORS,
+  PRODUCTION_STATE_LABELS,
+  ProductionState,
+} from '@/constants/ProductionStates';
 
-type ProduccionInfo = ProduccionPublicMetadataDTO | ProduccionProtectedResponseDTO;
+const { Title, Text } = Typography;
+const { Option } = Select;
 
-interface ProductionHeaderProps {
-    produccion: ProduccionInfo;
-    versionReceta: EstructuraProduccionDTO;
-    isEditable?: boolean;
-    onCambioEstado?: (nuevoEstado: 'FINALIZADA' | 'CANCELADA') => void;
-    onMetadataChange?: (data: ProduccionMetadataModifyRequestDTO) => void;
+interface InfoProduccionCardProps {
+  produccion: ProduccionProtectedResponseDTO | ProduccionPublicMetadataDTO;
+  versionReceta: EstructuraProduccionDTO;
+  isEditable?: boolean;
+  onCambioEstado?: (nuevoEstado: ProductionState) => void;
+  onMetadataChange?: (data: ProduccionMetadataModifyRequestDTO) => void;
 }
 
-export const InfoProduccionCard: React.FC<ProductionHeaderProps> = ({
-                                                                        produccion,
-                                                                        versionReceta,
-                                                                        isEditable,
-                                                                        onCambioEstado,
-                                                                        onMetadataChange
-                                                                    }) => {
-    const elapsedTime = useElapsedTime(produccion.fechaInicio, produccion.fechaFin);
-    const [lote, setLote] = useState(produccion.lote);
-    const [encargado, setEncargado] = useState((produccion as ProduccionProtectedResponseDTO).encargado);
-    const [observaciones, setObservaciones] = useState((produccion as ProduccionProtectedResponseDTO).observaciones);
+export const InfoProduccionCard: React.FC<InfoProduccionCardProps> = ({
+  produccion,
+  versionReceta,
+  isEditable = false,
+  onCambioEstado,
+  onMetadataChange,
+}) => {
+  const [isEditing, setIsEditable] = useState(false);
+  const [form] = Form.useForm();
 
-    useEffect(() => {
-        setLote(produccion.lote);
-        setEncargado((produccion as ProduccionProtectedResponseDTO).encargado);
-        setObservaciones((produccion as ProduccionProtectedResponseDTO).observaciones);
-    }, [produccion]);
+  const handleEdit = () => {
+    form.setFieldsValue({
+      lote: produccion.lote,
+      encargado: (produccion as any).encargado, // Cast as any because public DTO might not have it, but form handles it
+      observaciones: (produccion as any).observaciones,
+    });
+    setIsEditable(true);
+  };
 
-    const handleBlur = () => {
+  const handleSave = () => {
+    form
+      .validateFields()
+      .then((values) => {
         if (onMetadataChange) {
-            onMetadataChange({lote, encargado, observaciones});
+          onMetadataChange(values);
         }
-    };
+        setIsEditable(false);
+      })
+      .catch((info) => {
+        console.log('Validate Failed:', info);
+      });
+  };
 
-    const formatDate = (dateString: string | null) => {
-        if (!dateString) return 'N/A';
-        return new Date(dateString).toLocaleString('es-AR', {
-            year: 'numeric',
-            month: '2-digit',
-            day: '2-digit',
-            hour: '2-digit',
-            minute: '2-digit'
-        });
-    };
-
-    const getStatusTag = (estado: string) => {
-        switch (estado) {
-            case 'EN_PROCESO':
-                return <Tag color="blue">En Proceso</Tag>;
-            case 'FINALIZADA':
-                return <Tag color="green">Finalizada</Tag>;
-            case 'CANCELADA':
-                return <Tag color="red">Cancelada</Tag>;
-            default:
-                return <Tag>{estado}</Tag>;
+  const handleEstadoChange = (value: ProductionState) => {
+    Modal.confirm({
+      title: '¿Estás seguro de cambiar el estado?',
+      content: `La producción pasará a estado ${PRODUCTION_STATE_LABELS[value]}.`,
+      onOk: () => {
+        if (onCambioEstado) {
+          onCambioEstado(value);
         }
-    };
+      },
+    });
+  };
 
-    const metadata = versionReceta.metadata;
-    const isProtected = (produccion as ProduccionProtectedResponseDTO).encargado !== undefined;
-    const enProceso = produccion.estado === 'EN_PROCESO';
+  const renderEstadoTag = (estado: ProductionState) => {
+    const color = PRODUCTION_STATE_COLORS[estado] || 'default';
+    const text = PRODUCTION_STATE_LABELS[estado] || estado;
+    return <Tag color={color}>{text}</Tag>;
+  };
 
-    const cardTitle = (
-        <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
-            Información de la Producción
-            {isProtected && enProceso && onCambioEstado && (
-                <Space>
-                    <Button icon={<CheckCircleOutlined/>} type="primary" onClick={() => {
-                        onCambioEstado('FINALIZADA');
-                    }}>
-                        Finalizar
-                    </Button>
-                    <Button icon={<CloseCircleOutlined/>} danger onClick={() => {
-                        onCambioEstado('CANCELADA');
-                    }}>
-                        Cancelar
-                    </Button>
-                </Space>
+  return (
+    <Card className="info-card">
+      <div className="info-card-header">
+        <Title level={4} className="info-card-title">
+          Información de Producción
+        </Title>
+        {isEditable && !isEditing && (
+          <Button type="text" icon={<EditOutlined />} onClick={handleEdit}>
+            Editar
+          </Button>
+        )}
+        {isEditable && isEditing && (
+          <Button type="primary" icon={<SaveOutlined />} onClick={handleSave}>
+            Guardar
+          </Button>
+        )}
+      </div>
+
+      {isEditing ? (
+        <Form form={form} layout="vertical">
+          <Form.Item name="lote" label="Lote">
+            <Input />
+          </Form.Item>
+          <Form.Item name="encargado" label="Encargado">
+            <Input />
+          </Form.Item>
+          <Form.Item name="observaciones" label="Observaciones">
+            <Input.TextArea />
+          </Form.Item>
+        </Form>
+      ) : (
+        <Descriptions column={{ xxl: 2, xl: 2, lg: 2, md: 1, sm: 1, xs: 1 }} bordered size="small">
+          <Descriptions.Item label="Código">{produccion.codigoProduccion}</Descriptions.Item>
+          <Descriptions.Item label="Lote">
+            <Text strong>{produccion.lote || '-'}</Text>
+          </Descriptions.Item>
+          <Descriptions.Item label="Estado">
+            {isEditable ? (
+              <Select
+                defaultValue={produccion.estado}
+                style={{ width: 120 }}
+                onChange={handleEstadoChange}
+                disabled={
+                  produccion.estado === ProductionState.FINALIZADA ||
+                  produccion.estado === ProductionState.CANCELADA
+                }
+              >
+                <Option value={ProductionState.EN_PROCESO}>En Proceso</Option>
+                <Option value={ProductionState.FINALIZADA}>Finalizada</Option>
+                <Option value={ProductionState.CANCELADA}>Cancelada</Option>
+              </Select>
+            ) : (
+              renderEstadoTag(produccion.estado)
             )}
+          </Descriptions.Item>
+          <Descriptions.Item label="Versión Receta">
+            {versionReceta.metadata.nombre} ({versionReceta.metadata.codigoVersionReceta})
+          </Descriptions.Item>
+          <Descriptions.Item label="Fecha Inicio">
+            {new Date(produccion.fechaInicio).toLocaleString()}
+          </Descriptions.Item>
+          <Descriptions.Item label="Fecha Fin">
+            {produccion.fechaFin ? new Date(produccion.fechaFin).toLocaleString() : '-'}
+          </Descriptions.Item>
+          {(produccion as any).encargado && (
+            <Descriptions.Item label="Encargado">
+              {(produccion as any).encargado}
+            </Descriptions.Item>
+          )}
+          {(produccion as any).emailCreador && (
+            <Descriptions.Item label="Creado por">
+              {(produccion as any).emailCreador}
+            </Descriptions.Item>
+          )}
+        </Descriptions>
+      )}
+      {!isEditing && (produccion as any).observaciones && (
+        <div style={{ marginTop: 16 }}>
+          <Text strong>Observaciones:</Text>
+          <p>{(produccion as any).observaciones}</p>
         </div>
-    );
-
-    const spanOneThirdOrOneHalf = {xxl: 1, xl: 1, lg: 1, md: 1, sm: 1, xs: 1};
-    const spanTwoThirdsOrOneHalf = {xxl: 2, xl: 1, lg: 1, md: 1, sm: 1, xs: 1};
-    const spanFullRow = {xxl: 3, xl: 2, lg: 2, md: 2, sm: 1, xs: 1};
-
-    return (
-        <Card className="production-info-card" title={cardTitle}>
-            <Descriptions bordered column={{xxl: 3, xl: 2, lg: 2, md: 2, sm: 1, xs: 1}}>
-                <Descriptions.Item
-                    label="Código Producción" {...spanOneThirdOrOneHalf}>{produccion.codigoProduccion}</Descriptions.Item>
-                <Descriptions.Item label="Lote" {...spanOneThirdOrOneHalf}>
-                    {isEditable ? (
-                        <Input value={lote || ''} onChange={e => setLote(e.target.value)} onBlur={handleBlur}/>
-                    ) : (
-                        produccion.lote || 'N/A'
-                    )}
-                </Descriptions.Item>
-                <Descriptions.Item
-                    label="Estado" {...spanOneThirdOrOneHalf}>{getStatusTag(produccion.estado)}</Descriptions.Item>
-
-                <Descriptions.Item label="Encargado" {...spanOneThirdOrOneHalf}>
-                    {isEditable && isProtected ? (
-                        <Input value={encargado || ''} onChange={e => setEncargado(e.target.value)}
-                               onBlur={handleBlur}/>
-                    ) : (
-                        isProtected ? ((produccion as ProduccionProtectedResponseDTO).encargado || 'No asignado') : 'N/A'
-                    )}
-                </Descriptions.Item>
-                <Descriptions.Item
-                    label="Fecha de Inicio" {...spanOneThirdOrOneHalf}>{formatDate(produccion.fechaInicio)}</Descriptions.Item>
-                <Descriptions.Item label="Fecha de Finalización" {...spanOneThirdOrOneHalf}>
-                    {produccion.estado !== 'EN_PROCESO' ? formatDate(produccion.fechaFin) : 'N/A'}
-                </Descriptions.Item>
-
-                <Descriptions.Item label={enProceso ? 'Tiempo en Ejecución' : 'Duración Total'} {...spanFullRow}>
-                    <span className="elapsed-time">{elapsedTime}</span>
-                </Descriptions.Item>
-
-                <Descriptions.Item
-                    label="Código Versión" {...spanOneThirdOrOneHalf}>{metadata.codigoVersionReceta}</Descriptions.Item>
-                <Descriptions.Item
-                    label="Nombre Versión" {...spanTwoThirdsOrOneHalf}>{metadata.nombre}</Descriptions.Item>
-
-                <Descriptions.Item label="Receta Padre" {...spanFullRow}>
-                    {metadata.nombreRecetaPadre} ({metadata.codigoRecetaPadre})
-                </Descriptions.Item>
-
-                <Descriptions.Item label="Observaciones" {...spanFullRow}>
-                    {isEditable && isProtected ? (
-                        <Input.TextArea value={observaciones || ''} onChange={e => setObservaciones(e.target.value)}
-                                        onBlur={handleBlur} autoSize={{minRows: 2, maxRows: 6}}/>
-                    ) : (
-                        isProtected ? ((produccion as ProduccionProtectedResponseDTO).observaciones || 'N/A') : 'N/A'
-                    )}
-                </Descriptions.Item>
-            </Descriptions>
-        </Card>
-    );
+      )}
+    </Card>
+  );
 };

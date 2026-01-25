@@ -1,8 +1,9 @@
 import type {
   EstructuraProduccionDTO,
   RespuestasProduccionProtectedDTO,
-} from './Productions';
+} from '@/types/production';
 import { TipoDatoCampo } from '@/pages/Protected/VersionRecetas/types/TipoDatoCampo';
+import { ProductionState } from '@/constants/ProductionStates';
 
 // Mock de la estructura de una producción (lo que define qué campos y tablas existen)
 export const mockEstructura: EstructuraProduccionDTO = {
@@ -111,7 +112,7 @@ export const mockRespuestas: RespuestasProduccionProtectedDTO = {
     codigoProduccion: 'PROD-2024-07-21-A',
     codigoVersion: 'VR-PAST-01-V2',
     lote: 'LOTE-240721-A',
-    estado: 'EN_PROCESO',
+    estado: ProductionState.EN_PROCESO,
     fechaInicio: '2024-07-21T08:00:00Z',
     fechaFin: '',
     fechaModificacion: '2024-07-21T09:15:00Z',

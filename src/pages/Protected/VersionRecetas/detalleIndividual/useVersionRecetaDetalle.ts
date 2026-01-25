@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { versionRecetaService } from '../../../../services/recetas/VersionRecetaService.ts';
-import type { VersionRecetaMetadataResponseDTO } from '@/pages/common/DetalleProduccion/types/Productions.ts';
+import type { VersionRecetaMetadataResponseDTO } from '@/types/production';
 
 export const useVersionRecetaDetalle = (id: string | undefined) => {
   const [recipe, setRecipe] = useState<VersionRecetaMetadataResponseDTO | null>(null);

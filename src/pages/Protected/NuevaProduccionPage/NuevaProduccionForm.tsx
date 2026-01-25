@@ -4,7 +4,7 @@ import { PlusOutlined } from '@ant-design/icons';
 import type {
   ProduccionCreateRequestDTO,
   VersionRecetaMetadataResponseDTO,
-} from '@/pages/common/DetalleProduccion/types/Productions.ts'; // Corrected import path
+} from '@/types/production'; // Corrected import path
 import { type FormFieldConfig, getProduccionFormFields } from './NuevaProduccionFormFields.tsx';
 import { VersionDetails } from './VersionDetails.tsx'; // Importamos el componente VersionDetails
 

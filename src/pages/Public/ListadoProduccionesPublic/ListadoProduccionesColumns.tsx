@@ -1,82 +1,69 @@
-import {Button, Tag} from 'antd';
-import {EyeOutlined} from '@ant-design/icons';
-import type {ColumnsType} from 'antd/es/table';
-import type {ProduccionPublicMetadataDTO} from '@/pages/common/DetalleProduccion/types/Productions.ts'; // Changed import
+import type { ColumnsType } from 'antd/es/table';
+import { Tag } from 'antd';
+import dayjs from 'dayjs';
+import type { ProduccionPublicMetadataDTO } from '@/types/production'; // Changed import
+import { CustomTableRowActions } from '@/components/ui/CustomTable/CustomTableRowActions.tsx';
+import {
+  PRODUCTION_STATE_COLORS,
+  PRODUCTION_STATE_LABELS,
+  ProductionState,
+} from '@/constants/ProductionStates';
 
-interface GetColumnsProps {
-    onView: (record: ProduccionPublicMetadataDTO) => void; // Changed type
+interface PublicProductionColumnsProps {
+  onView: (record: ProduccionPublicMetadataDTO) => void;
+  isMobile: boolean;
 }
 
-const getStatusTag = (estado: string) => {
-    switch (estado) {
-        case 'EN_PROCESO':
-            return <Tag color="blue">En Proceso</Tag>;
-        case 'FINALIZADA':
-            return <Tag color="green">Finalizada</Tag>;
-        case 'CANCELADA':
-            return <Tag color="red">Cancelada</Tag>;
-        default:
-            return <Tag>{estado}</Tag>;
-    }
+export const getPublicProductionColumns = ({
+  onView,
+  isMobile,
+}: PublicProductionColumnsProps): ColumnsType<ProduccionPublicMetadataDTO> => {
+  return [
+    {
+      title: 'Código',
+      dataIndex: 'codigoProduccion',
+      key: 'codigoProduccion',
+      sorter: (a, b) => a.codigoProduccion.localeCompare(b.codigoProduccion),
+      responsive: ['xs', 'sm', 'md', 'lg', 'xl'],
+    },
+    {
+      title: 'Lote',
+      dataIndex: 'lote',
+      key: 'lote',
+      render: (text) => text || '-',
+      responsive: ['xs', 'sm', 'md', 'lg', 'xl'],
+    },
+    {
+      title: 'Estado',
+      dataIndex: 'estado',
+      key: 'estado',
+      render: (estado: ProductionState) => {
+        const color = PRODUCTION_STATE_COLORS[estado] || 'default';
+        const text = PRODUCTION_STATE_LABELS[estado] || estado;
+        return <Tag color={color}>{text}</Tag>;
+      },
+      responsive: ['xs', 'sm', 'md', 'lg', 'xl'],
+    },
+    {
+      title: 'Inicio',
+      dataIndex: 'fechaInicio',
+      key: 'fechaInicio',
+      render: (date) => dayjs(date).format('DD/MM/YYYY HH:mm'),
+      responsive: ['sm', 'md', 'lg', 'xl'], // Oculto en móvil muy pequeño
+    },
+    {
+      title: 'Acciones',
+      key: 'actions',
+      fixed: 'right',
+      width: isMobile ? 50 : 100,
+      render: (_, record) => (
+        <CustomTableRowActions
+          record={record}
+          onView={onView}
+          getRecordId={(r) => r.codigoProduccion}
+          isMobile={isMobile}
+        />
+      ),
+    },
+  ];
 };
-
-export const getColumns = ({onView}: GetColumnsProps): ColumnsType<ProduccionPublicMetadataDTO> => [ // Changed type
-    {
-        title: 'Código Producción',
-        dataIndex: 'codigoProduccion',
-        key: 'codigoProduccion',
-        sorter: (a, b) => a.codigoProduccion.localeCompare(b.codigoProduccion),
-    },
-    {
-        title: 'Lote',
-        dataIndex: 'lote',
-        key: 'lote',
-        render: (text) => text || 'N/A',
-    },
-    {
-        title: 'Fecha inicio',
-        dataIndex: 'fechaInicio',
-        key: 'fechaInicio',
-        render: (text) => text || 'N/A',
-        sorter: (a, b) => a.fechaInicio.localeCompare(b.fechaInicio),
-
-    },
-    {
-        title: 'Fecha Fin',
-        dataIndex: 'fechaFin',
-        key: 'fechaFin',
-        render: (text) => text || 'N/A',
-        sorter: (a, b) => {
-            if (!a.fechaFin && !b.fechaFin) return 0;
-            if (!a.fechaFin) return 1;
-            if (!b.fechaFin) return -1;
-            return a.fechaFin.localeCompare(b.fechaFin);
-        },
-        defaultSortOrder: 'descend', // Added default sort order
-    },
-    {
-        title: 'Estado',
-        dataIndex: 'estado',
-        key: 'estado',
-        render: getStatusTag,
-        filters: [
-            {text: 'En Proceso', value: 'EN_PROCESO'},
-            {text: 'Finalizada', value: 'FINALIZADA'},
-            {text: 'Cancelada', value: 'CANCELADA'},
-        ],
-        onFilter: (value, record) => record.estado.indexOf(value as string) === 0,
-    },
-    {
-        title: 'Acciones',
-        key: 'actions',
-        align: 'center',
-        render: (_, record) => (
-            <Button
-                icon={<EyeOutlined/>}
-                onClick={() => onView(record)}
-            >
-                Ver
-            </Button>
-        ),
-    },
-];

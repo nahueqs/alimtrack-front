@@ -11,8 +11,8 @@ import type {
   ProductionStateUpdatePayload,
   RespuestaCampoRequestDTO,
   TableCellUpdatePayload,
-} from '@/pages/common/DetalleProduccion/types/Productions';
-import { useProduccionService } from '@/services/producciones/useProduccionService';
+} from '@/types/production';
+import { useProductionService } from '@/services/production/useProductionService';
 
 interface UseProductionDataReturn {
   loading: boolean;
@@ -65,7 +65,7 @@ export const useProductionData = (
     updateProductionState,
     updateProductionMetadata,
     setEstructura,
-  } = useProduccionService();
+  } = useProductionService();
 
   const {
     loading: loadingEstructura,
@@ -82,7 +82,7 @@ export const useProductionData = (
       setIsSaving(true);
       setError(null);
       try {
-        await productionService.updateMetadata(codigoProduccion, data);
+        await productionService.guardarMetadata(codigoProduccion, data);
       } catch (err) {
         setError('Failed to update metadata');
         console.error(err);
@@ -98,7 +98,7 @@ export const useProductionData = (
       setIsSaving(true);
       setError(null);
       try {
-        await productionService.changeProductionState(codigoProduccion, data);
+        await productionService.cambiarEstado(codigoProduccion, data);
       } catch (err) {
         setError('Failed to change production state');
         console.error(err);
