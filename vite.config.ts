@@ -5,7 +5,7 @@ import path from 'path';
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
-  base: './',
+  // base: './', // <--- ELIMINADO: Vercel usa la raíz por defecto
   assetsInclude: ['**/*.jpg', '**/*.jpeg', '**/*.png', '**/*.svg'],
   server: {
     port: 3000,
