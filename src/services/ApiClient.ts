@@ -11,10 +11,13 @@ interface ApiError extends Error {
   };
 }
 
+// URL base por defecto: usa la variable de entorno si existe, sino localhost
+const DEFAULT_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://alimtrackunlu.onrender.com/api';
+
 class ApiClient {
   private baseURL: string;
 
-  constructor(baseURL: string = 'http://localhost:8080/api/v1') {
+  constructor(baseURL: string = DEFAULT_BASE_URL) {
     this.baseURL = baseURL;
   }
 
