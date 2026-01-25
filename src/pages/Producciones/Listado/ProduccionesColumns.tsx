@@ -1,7 +1,7 @@
 import type { ColumnsType } from 'antd/es/table';
 import type { ProduccionProtectedResponseDTO } from '@/types/production';
 import dayjs from 'dayjs';
-import { CustomTableRowActions } from '../../../components/ui/CustomTable/CustomTableRowActions.tsx';
+import { CustomTableRowActions } from '@/components/ui/CustomTable/CustomTableRowActions.tsx';
 import { Tag } from 'antd';
 import {
   PRODUCTION_STATE_COLORS,

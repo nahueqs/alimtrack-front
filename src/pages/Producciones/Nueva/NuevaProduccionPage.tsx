@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import type { ProduccionCreateRequestDTO } from '@/types/production';
 import { NuevaProduccionForm } from './NuevaProduccionForm.tsx';
 import { message, Spin } from 'antd';
-import { useAuth } from '@/services/auth/authProvider/authProvider.tsx';
+import { useAuth } from '@/context/auth/AuthProvider.tsx';
 import { useProductionService } from '@/services/production/useProductionService.ts';
 import { useVersionRecetaService } from '@/services/recetas/useVersionRecetaService.ts';
 import { AppHeader } from '@/components/AppHeader/AppHeader.tsx';

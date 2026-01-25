@@ -2,7 +2,7 @@ import type {
   EstructuraProduccionDTO,
   RespuestasProduccionProtectedDTO,
 } from '@/types/production';
-import { TipoDatoCampo } from '@/pages/Protected/VersionRecetas/types/TipoDatoCampo';
+import { TipoDatoCampo } from '@/pages/Recetas/types/TipoDatoCampo';
 import { ProductionState } from '@/constants/ProductionStates';
 
 // Mock de la estructura de una producción (lo que define qué campos y tablas existen)

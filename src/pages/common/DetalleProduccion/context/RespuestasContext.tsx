@@ -1,6 +1,6 @@
 import { createContext, useContext } from 'react';
 import type { RespuestaTablaDTO } from '@/types/production';
-import type { TipoDatoCampo } from '@/pages/Protected/VersionRecetas/types/TipoDatoCampo';
+import type { TipoDatoCampo } from '@/pages/Recetas/types/TipoDatoCampo';
 
 interface RespuestasContextType {
   respuestasCampos: Record<number, string>;

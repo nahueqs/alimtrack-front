@@ -1,4 +1,4 @@
-import type { TipoDatoCampo } from '@/pages/Protected/VersionRecetas/types/TipoDatoCampo.ts';
+import type { TipoDatoCampo } from '@/pages/Recetas/types/TipoDatoCampo.ts';
 
 export interface EstructuraProduccionDTO {
   metadata: VersionRecetaMetadataResponseDTO;

@@ -11,7 +11,7 @@ import type {
   RespuestasProduccionProtectedDTO,
   RespuestasProduccionPublicDTO,
 } from '@/types/production';
-import { TipoDatoCampo } from '@/pages/Protected/VersionRecetas/types/TipoDatoCampo';
+import { TipoDatoCampo } from '@/pages/Recetas/types/TipoDatoCampo';
 import { ProductionState } from '@/constants/ProductionStates';
 // import { PublicHeader } from "@/components/layout/PublicHeader/PublicHeader.tsx"; // Removed direct import
 

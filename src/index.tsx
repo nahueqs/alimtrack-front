@@ -1,14 +1,14 @@
 import { Navigate, type RouteObject } from 'react-router-dom';
 import { ProtectedRoute } from '@/context/auth/ProtectedRoute.tsx';
 import { PublicRoute } from '@/context/auth/PublicRoute.tsx';
-import { DashboardPage } from '@/pages/Protected/DashboardProtected/DashboardPage.tsx';
-import LoginPage from '@/pages/Public/IniciarSesionPage/LoginPage.tsx';
-import { NuevaProduccionPage } from '@/pages/Protected/NuevaProduccionPage/NuevaProduccionPage.tsx';
-import ProductionsResultPage from '@/pages/Protected/ListadoProduccionesProtected/ProduccionesPage.tsx';
-import DetalleProduccionPublicPage from '@/pages/Public/DetalleProduccionPublicPage/DetalleProduccionPublicPage.tsx';
-import DetalleProduccionProtectedPage from '@/pages/Protected/DetalleProduccionProtected/DetalleProduccionProtectedPage.tsx';
-import { ListadoProducciones } from '@/pages/Public/ListadoProduccionesPublic/ListadoProducciones.tsx';
-import { VersionRecetasPage } from '@/pages/Protected/VersionRecetas/listado/VersionRecetasPage.tsx';
+import { DashboardPage } from '@/pages/Dashboard/DashboardPage.tsx';
+import LoginPage from '@/pages/Auth/LoginPage.tsx';
+import { NuevaProduccionPage } from '@/pages/Producciones/Nueva/NuevaProduccionPage.tsx';
+import ProductionsResultPage from '@/pages/Producciones/Listado/ProduccionesPage.tsx';
+import DetalleProduccionPublicPage from '@/pages/Public/Detalle/DetalleProduccionPublicPage.tsx';
+import DetalleProduccionProtectedPage from '@/pages/Producciones/Detalle/DetalleProduccionProtectedPage.tsx';
+import { ListadoProducciones } from '@/pages/Public/Listado/ListadoProducciones.tsx';
+import { VersionRecetasPage } from '@/pages/Recetas/Listado/VersionRecetasPage.tsx';
 import type { ProduccionFilterRequestDTO } from '@/types/production';
 import { ProductionState } from '@/constants/ProductionStates';
 

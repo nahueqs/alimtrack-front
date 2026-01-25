@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { LoginForm } from './Login form/LoginForm.tsx';
-import { RegisterForm } from './Register form/RegisterForm.tsx';
+import { LoginForm } from './components/LoginForm.tsx';
+import { RegisterForm } from './components/RegisterForm.tsx';
 import { useNavigate } from 'react-router-dom';
 import logoUnlu from '@/assets/logoUnlu.png';
 import logoCideta from '@/assets/logoCideta.png';

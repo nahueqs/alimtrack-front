@@ -11,7 +11,7 @@ import type {
   RespuestaCampoRequestDTO,
   RespuestaCeldaTablaRequestDTO,
 } from '@/types/production';
-import { TipoDatoCampo } from '@/pages/Protected/VersionRecetas/types/TipoDatoCampo';
+import { TipoDatoCampo } from '@/pages/Recetas/types/TipoDatoCampo';
 import { ProductionState } from '@/constants/ProductionStates';
 
 interface UseProductionActionsProps {

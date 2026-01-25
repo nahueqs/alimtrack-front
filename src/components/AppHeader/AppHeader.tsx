@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../services/auth/authProvider/authProvider';
+import { useAuth } from '@/context/auth/AuthProvider';
 import logoCideta from '../../assets/logoCideta.png';
 import './AppHeader.css';
 import { MenuIcon, UserIcon } from 'lucide-react';

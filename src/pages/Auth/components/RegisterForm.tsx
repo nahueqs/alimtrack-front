@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { Button, Form, Input, message } from 'antd';
 import { LockOutlined, MailOutlined, UserOutlined } from '@ant-design/icons';
 import type { RegisterRequest } from '@/services/auth/Auth.ts';

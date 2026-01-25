@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { versionRecetaService } from '../../../../services/recetas/VersionRecetaService.ts';
+import { versionRecetaService } from '@/services/recetas/VersionRecetaService.ts';
 import type { VersionRecetaMetadataResponseDTO } from '@/types/production';
 
 export const useVersionRecetaDetalle = (id: string | undefined) => {

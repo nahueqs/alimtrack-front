@@ -7,10 +7,66 @@
 }
 
 .dashboard__main {
-    padding: 1.5rem;
+    padding: 2rem 1.5rem; /* Aumentado padding vertical */
     max-width: 1200px;
     margin: 0 auto;
 }
+
+/* ==========================================================================
+   SECCIÓN DE BIENVENIDA (Welcome)
+   ========================================================================== */
+.dashboard__welcome {
+    margin-bottom: 3rem; /* Espacio debajo de la sección de bienvenida */
+    text-align: center; /* Centrar textos por defecto */
+}
+
+.dashboard__welcome-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 1rem; /* Espacio aumentado entre título y subtítulo */
+    line-height: 1.2;
+}
+
+.dashboard__welcome-subtitle {
+    font-size: 1.125rem;
+    color: var(--text-secondary);
+    margin-bottom: 3rem; /* Espacio aumentado entre subtítulo y grid de tarjetas */
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* ==========================================================================
+   GRID DE TARJETAS
+   ========================================================================== */
+.dashboard__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem; /* Espacio generoso entre tarjetas */
+    align-items: stretch; /* Que las tarjetas tengan la misma altura */
+}
+
+/* Ajustes específicos para las tarjetas dentro del dashboard */
+.dashboard__grid .card--dashboard {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.dashboard__grid .card--dashboard .dashboard-card__content {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem; /* Espacio entre botones dentro de la tarjeta */
+    padding-top: 1.5rem; /* Más espacio arriba del contenido */
+}
+
+.dashboard__grid .card--dashboard .dashboard-card__description {
+    margin-top: 0.5rem; /* Espacio entre título y descripción de la tarjeta */
+    margin-bottom: 1.5rem; /* Espacio entre descripción y botones */
+}
+
 
 /* ==========================================================================
    HEADER: BASE Y LAYOUT
