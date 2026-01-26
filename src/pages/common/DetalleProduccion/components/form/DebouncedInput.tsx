@@ -81,6 +81,31 @@ export const DebouncedInput: React.FC<DebouncedInputProps> = ({
     ref: inputRef,
   };
 
+  // Helper para parsear fechas de forma segura
+  const parseDate = (val: string) => {
+    if (!val) return null;
+    const d = dayjs(val);
+    return d.isValid() ? d : null;
+  };
+
+  // Helper para parsear horas de forma robusta
+  const parseTime = (val: string) => {
+    if (!val) return null;
+    // Intento 1: ISO completo o formato estándar
+    let d = dayjs(val);
+    if (d.isValid()) return d;
+
+    // Intento 2: Formato HH:mm:ss
+    d = dayjs(val, 'HH:mm:ss');
+    if (d.isValid()) return d;
+
+    // Intento 3: Formato HH:mm
+    d = dayjs(val, 'HH:mm');
+    if (d.isValid()) return d;
+
+    return null;
+  };
+
   const renderInput = () => {
     switch (tipoDato) {
       case TipoDatoCampo.ENTERO:
@@ -118,7 +143,7 @@ export const DebouncedInput: React.FC<DebouncedInputProps> = ({
       case TipoDatoCampo.FECHA:
         return (
           <DatePicker
-            value={localValue ? dayjs(localValue) : null}
+            value={parseDate(localValue)}
             onChange={(_date, dateString) => {
               const newValue = typeof dateString === 'string' ? dateString : '';
               setLocalValue(newValue);
@@ -132,20 +157,14 @@ export const DebouncedInput: React.FC<DebouncedInputProps> = ({
       case TipoDatoCampo.HORA:
         return (
           <TimePicker
-            value={
-              localValue
-                ? localValue.includes('T')
-                  ? dayjs(localValue)
-                  : dayjs(localValue, 'HH:mm:ss')
-                : null
-            }
+            value={parseTime(localValue)}
             onChange={(_time, timeString) => {
               const newValue = typeof timeString === 'string' ? timeString : '';
               setLocalValue(newValue);
               setHasChanged(newValue !== globalValue);
               setError(null);
             }}
-            format="HH:mm:ss" // Aseguramos formato con segundos
+            format="HH:mm:ss"
             {...commonProps}
             {...(rest as any)}
           />
