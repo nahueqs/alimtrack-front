@@ -71,16 +71,7 @@ class ProductionService {
     );
   }
 
-  async guardarMetadata(
-    codigoProduccion: string,
-    data: ProduccionMetadataModifyRequestDTO
-  ): Promise<void> {
-    if (!codigoProduccion) throw new Error('El código de producción es requerido.');
-    return apiClient.put<void>(
-      `/producciones/${encodeURIComponent(codigoProduccion)}/metadata`,
-      data
-    );
-  }
+
 
   async createProduction(productionData: any): Promise<ProduccionProtectedResponseDTO> {
     if (!productionData) throw new Error('Los datos de producción son requeridos.');
@@ -98,7 +89,16 @@ class ProductionService {
       productionData
     );
   }
-
+  async guardarMetadata(
+    codigoProduccion: string,
+    data: ProduccionMetadataModifyRequestDTO
+  ): Promise<void> {
+    if (!codigoProduccion) throw new Error('El código de producción es requerido.');
+    return apiClient.put<void>(
+      `/producciones/${encodeURIComponent(codigoProduccion)}/metadata`,
+      data
+    );
+  }
   async deleteProduction(codigoProduccion: string): Promise<void> {
     if (!codigoProduccion) throw new Error('El código de producción es requerido.');
     return apiClient.delete<void>(`/producciones/${encodeURIComponent(codigoProduccion)}`);

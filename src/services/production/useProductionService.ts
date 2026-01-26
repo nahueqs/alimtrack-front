@@ -64,7 +64,6 @@ export const useProductionService = (): UseProductionServiceReturn => {
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState(false);
 
-  // Usamos el hook genérico para manejar el estado de la producción
   const {
     state: estadoActual,
     setState: setEstadoActual,
