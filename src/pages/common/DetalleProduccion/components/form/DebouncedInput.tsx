@@ -16,6 +16,7 @@ export const DebouncedInput: React.FC<DebouncedInputProps> = ({
   value: globalValue,
   onChange: onGlobalChange,
   tipoDato = TipoDatoCampo.TEXTO,
+  placeholder,
   ...rest
 }) => {
   const [localValue, setLocalValue] = useState(globalValue);
@@ -38,7 +39,39 @@ export const DebouncedInput: React.FC<DebouncedInputProps> = ({
     }
   }, [globalValue, localValue]);
 
+  const validateValue = (val: string): string | null => {
+    if (!val) return null; // Permitir vacío (validación de requerido es externa)
+
+    switch (tipoDato) {
+      case TipoDatoCampo.ENTERO:
+        // Permite negativos, pero no decimales
+        if (!/^-?\d+$/.test(val)) {
+          return 'Debe ser un número entero (sin decimales)';
+        }
+        break;
+      case TipoDatoCampo.DECIMAL:
+        // Permite negativos y decimales con punto
+        if (!/^-?\d+(\.\d+)?$/.test(val)) {
+          return 'Debe ser un número decimal válido (ej: 10.5)';
+        }
+        break;
+      default:
+        break;
+    }
+    return null;
+  };
+
   const handleSave = async () => {
+    // Validación local antes de enviar
+    const validationError = validateValue(localValue);
+    if (validationError) {
+      setError(validationError);
+      if (inputRef.current) {
+        inputRef.current.focus();
+      }
+      return;
+    }
+
     setIsSaving(true);
     setError(null);
     try {
@@ -81,32 +114,54 @@ export const DebouncedInput: React.FC<DebouncedInputProps> = ({
     ref: inputRef,
   };
 
-  // Helper para parsear fechas de forma segura
+  // Generar placeholder con tipo de dato
+  const getPlaceholder = () => {
+    const basePlaceholder = placeholder || 'Ingrese valor';
+    // No mostrar tipo para fechas/horas/booleanos ya que el control es explícito
+    if (
+      tipoDato === TipoDatoCampo.FECHA ||
+      tipoDato === TipoDatoCampo.HORA ||
+      tipoDato === TipoDatoCampo.BOOLEANO
+    ) {
+      return basePlaceholder;
+    }
+    
+    let typeLabel = '';
+    switch (tipoDato) {
+      case TipoDatoCampo.ENTERO:
+        typeLabel = 'Entero';
+        break;
+      case TipoDatoCampo.DECIMAL:
+        typeLabel = 'Decimal';
+        break;
+      case TipoDatoCampo.TEXTO:
+        typeLabel = 'Texto';
+        break;
+    }
+    
+    return typeLabel ? `${basePlaceholder} (${typeLabel})` : basePlaceholder;
+  };
+
   const parseDate = (val: string) => {
     if (!val) return null;
     const d = dayjs(val);
     return d.isValid() ? d : null;
   };
 
-  // Helper para parsear horas de forma robusta
   const parseTime = (val: string) => {
     if (!val) return null;
-    // Intento 1: ISO completo o formato estándar
     let d = dayjs(val);
     if (d.isValid()) return d;
-
-    // Intento 2: Formato HH:mm:ss
     d = dayjs(val, 'HH:mm:ss');
     if (d.isValid()) return d;
-
-    // Intento 3: Formato HH:mm
     d = dayjs(val, 'HH:mm');
     if (d.isValid()) return d;
-
     return null;
   };
 
   const renderInput = () => {
+    const finalPlaceholder = getPlaceholder();
+
     switch (tipoDato) {
       case TipoDatoCampo.ENTERO:
         return (
@@ -120,6 +175,7 @@ export const DebouncedInput: React.FC<DebouncedInputProps> = ({
             }}
             stringMode
             precision={0}
+            placeholder={finalPlaceholder}
             {...commonProps}
             {...(rest as any)}
           />
@@ -136,6 +192,7 @@ export const DebouncedInput: React.FC<DebouncedInputProps> = ({
             }}
             stringMode
             step={0.01}
+            placeholder={finalPlaceholder}
             {...commonProps}
             {...(rest as any)}
           />
@@ -150,6 +207,7 @@ export const DebouncedInput: React.FC<DebouncedInputProps> = ({
               setHasChanged(newValue !== globalValue);
               setError(null);
             }}
+            placeholder={placeholder || 'Seleccione fecha'}
             {...commonProps}
             {...(rest as any)}
           />
@@ -165,6 +223,7 @@ export const DebouncedInput: React.FC<DebouncedInputProps> = ({
               setError(null);
             }}
             format="HH:mm:ss"
+            placeholder={placeholder || 'Seleccione hora'}
             {...commonProps}
             {...(rest as any)}
           />
@@ -195,6 +254,7 @@ export const DebouncedInput: React.FC<DebouncedInputProps> = ({
               setHasChanged(newValue !== globalValue);
               setError(null);
             }}
+            placeholder={finalPlaceholder}
             {...commonProps}
             {...rest}
           />
