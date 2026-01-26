@@ -78,7 +78,9 @@ const buildTypedRequestData = (valor: string, tipoDato: TipoDatoCampo) => {
         data.valorFecha = valor.includes('T') ? valor : `${valor}T00:00:00`;
         break;
       case TipoDatoCampo.HORA:
-        data.valorFecha = valor.includes('T') ? valor : `1970-01-01T${valor}`;
+        // Usamos la fecha actual para evitar problemas de zona horaria con 1970
+        const today = new Date().toISOString().split('T')[0];
+        data.valorFecha = valor.includes('T') ? valor : `${today}T${valor}`;
         break;
       case TipoDatoCampo.BOOLEANO:
         data.valorBooleano = valor === 'true';

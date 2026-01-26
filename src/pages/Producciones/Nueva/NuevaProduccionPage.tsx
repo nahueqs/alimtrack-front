@@ -34,10 +34,9 @@ export const NuevaProduccionPage: React.FC = () => {
   const handleSubmit = async (data: ProduccionCreateRequestDTO) => {
     setLoadingSubmit(true);
     try {
-      // Añadimos el usernameCreador aquí
       const dataWithCreator: ProduccionCreateRequestDTO = {
         ...data,
-        emailCreador: user?.email || 'desconocido', // Changed to usernameCreador
+        emailCreador: user?.email || 'desconocido',
       };
 
       if (import.meta.env.DEV) {

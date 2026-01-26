@@ -1,3 +1,6 @@
+/* ==========================================================================
+   CONTENEDOR PRINCIPAL
+   ========================================================================== */
 .nueva-produccion-form {
     max-width: 800px;
     margin: 0 auto;
@@ -5,99 +8,88 @@
     background-color: var(--bg-primary);
     border-radius: var(--radius-lg);
     border: 1px solid var(--border-light);
+    transition: all 0.3s ease; /* Suaviza cambios de tamaño */
 }
 
+/* Header del formulario (Icono + Título) */
 .nueva-produccion-form__header {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 12px;
     color: var(--text-primary);
-    font-size: 1.1rem; /* Ajuste para móvil */
+    font-size: 1.1rem;
+    font-weight: 600;
 }
 
+/* Información del usuario (derecha del header) */
 .nueva-produccion-form__user-info {
-    font-size: 12px;
+    font-size: 0.85rem;
     color: var(--text-secondary);
-    /* En móvil, ocultamos el usuario en el header de la card si es muy estrecho */
-    display: none; 
+    display: none; /* Oculto por defecto en móvil */
 }
 
 .nueva-produccion-form__user-highlight {
     color: var(--primary-500);
+    font-weight: 600;
 }
 
-/* Estilo general para todos los labels de Form.Item dentro del formulario */
+/* ==========================================================================
+   ESTILOS DE FORMULARIO (ANT DESIGN OVERRIDES)
+   ========================================================================== */
 .nueva-produccion-form .ant-form-item-label > label {
     color: var(--text-primary);
-}
-
-.nueva-produccion-form__required-label {
     font-weight: 500;
 }
 
 .nueva-produccion-form__required-asterisk {
     color: var(--error-500);
+    margin-left: 4px;
 }
 
-/* Estilos para las opciones del dropdown */
-.nueva-produccion-form__option-container {
-    padding: 8px 4px;
-}
-
-.nueva-produccion-form__option-main {
-    font-size: 14px;
-    margin-bottom: 4px;
-    color: var(--text-primary);
-    white-space: normal; /* Permitir wrap en móvil */
-}
-
-.nueva-produccion-form__option-separator {
-    color: var(--text-tertiary);
-    margin: 0 4px;
-}
-
-.nueva-produccion-form__option-description {
-    font-size: 12px;
-    color: var(--text-secondary);
-    font-style: italic;
-    white-space: normal; /* Permitir wrap en móvil */
-}
-
+/* Panel de información (gris) */
 .nueva-produccion-form__info-panel {
-    margin-top: 16px;
-    padding: 12px;
+    margin-top: 24px;
+    padding: 16px;
     background-color: var(--bg-tertiary);
     border-radius: var(--radius-md);
     border: 1px solid var(--border-light);
 }
 
 .nueva-produccion-form__info-text {
-    font-size: 12px;
+    font-size: 0.85rem;
     color: var(--text-secondary);
     text-align: center;
+    line-height: 1.5;
 }
 
 .nueva-produccion-form__error-text {
     color: var(--error-500);
-    margin-top: 4px;
+    margin-top: 8px;
+    font-weight: 500;
 }
 
-/* --- Botones de Acción Responsive --- */
+/* ==========================================================================
+   BOTONES DE ACCIÓN
+   ========================================================================== */
 .nueva-produccion-form__action-buttons {
     width: 100%;
     display: flex;
-    flex-direction: column-reverse; /* En móvil, botones apilados, principal arriba (por orden DOM inverso o visual) */
+    /* MÓVIL: Apilados, con el botón principal (Crear) visualmente arriba */
+    flex-direction: column-reverse; 
     gap: 12px;
+    margin-top: 16px;
 }
 
 .nueva-produccion-form__submit-button {
-    width: 100%;
+    width: 100%; /* MÓVIL: Ancho completo */
 }
 
-/* Estilos para los detalles de la versión seleccionada */
+/* ==========================================================================
+   DETALLES DE LA VERSIÓN (TARJETA INTERNA)
+   ========================================================================== */
 .nueva-produccion-form__selected-version-section {
-    margin: 16px 0 24px 0;
-    animation: fadeIn 0.3s ease-in;
+    margin: 20px 0;
+    animation: fadeIn 0.4s ease-out;
 }
 
 .nueva-produccion-form__version-details {
@@ -111,9 +103,9 @@
 .nueva-produccion-form__version-details-header {
     display: flex;
     align-items: center;
-    margin-bottom: 12px;
+    margin-bottom: 16px;
     color: var(--primary-500);
-    font-size: 14px;
+    font-size: 1rem;
     font-weight: 600;
 }
 
@@ -123,11 +115,12 @@
     gap: 12px;
 }
 
+/* Fila de detalle (Label + Valor) */
 .nueva-produccion-form__version-detail-row {
     display: flex;
-    flex-direction: column; /* Apilado en móvil */
+    flex-direction: column; /* MÓVIL: Apilado */
     gap: 4px;
-    padding: 8px 0;
+    padding-bottom: 8px;
     border-bottom: 1px solid var(--border-light);
 }
 
@@ -138,60 +131,106 @@
 .nueva-produccion-form__version-detail-label {
     font-weight: 600;
     color: var(--text-secondary);
-    font-size: 13px;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 .nueva-produccion-form__version-detail-value {
     color: var(--text-primary);
-    font-size: 14px;
+    font-size: 1rem;
     line-height: 1.4;
-}
-
-/* Animación para la aparición suave */
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(-10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+    word-break: break-word; /* Evita desbordamiento de textos largos */
 }
 
 /* ==========================================================================
-   MEDIA QUERIES (Tablet y Desktop)
+   OPCIONES DEL SELECT
+   ========================================================================== */
+.nueva-produccion-form__option-container {
+    padding: 4px 0;
+}
+
+.nueva-produccion-form__option-main {
+    font-size: 0.95rem;
+    color: var(--text-primary);
+    font-weight: 500;
+    white-space: normal; /* Permitir salto de línea en móvil */
+}
+
+.nueva-produccion-form__option-description {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    margin-top: 2px;
+    white-space: normal; /* Permitir salto de línea en móvil */
+    line-height: 1.3;
+}
+
+/* ==========================================================================
+   ANIMACIONES
+   ========================================================================== */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* ==========================================================================
+   MEDIA QUERIES (TABLET Y DESKTOP)
    ========================================================================== */
 @media (min-width: 768px) {
+    /* Ajustes generales */
+    .nueva-produccion-form {
+        padding: 24px; /* Más padding interno en desktop */
+    }
+
     .nueva-produccion-form__header {
         font-size: 1.25rem;
     }
 
     .nueva-produccion-form__user-info {
-        display: block; /* Mostrar usuario en desktop */
+        display: block; /* Mostrar usuario */
     }
 
+    /* Botones: Volver a fila */
     .nueva-produccion-form__action-buttons {
-        flex-direction: row; /* En línea en desktop */
+        flex-direction: row; /* DESKTOP: En línea */
         justify-content: flex-end;
+        align-items: center;
     }
 
     .nueva-produccion-form__submit-button {
-        width: auto;
-        min-width: 160px;
+        width: auto; /* DESKTOP: Ancho automático */
+        min-width: 180px;
     }
 
+    /* Detalles de versión: Volver a fila */
     .nueva-produccion-form__version-details {
-        padding: 20px;
+        padding: 24px;
     }
 
     .nueva-produccion-form__version-detail-row {
-        flex-direction: row; /* En línea en desktop */
-        align-items: flex-start;
-        gap: 16px;
+        flex-direction: row; /* DESKTOP: En línea */
+        align-items: baseline; /* Alinear texto base */
+        gap: 24px;
+        padding-bottom: 12px;
     }
 
     .nueva-produccion-form__version-detail-label {
-        min-width: 120px;
+        min-width: 140px; /* Ancho fijo para etiquetas */
+        text-align: right; /* Alinear etiquetas a la derecha */
+        font-size: 0.9rem;
     }
+
+    .nueva-produccion-form__version-detail-value {
+        flex: 1;
+    }
+}
+
+/* ==========================================================================
+   ESTILOS ADICIONALES PARA LA PÁGINA (Botón Volver)
+   ========================================================================== */
+/* Esto asegura que el botón de volver tenga espacio en la página */
+.productions-list__header {
+    margin-bottom: 1.5rem;
+    display: flex;
+    justify-content: flex-start;
 }

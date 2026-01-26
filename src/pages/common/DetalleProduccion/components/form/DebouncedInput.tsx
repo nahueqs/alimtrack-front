@@ -25,24 +25,37 @@ export const DebouncedInput: React.FC<DebouncedInputProps> = ({
   const [isSaving, setIsSaving] = useState(false);
 
   const inputRef = useRef<any>(null);
+  // Ref para rastrear el valor global anterior y detectar cambios externos reales
+  const prevGlobalValueRef = useRef(globalValue);
   const isMobile = useIsMobile();
 
+  // Sincronizar con cambios externos (WebSocket o recarga)
   useEffect(() => {
-    if (!isFocused && !hasChanged) {
+    if (globalValue !== prevGlobalValueRef.current) {
+      // Si el valor global cambió, actualizamos el local
+      // Esto maneja el caso donde el WebSocket confirma el guardado
       setLocalValue(globalValue);
+      prevGlobalValueRef.current = globalValue;
+      // Si el valor externo coincide con lo que teníamos localmente, ya no hay cambios pendientes
+      if (globalValue === localValue) {
+        setHasChanged(false);
+      }
     }
-  }, [globalValue, isFocused, hasChanged]);
+  }, [globalValue, localValue]);
 
   const handleSave = async () => {
     setIsSaving(true);
     setError(null);
     try {
       await onGlobalChange(localValue);
+      // NO reseteamos localValue aquí. Esperamos a que el prop 'value' cambie (via WebSocket/Refetch)
+      // O si queremos optimismo, asumimos que se guardó:
       setHasChanged(false);
+      // Actualizamos la ref para que cuando venga el nuevo valor (que será igual a localValue), no re-renderice innecesariamente
+      // Pero es mejor dejar que el useEffect maneje la sincronización
     } catch (e: any) {
       console.error('Error al guardar input:', e);
       setError(e.message || 'Error al guardar');
-      // Mantenemos el foco y seleccionamos el texto para facilitar corrección
       if (inputRef.current) {
         inputRef.current.focus();
         if (inputRef.current.select) {
@@ -57,7 +70,6 @@ export const DebouncedInput: React.FC<DebouncedInputProps> = ({
   const handleFocus = (e: React.FocusEvent<HTMLInputElement>) => {
     setIsFocused(true);
     setError(null);
-    // Autoseleccionar texto al enfocar
     if (e.target && e.target.select) {
       e.target.select();
     }
@@ -83,19 +95,15 @@ export const DebouncedInput: React.FC<DebouncedInputProps> = ({
       case TipoDatoCampo.ENTERO:
         return (
           <InputNumber
-            value={localValue} // Pasamos el valor tal cual (puede ser string "10.5")
+            value={localValue}
             onChange={(val) => {
-              // InputNumber devuelve null si está vacío o número si es válido
-              // Pero si el usuario escribe "10.", queremos mantenerlo como string temporalmente
               const newValue = val === null ? '' : val.toString();
               setLocalValue(newValue);
               setHasChanged(newValue !== globalValue);
               setError(null);
             }}
-            stringMode // Importante: permite manejar valores como string para no perder precisión o decimales intermedios
-            precision={0} // Esto fuerza visualmente a entero, pero stringMode ayuda a mantener el input
-            // Si queremos permitir que escriba decimales para luego validarlos (y que fallen),
-            // quizás sea mejor NO poner precision={0} estricto aquí, o usar un Input normal con type="number"
+            stringMode
+            precision={0}
             {...commonProps}
             {...(rest as any)}
           />
@@ -125,6 +133,7 @@ export const DebouncedInput: React.FC<DebouncedInputProps> = ({
               setLocalValue(newValue);
               setHasChanged(newValue !== globalValue);
               setError(null);
+              // Auto-guardar para fechas suele ser mejor UX, pero mantenemos el botón por consistencia
             }}
             {...commonProps}
             {...(rest as any)}
@@ -199,7 +208,7 @@ export const DebouncedInput: React.FC<DebouncedInputProps> = ({
             disabled={!hasChanged && !error}
             size={isMobile ? 'small' : 'middle'}
             style={{ flexShrink: 0 }}
-            onMouseDown={(e) => e.preventDefault()} // Evita que el botón robe el foco al hacer clic
+            onMouseDown={(e) => e.preventDefault()}
           >
             {!isMobile && (error ? 'Reintentar' : 'Guardar')}
           </Button>
