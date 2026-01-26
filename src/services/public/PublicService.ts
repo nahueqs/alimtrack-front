@@ -23,7 +23,7 @@ class PublicService {
   ): Promise<RespuestasProduccionPublicDTO> {
     if (!codigoProduccion) throw new Error('El código de producción es requerido.');
     return apiClient.get<RespuestasProduccionPublicDTO>(
-      `/public/producciones/${encodeURIComponent(codigoProduccion)}/respuestas`
+      `/public/producciones/${encodeURIComponent(codigoProduccion)}/ultimas-respuestas`
     );
   }
 
