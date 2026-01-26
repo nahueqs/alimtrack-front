@@ -39,7 +39,7 @@ export interface ProduccionFilterRequestDTO {
 export interface ProduccionCreateRequestDTO {
   codigoVersionReceta: string;
   codigoProduccion: string;
-  usernameCreador: string;
+  emailCreador: string;
   lote: string;
   encargado: string;
   observaciones?: string;

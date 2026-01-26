@@ -37,7 +37,7 @@ export const NuevaProduccionPage: React.FC = () => {
       // Añadimos el usernameCreador aquí
       const dataWithCreator: ProduccionCreateRequestDTO = {
         ...data,
-        usernameCreador: user?.email || 'desconocido', // Changed to usernameCreador
+        emailCreador: user?.email || 'desconocido', // Changed to usernameCreador
       };
 
       if (import.meta.env.DEV) {
