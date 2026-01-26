@@ -1,13 +1,18 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { Alert, Spin } from 'antd';
+import { Alert, Select, Space, Spin, Typography } from 'antd';
+import { BellOutlined } from '@ant-design/icons';
 import { DetalleProduccionPage } from '@/pages/common/DetalleProduccion/DetalleProduccionPage';
 import { usePublicService } from '@/services/public/usePublicService';
 import { PublicHeader } from '@/components/layout/PublicHeader/PublicHeader.tsx';
-import { useProductionWebSocket } from '@/hooks/useProductionWebSocket';
+import { useProductionWebSocket, type NotificationLevel } from '@/hooks/useProductionWebSocket';
+
+const { Text } = Typography;
 
 const DetalleProduccionPublicPage: React.FC = () => {
   const { codigoProduccion } = useParams<{ codigoProduccion: string }>();
+  const [notificationLevel, setNotificationLevel] = useState<NotificationLevel>('ALL');
+
   const {
     loading,
     error,
@@ -30,6 +35,7 @@ const DetalleProduccionPublicPage: React.FC = () => {
     updateTableCellResponse,
     updateProductionState,
     updateProductionMetadata,
+    notificationLevel,
   });
 
   useEffect(() => {
@@ -71,12 +77,46 @@ const DetalleProduccionPublicPage: React.FC = () => {
   }
 
   return (
-    <DetalleProduccionPage
-      estructura={estructura}
-      respuestas={respuestas}
-      isEditable={false}
-      HeaderComponent={PublicHeader}
-    />
+    <>
+      <PublicHeader />
+      <div
+        style={{
+          padding: '0 24px',
+          marginTop: '16px',
+          display: 'flex',
+          justifyContent: 'flex-end',
+          maxWidth: '1200px',
+          margin: '16px auto 0',
+        }}
+      >
+        <Space>
+          <BellOutlined style={{ color: '#8c8c8c' }} />
+          <Text type="secondary" style={{ fontSize: '14px' }}>
+            Avisos:
+          </Text>
+          <Select
+            value={notificationLevel}
+            onChange={setNotificationLevel}
+            style={{ width: 180 }}
+            size="small"
+            options={[
+              { value: 'ALL', label: 'Todos los cambios' },
+              { value: 'STATE_ONLY', label: 'Solo estado' },
+              { value: 'NONE', label: 'Silenciar' },
+            ]}
+          />
+        </Space>
+      </div>
+      <div style={{ marginTop: '-24px' }}>
+        {/* Ajuste negativo para compensar el padding del componente hijo si es necesario, o simplemente dejar que fluya */}
+        <DetalleProduccionPage
+          estructura={estructura}
+          respuestas={respuestas}
+          isEditable={false}
+          HeaderComponent={() => null} // Pasamos null porque ya renderizamos el Header arriba
+        />
+      </div>
+    </>
   );
 };
 

@@ -1,7 +1,12 @@
 let onUnauthorized: (() => void) | null = null;
+let tokenRefreshHandler: (() => Promise<string | null>) | null = null;
 
 export const setOnUnauthorizedHandler = (callback: () => void) => {
   onUnauthorized = callback;
+};
+
+export const setTokenRefreshHandler = (handler: () => Promise<string | null>) => {
+  tokenRefreshHandler = handler;
 };
 
 interface ApiError extends Error {
@@ -12,7 +17,8 @@ interface ApiError extends Error {
 }
 
 // URL base por defecto: usa la variable de entorno si existe, sino localhost
-const DEFAULT_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://alimtrackunlu.onrender.com/api/v1';
+const DEFAULT_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL || 'https://alimtrackunlu.onrender.com/api/v1';
 
 class ApiClient {
   private baseURL: string;
@@ -21,33 +27,36 @@ class ApiClient {
     this.baseURL = baseURL;
   }
 
-  async get<T>(endpoint: string, params?: Record<string, any>): Promise<T> {
-    return this.request<T>(endpoint, { method: 'GET', params });
+  async get<T>(endpoint: string, params?: Record<string, any>, options?: RequestInit): Promise<T> {
+    return this.request<T>(endpoint, { method: 'GET', params, ...options });
   }
 
-  async post<T>(endpoint: string, data?: any): Promise<T> {
+  async post<T>(endpoint: string, data?: any, options?: RequestInit): Promise<T> {
     return this.request<T>(endpoint, {
       method: 'POST',
       body: data ? JSON.stringify(data) : undefined,
+      ...options,
     });
   }
 
-  async put<T>(endpoint: string, data?: any): Promise<T> {
+  async put<T>(endpoint: string, data?: any, options?: RequestInit): Promise<T> {
     return this.request<T>(endpoint, {
       method: 'PUT',
       body: data ? JSON.stringify(data) : undefined,
+      ...options,
     });
   }
 
-  async patch<T>(endpoint: string, data?: any): Promise<T> {
+  async patch<T>(endpoint: string, data?: any, options?: RequestInit): Promise<T> {
     return this.request<T>(endpoint, {
       method: 'PATCH',
       body: data ? JSON.stringify(data) : undefined,
+      ...options,
     });
   }
 
-  async delete<T>(endpoint: string): Promise<T> {
-    return this.request<T>(endpoint, { method: 'DELETE' });
+  async delete<T>(endpoint: string, options?: RequestInit): Promise<T> {
+    return this.request<T>(endpoint, { method: 'DELETE', ...options });
   }
 
   private async request<T>(
@@ -69,7 +78,8 @@ class ApiClient {
       ...(options.headers as Record<string, string>),
     });
 
-    if (token) {
+    // Solo agregamos el token si no viene ya un Authorization en los headers (para permitir override en refresh)
+    if (token && !headers.has('Authorization')) {
       headers.set('Authorization', `Bearer ${token}`);
     }
 
@@ -89,16 +99,13 @@ class ApiClient {
           data = responseText ? JSON.parse(responseText) : {};
         } catch (e) {
           console.warn('[ApiClient] Error parsing JSON response:', e);
-          // Si falla el parseo pero el status es error, intentamos usar el texto como mensaje
           if (!response.ok) {
             data = { message: responseText };
           }
         }
       } else {
-        // If not JSON, read as text and include in error message if not ok
         const responseText = await response.text();
         if (!response.ok) {
-          // Limitar longitud para no ensuciar logs si es HTML gigante
           const msg =
             responseText.length > 200 ? responseText.substring(0, 200) + '...' : responseText;
           data = { message: msg || `Error ${response.status}` };
@@ -113,19 +120,21 @@ class ApiClient {
 
       return data;
     } catch (error: any) {
-      console.groupCollapsed(`[ApiClient] Error Capturado`);
-      console.error(error);
+      if (error.response && error.response.status === 401 && tokenRefreshHandler) {
+        // Silencioso
+      } else {
+        console.groupCollapsed(`[ApiClient] Error Capturado`);
+        console.error(error);
+      }
 
       let friendlyError: Error;
 
       if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
         console.log('[ApiClient] Interpretado como: Error de Red.');
         friendlyError = new Error('Error de Conexión: No se pudo comunicar con el servidor.');
-        // message.error(friendlyError.message); // Opcional: comentar si el componente lo maneja
       } else if (error.response) {
         const status = error.response.status;
         const apiMessage = error.message;
-        console.log(`[ApiClient] Interpretado como: Error HTTP ${status}.`);
 
         switch (status) {
           case 400:
@@ -134,18 +143,43 @@ class ApiClient {
             );
             break;
           case 401:
+            if (tokenRefreshHandler) {
+              console.log('[ApiClient] 401 detectado. Intentando recuperar sesión...');
+              try {
+                const newToken = await tokenRefreshHandler();
+                if (newToken) {
+                  console.log('[ApiClient] Sesión recuperada. Reintentando petición...');
+                  const newHeaders: Record<string, string> = {};
+                  headers.forEach((value, key) => {
+                    newHeaders[key] = value;
+                  });
+                  newHeaders['Authorization'] = `Bearer ${newToken}`;
+
+                  return await this.request<T>(endpoint, {
+                    ...options,
+                    headers: newHeaders,
+                  });
+                }
+              } catch (refreshError) {
+                console.error('[ApiClient] Falló la recuperación de sesión.', refreshError);
+              }
+            }
+            console.log(`[ApiClient] Interpretado como: Error HTTP ${status}.`);
             friendlyError = new Error(
               apiMessage || 'Sesión expirada. Por favor, inicie sesión de nuevo.'
             );
             if (onUnauthorized) onUnauthorized();
             break;
           case 403:
+            console.log(`[ApiClient] Interpretado como: Error HTTP ${status}.`);
             friendlyError = new Error(apiMessage || 'No tienes permisos para realizar esta acción.');
             break;
           case 404:
+            console.log(`[ApiClient] Interpretado como: Error HTTP ${status}.`);
             friendlyError = new Error(apiMessage || 'El recurso solicitado no fue encontrado.');
             break;
           case 409:
+            console.log(`[ApiClient] Interpretado como: Error HTTP ${status}.`);
             friendlyError = new Error(
               apiMessage || 'Conflicto: El recurso ya existe o hay un conflicto de datos.'
             );
@@ -154,26 +188,31 @@ class ApiClient {
           case 502:
           case 503:
           case 504:
+            console.log(`[ApiClient] Interpretado como: Error HTTP ${status}.`);
             friendlyError = new Error(
               'Error del Servidor: Problema inesperado. Intente más tarde.'
             );
             break;
           default:
+            console.log(`[ApiClient] Interpretado como: Error HTTP ${status}.`);
             friendlyError = error;
             break;
         }
-        // message.error(friendlyError.message); // Opcional: comentar si el componente lo maneja
       } else if (error instanceof SyntaxError) {
         console.log('[ApiClient] Interpretado como: Error de parseo JSON.');
         friendlyError = new Error(
           'Error de Respuesta: El formato de la respuesta del servidor no es válido.'
         );
-        // message.error(friendlyError.message);
       } else {
         friendlyError = error;
       }
 
-      console.groupEnd();
+      if (
+        !(error.response && error.response.status === 401 && tokenRefreshHandler)
+      ) {
+          console.groupEnd();
+      }
+      
       throw friendlyError;
     }
   }

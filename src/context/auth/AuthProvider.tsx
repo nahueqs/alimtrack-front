@@ -5,13 +5,15 @@ import React, {
   useCallback,
   useContext,
   useEffect,
+  useRef,
   useState,
 } from 'react';
 import { Spin } from 'antd';
 import type { AuthResponse, LoginRequest, RegisterRequest } from '@/services/auth/Auth.ts';
 import { authService } from '@/services/auth/AuthService.ts';
 import type { User } from '@/services/auth/User.ts';
-import { setOnUnauthorizedHandler } from '@/services/ApiClient.ts';
+import { setOnUnauthorizedHandler, setTokenRefreshHandler } from '@/services/ApiClient.ts';
+import { SessionExpiredModal } from '@/components/auth/SessionExpiredModal.tsx';
 
 interface AuthContextType {
   user: User | null;
@@ -36,17 +38,84 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [loading, setLoading] = useState(false);
   const [initialLoading, setInitialLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isSessionExpired, setIsSessionExpired] = useState(false);
+
+  // Referencia para guardar la función 'resolve' de la promesa de refresco
+  const refreshResolver = useRef<((token: string | null) => void) | null>(null);
 
   const logout = useCallback(() => {
     localStorage.removeItem('authToken');
+    localStorage.removeItem('refreshToken');
     localStorage.removeItem('userData');
     setUser(null);
     setError(null);
   }, []);
 
+  // Configurar handlers de ApiClient
   useEffect(() => {
     setOnUnauthorizedHandler(logout);
 
+    setTokenRefreshHandler(async () => {
+      // 1. Intentar Refresh Silencioso
+      const storedRefreshToken = localStorage.getItem('refreshToken');
+      if (storedRefreshToken) {
+        try {
+          console.log('[AuthProvider] Intentando refresh silencioso...');
+          const response = await authService.refreshToken(storedRefreshToken);
+          const newAccessToken = response.access_token;
+
+          if (newAccessToken) {
+            console.log('[AuthProvider] Refresh silencioso exitoso.');
+            localStorage.setItem('authToken', newAccessToken);
+            if (response.refresh_token) {
+              localStorage.setItem('refreshToken', response.refresh_token);
+            }
+            return newAccessToken;
+          }
+        } catch (err) {
+          console.warn('[AuthProvider] Falló el refresh silencioso.', err);
+          // Si falla, continuamos al modal
+        }
+      }
+
+      // 2. Si falla el silencioso, mostrar Modal
+      if (isSessionExpired && refreshResolver.current) {
+        return new Promise<string | null>((resolve) => {
+          const oldResolver = refreshResolver.current;
+          refreshResolver.current = (token) => {
+            if (oldResolver) oldResolver(token);
+            resolve(token);
+          };
+        });
+      }
+
+      setIsSessionExpired(true);
+      return new Promise<string | null>((resolve) => {
+        refreshResolver.current = resolve;
+      });
+    });
+  }, [logout, isSessionExpired]);
+
+  const handleSessionRestored = (token: string) => {
+    setIsSessionExpired(false);
+    localStorage.setItem('authToken', token);
+
+    if (refreshResolver.current) {
+      refreshResolver.current(token);
+      refreshResolver.current = null;
+    }
+  };
+
+  const handleSessionCancel = () => {
+    setIsSessionExpired(false);
+    if (refreshResolver.current) {
+      refreshResolver.current(null);
+      refreshResolver.current = null;
+    }
+    logout();
+  };
+
+  useEffect(() => {
     const checkAuthStatus = async () => {
       const token = localStorage.getItem('authToken');
       if (!token) {
@@ -75,11 +144,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     try {
       const response: AuthResponse = await authService.login(credentials);
 
-      if (!response.token || !response.user) {
+      const token = response.access_token;
+
+      if (!token || !response.user) {
         throw new Error('Respuesta de login inválida desde el servidor.');
       }
 
-      localStorage.setItem('authToken', response.token);
+      localStorage.setItem('authToken', token);
+      if (response.refresh_token) {
+        localStorage.setItem('refreshToken', response.refresh_token);
+      }
       localStorage.setItem('userData', JSON.stringify(response.user));
       setUser(response.user);
     } catch (err: any) {
@@ -97,11 +171,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     try {
       const response: AuthResponse = await authService.register(userData);
 
-      if (!response.token || !response.user) {
+      const token = response.access_token;
+
+      if (!token || !response.user) {
         throw new Error('Respuesta de registro inválida desde el servidor.');
       }
 
-      localStorage.setItem('authToken', response.token);
+      localStorage.setItem('authToken', token);
+      if (response.refresh_token) {
+        localStorage.setItem('refreshToken', response.refresh_token);
+      }
       localStorage.setItem('userData', JSON.stringify(response.user));
       setUser(response.user);
     } catch (err: any) {
@@ -133,6 +212,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     <AuthContext.Provider value={value}>
       <Spin spinning={initialLoading} fullscreen tip="Verificando sesión..." />
       {children}
+      <SessionExpiredModal
+        open={isSessionExpired}
+        user={user}
+        onSuccess={handleSessionRestored}
+        onCancel={handleSessionCancel}
+      />
     </AuthContext.Provider>
   );
 };

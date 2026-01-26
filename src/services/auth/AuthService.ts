@@ -6,7 +6,7 @@ export const authService = {
   async login(credentials: LoginRequest): Promise<AuthResponse> {
     try {
       const response = await apiClient.post<AuthResponse>('/auth/login', credentials);
-      if (!response.token || !response.user) {
+      if (!response.access_token || !response.user) {
         throw new Error('Respuesta de login inválida desde el servidor.');
       }
       return response;
@@ -21,10 +21,33 @@ export const authService = {
   async register(userData: RegisterRequest): Promise<AuthResponse> {
     try {
       const response = await apiClient.post<AuthResponse>('/auth/register', userData);
+      if (!response.access_token || !response.user) {
+        throw new Error('Respuesta de registro inválida desde el servidor.');
+      }
       return response;
     } catch (error: any) {
       if (import.meta.env.DEV) {
         console.error('Error en el registro:', error);
+      }
+      throw error;
+    }
+  },
+
+  async refreshToken(token: string): Promise<AuthResponse> {
+    try {
+      // Enviamos el refresh token en el header Authorization
+      return await apiClient.post<AuthResponse>(
+        '/auth/refresh-token',
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+    } catch (error: any) {
+      if (import.meta.env.DEV) {
+        console.error('Error al refrescar token:', error);
       }
       throw error;
     }
@@ -44,6 +67,7 @@ export const authService = {
 
   logout() {
     localStorage.removeItem('authToken');
+    localStorage.removeItem('refreshToken'); // Limpiamos también el refresh token
     localStorage.removeItem('userData');
   },
 };

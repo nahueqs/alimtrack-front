@@ -9,6 +9,8 @@ import type {
 } from '@/types/production';
 import { findItemInStructure } from '@/utils/production/structureUtils';
 
+export type NotificationLevel = 'ALL' | 'STATE_ONLY' | 'NONE';
+
 // Definimos un tipo compatible con DTOs públicos y protegidos que tengan la info de estado
 interface ProductionStateSource {
   produccion: {
@@ -27,6 +29,7 @@ interface UseProductionWebSocketProps {
   updateProductionMetadata: (
     update: ProductionMetadataUpdatedPayload & { timestamp: string }
   ) => void;
+  notificationLevel?: NotificationLevel;
 }
 
 export const useProductionWebSocket = ({
@@ -38,6 +41,7 @@ export const useProductionWebSocket = ({
   updateTableCellResponse,
   updateProductionState,
   updateProductionMetadata,
+  notificationLevel = 'ALL',
 }: UseProductionWebSocketProps) => {
   const [isConnected, setIsConnected] = useState(false);
   const isPageVisible = useRef(true);
@@ -144,7 +148,11 @@ export const useProductionWebSocket = ({
 
       if (!isFinalState) {
         unsubscribe = notificationService.subscribeToAutoSave(codigoProduccion, (message: any) => {
-          const tryShowNotification = (title: string, body: string) => {
+          const tryShowNotification = (title: string, body: string, type: string) => {
+            // Filtrado de notificaciones según preferencia del usuario
+            if (notificationLevel === 'NONE') return;
+            if (notificationLevel === 'STATE_ONLY' && type !== 'STATE_CHANGED') return;
+
             console.log('[WebSocket] Intentando mostrar notificación:', {
               visible: isPageVisible.current,
               permission: Notification.permission,
@@ -181,7 +189,7 @@ export const useProductionWebSocket = ({
                 itemTitle && sectionTitle
                   ? `Cambio en campo "${itemTitle}" de sección "${sectionTitle}".`
                   : `Cambio en un campo de la producción ${codigoProduccion}.`;
-              tryShowNotification(`Producción Actualizada`, body);
+              tryShowNotification(`Producción Actualizada`, body, 'FIELD_UPDATED');
               break;
             }
             case 'TABLE_CELL_UPDATED': {
@@ -196,14 +204,15 @@ export const useProductionWebSocket = ({
                 itemTitle && sectionTitle
                   ? `Cambio en tabla "${itemTitle}" de sección "${sectionTitle}".`
                   : `Cambio en una celda de tabla de la producción ${codigoProduccion}.`;
-              tryShowNotification(`Producción Actualizada`, body);
+              tryShowNotification(`Producción Actualizada`, body, 'TABLE_CELL_UPDATED');
               break;
             }
             case 'STATE_CHANGED':
               updateProductionState(message.payload);
               tryShowNotification(
                 `Estado Actualizado`,
-                `El estado ha cambiado a: ${message.payload.estado}`
+                `El estado ha cambiado a: ${message.payload.estado}`,
+                'STATE_CHANGED'
               );
               break;
             case 'PRODUCTION_METADATA_UPDATED':
@@ -215,7 +224,8 @@ export const useProductionWebSocket = ({
               updateProductionMetadata(payloadWithTimestamp);
               tryShowNotification(
                 `Metadatos Actualizados`,
-                `Se han actualizado los metadatos de la producción.`
+                `Se han actualizado los metadatos de la producción.`,
+                'PRODUCTION_METADATA_UPDATED'
               );
               break;
             default:
@@ -246,6 +256,7 @@ export const useProductionWebSocket = ({
     updateProductionMetadata,
     estructura,
     queueUpdate,
+    notificationLevel, // Agregado a dependencias
   ]);
 
   return { isConnected };

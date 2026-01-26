@@ -1,18 +1,18 @@
-import type {User} from './User.ts';
+import type { User } from './User.ts';
 
 export interface LoginRequest {
-    email: string;
-    password: string;
+  email: string;
+  password: string;
 }
 
 export interface RegisterRequest {
-    nombre: string;
-    username: string;
-    email: string;
-    password: string;
+  nombre: string;
+  email: string;
+  password: string;
 }
 
 export interface AuthResponse {
-    token: string;
-    user: User;
+  access_token: string;
+  refresh_token: string;
+  user: User;
 }
