@@ -117,6 +117,7 @@ export const DebouncedInput: React.FC<DebouncedInputProps> = ({
   // Generar placeholder con tipo de dato
   const getPlaceholder = () => {
     const basePlaceholder = placeholder || 'Ingrese valor';
+    // No mostrar tipo para fechas/horas/booleanos ya que el control es explícito
     if (
       tipoDato === TipoDatoCampo.FECHA ||
       tipoDato === TipoDatoCampo.HORA ||
@@ -239,7 +240,7 @@ export const DebouncedInput: React.FC<DebouncedInputProps> = ({
             }}
             disabled={isSaving || rest.disabled}
           >
-            {rest.placeholder || 'Sí/No'}
+            {placeholder || 'Sí/No'}
           </Checkbox>
         );
       case TipoDatoCampo.TEXTO:
