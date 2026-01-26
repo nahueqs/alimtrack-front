@@ -1,67 +1,67 @@
 /* --- Estilos para InfoProduccionCard --- */
-.production-info-card {
+.info-card {
     background-color: var(--bg-primary);
     border: 1px solid var(--border-light);
     border-radius: var(--radius-lg);
     height: 100%; /* Asegura que la tarjeta ocupe toda la altura de la columna */
+    margin-bottom: 1rem; /* Espacio inferior en móvil */
 }
 
-.production-info-card .ant-card-body {
-    overflow-x: auto;
+.info-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
 }
 
-.production-info-card .ant-descriptions-title {
+.info-card-title {
+    margin: 0 !important;
     color: var(--text-primary);
 }
 
-.production-info-card .ant-descriptions-item-label {
+.info-card .ant-descriptions-title {
+    color: var(--text-primary);
+}
+
+.info-card .ant-descriptions-item-label {
     background-color: var(--bg-secondary);
     color: var(--text-secondary);
     font-weight: 600;
     white-space: nowrap;
 }
 
-.production-info-card .ant-descriptions-item-content {
+.info-card .ant-descriptions-item-content {
     background-color: var(--bg-primary);
     color: var(--text-primary);
 }
 
-.production-info-card .ant-descriptions-bordered .ant-descriptions-item-label,
-.production-info-card .ant-descriptions-bordered .ant-descriptions-item-content {
+.info-card .ant-descriptions-bordered .ant-descriptions-item-label,
+.info-card .ant-descriptions-bordered .ant-descriptions-item-content {
     border-color: var(--border-light) !important;
 }
 
-.elapsed-time {
-    font-weight: 600;
-    color: var(--primary-500);
-}
-
 /* --- Estilos para ProgresoProduccionCard --- */
-.progress-info-card {
+.progress-card {
     background-color: var(--bg-primary);
     border: 1px solid var(--border-light);
     border-radius: var(--radius-lg);
     height: 100%;
 }
 
-.progress-info-card .ant-card-head-title {
+.progress-card-title {
+    margin: 0 !important;
     color: var(--text-primary);
+    text-align: center;
+    margin-bottom: 1rem !important;
 }
 
-.progress-info-card .ant-statistic-title {
+.progress-card .ant-statistic-title {
     color: var(--text-secondary);
 }
 
-.progress-info-card .ant-statistic-content {
+.progress-card .ant-statistic-content {
     color: var(--text-primary);
 }
-
-.statistic-percentage {
-    font-size: 0.85em;
-    color: var(--text-tertiary);
-    margin-left: 8px;
-}
-
 
 /* --- Estilos para EstructuraProduccion --- */
 .production-structure {
@@ -85,6 +85,7 @@
     display: flex;
     align-items: center;
     gap: 12px;
+    flex-wrap: wrap; /* Permitir wrap en móvil */
 }
 
 .section-number {
@@ -98,12 +99,13 @@
     color: white;
     font-size: 1rem;
     font-weight: 700;
+    flex-shrink: 0;
 }
 
 .section-progress-text {
     font-size: 0.9em;
     color: var(--text-secondary);
-    margin-left: 8px;
+    margin-left: auto; /* Empujar a la derecha */
 }
 
 .section-card .ant-form-item-label > label {
@@ -131,25 +133,24 @@
 
 .group-title {
     color: var(--text-secondary);
-    margin-bottom: 8px !important;
+    margin-bottom: 12px !important;
     font-size: 1.1rem !important;
-}
-
-.group-subtitle {
-    color: var(--text-tertiary);
-    font-size: 0.9rem;
-    margin-bottom: 16px;
-    display: block;
 }
 
 .production-table-container {
     margin-bottom: 24px;
+    overflow-x: auto; /* Scroll horizontal para tablas */
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-md);
+    padding: 1rem;
+    background-color: var(--bg-primary);
 }
 
 .production-table-title {
     color: var(--text-secondary);
     margin-bottom: 8px;
     font-size: 1.1rem;
+    font-weight: 600;
 }
 
 .production-table-description {
@@ -166,15 +167,29 @@
 /* --- Estilos para Mobile --- */
 @media (max-width: 768px) {
     #production-content {
-        padding: 12px !important;
+        padding: 1rem !important;
+    }
+
+    .info-card, .progress-card {
+        margin-bottom: 1rem;
     }
 
     .section-card .ant-card-body {
-        padding: 12px;
+        padding: 16px;
     }
 
     .section-title {
         font-size: 1.2rem !important;
         gap: 8px;
+    }
+    
+    .section-progress-text {
+        width: 100%;
+        margin-left: 40px; /* Alinear con el texto del título */
+        margin-top: 4px;
+    }
+
+    .group-card {
+        padding: 12px;
     }
 }

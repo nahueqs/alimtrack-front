@@ -1,38 +1,42 @@
 /* ProduccionesPage.css */
 
-.productions-page__content {
-    padding: 20px;
+.productions-list__header {
+    display: flex;
+    flex-direction: column; /* Apilado en móvil */
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    align-items: flex-start;
+}
+
+.productions-list__title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.productions-list__content {
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 1.5rem;
 }
 
-.productions-page__header {
-    display: flex;
-    justify-content: flex-start;
-    align-items: center;
+/* Ajustes para la tabla en móvil */
+.productions-list__content .ant-table-wrapper {
+    overflow-x: auto; /* Scroll horizontal si es necesario */
 }
 
-.productions-page__body {
-    /* Flex grow to take available space, if needed */
-    flex-grow: 1;
-}
-
-.productions-page__table {
-    /* Specific styles for the table if needed */
-}
-
-/* Responsive adjustments */
-@media (max-width: 768px) {
-    .productions-page__content {
-        padding: 15px;
-        gap: 15px;
+/* ==========================================================================
+   MEDIA QUERIES
+   ========================================================================== */
+@media (min-width: 768px) {
+    .productions-list__header {
+        flex-direction: row; /* En línea en escritorio */
+        justify-content: space-between;
+        align-items: center;
     }
-}
 
-@media (max-width: 576px) {
-    .productions-page__content {
-        padding: 10px;
-        gap: 10px;
+    .productions-list__title {
+        font-size: 1.75rem;
     }
 }

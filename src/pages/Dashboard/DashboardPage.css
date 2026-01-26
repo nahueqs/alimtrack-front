@@ -7,7 +7,7 @@
 }
 
 .dashboard__main {
-    padding: 2rem 1.5rem; /* Aumentado padding vertical */
+    padding: 1.5rem 1rem; /* Reducido padding horizontal para móviles */
     max-width: 1200px;
     margin: 0 auto;
 }
@@ -16,22 +16,22 @@
    SECCIÓN DE BIENVENIDA (Welcome)
    ========================================================================== */
 .dashboard__welcome {
-    margin-bottom: 3rem; /* Espacio debajo de la sección de bienvenida */
-    text-align: center; /* Centrar textos por defecto */
+    margin-bottom: 2rem;
+    text-align: center;
 }
 
 .dashboard__welcome-title {
-    font-size: 2.5rem;
+    font-size: 1.75rem; /* Fuente más pequeña para móvil por defecto */
     font-weight: 700;
     color: var(--text-primary);
-    margin-bottom: 1rem; /* Espacio aumentado entre título y subtítulo */
+    margin-bottom: 0.75rem;
     line-height: 1.2;
 }
 
 .dashboard__welcome-subtitle {
-    font-size: 1.125rem;
+    font-size: 1rem;
     color: var(--text-secondary);
-    margin-bottom: 3rem; /* Espacio aumentado entre subtítulo y grid de tarjetas */
+    margin-bottom: 2rem;
     max-width: 600px;
     margin-left: auto;
     margin-right: auto;
@@ -42,9 +42,10 @@
    ========================================================================== */
 .dashboard__grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 2rem; /* Espacio generoso entre tarjetas */
-    align-items: stretch; /* Que las tarjetas tengan la misma altura */
+    /* En móvil, 1 columna. En escritorio, se adapta. */
+    grid-template-columns: 1fr; 
+    gap: 1.5rem;
+    align-items: stretch;
 }
 
 /* Ajustes específicos para las tarjetas dentro del dashboard */
@@ -58,228 +59,44 @@
     flex-grow: 1;
     display: flex;
     flex-direction: column;
-    gap: 1rem; /* Espacio entre botones dentro de la tarjeta */
-    padding-top: 1.5rem; /* Más espacio arriba del contenido */
+    gap: 1rem;
+    padding-top: 1rem;
 }
 
 .dashboard__grid .card--dashboard .dashboard-card__description {
-    margin-top: 0.5rem; /* Espacio entre título y descripción de la tarjeta */
-    margin-bottom: 1.5rem; /* Espacio entre descripción y botones */
-}
-
-
-/* ==========================================================================
-   HEADER: BASE Y LAYOUT
-   ========================================================================== */
-.header {
-    background-color: var(--bg-primary);
-    border-bottom: 1px solid var(--border-light);
-    box-shadow: var(--shadow-sm);
-    position: relative;
-    z-index: 100;
-}
-
-.header__nav {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    height: 4rem;
-    padding: 0 1.5rem;
-}
-
-.header__brand {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-}
-
-.header__brand-logo {
-    height: 36px;
-    width: 36px;
-}
-
-.header__brand-title {
-    font-size: 1.25rem;
-    font-weight: 700;
-    color: var(--text-primary);
-}
-
-.header__actions {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
+    margin-top: 0.5rem;
+    margin-bottom: 1.5rem;
 }
 
 /* ==========================================================================
-   NAVEGACIÓN MÓVIL (Mobile First)
+   MEDIA QUERIES (Tablet y Desktop)
    ========================================================================== */
+@media (min-width: 768px) {
+    .dashboard__main {
+        padding: 2rem 1.5rem;
+    }
 
-/* Por defecto, la navegación de escritorio está oculta */
-.header__desktop-nav {
-    display: none;
-}
+    .dashboard__welcome {
+        margin-bottom: 3rem;
+    }
 
-/* El botón de hamburguesa es visible por defecto */
-.header__hamburger {
-    background: none;
-    border: none;
-    padding: 0.5rem;
-    cursor: pointer;
-    border-radius: var(--radius-sm);
-    display: flex;
-    color: var(--text-secondary);
-}
+    .dashboard__welcome-title {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+    }
 
-/* Contenido del menú desplegable móvil */
-.header__mobile-menu-content {
-    background-color: var(--bg-primary);
-    position: absolute;
-    top: 4rem; /* Justo debajo del header */
-    left: 0;
-    right: 0;
-    border-bottom: 1px solid var(--border-light);
-    box-shadow: var(--shadow-md);
-    padding: 1rem;
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
+    .dashboard__welcome-subtitle {
+        font-size: 1.125rem;
+        margin-bottom: 3rem;
+    }
+
+    .dashboard__grid {
+        /* En tablet/desktop, columnas automáticas */
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2rem;
+    }
     
-    /* Lógica de visibilidad */
-    opacity: 0;
-    visibility: hidden;
-    transform: translateY(-10px);
-    transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s;
-}
-
-.header__mobile-menu-content--open {
-    opacity: 1;
-    visibility: visible;
-    transform: translateY(0);
-}
-
-.header__separator {
-    border: none;
-    border-top: 1px solid var(--border-light);
-    margin: 0.5rem 0;
-}
-
-.header__mobile-user-info {
-    padding: 0.5rem;
-    text-align: center;
-    border-bottom: 1px solid var(--border-light);
-    margin-bottom: 0.5rem;
-}
-
-.header__mobile-user-role {
-    font-size: 0.8rem;
-    color: var(--text-secondary);
-    text-transform: capitalize;
-}
-
-/* ==========================================================================
-   NAVEGACIÓN DE ESCRITORIO (Se activa en pantallas grandes)
-   ========================================================================== */
-@media (min-width: 769px) {
-    /* Oculta el nombre de la marca en pantallas medianas para dar espacio */
-    .header__brand-title {
-        display: block;
+    .dashboard__grid .card--dashboard .dashboard-card__content {
+        padding-top: 1.5rem;
     }
-
-    /* Oculta la navegación móvil */
-    .header__mobile-nav {
-        display: none;
-    }
-    .header__mobile-menu-content {
-        display: none;
-    }
-
-    /* Muestra la navegación de escritorio */
-    .header__desktop-nav {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-    }
-
-    .header__nav-link {
-        padding: 0.25rem 0.5rem;
-        color: var(--text-secondary);
-        font-weight: 500;
-        cursor: pointer;
-        border-radius: var(--radius-sm);
-        transition: color 0.2s ease;
-        text-decoration: none;
-    }
-
-    .header__nav-link:hover {
-        color: var(--text-primary);
-    }
-
-    /* Menú de usuario en escritorio */
-    .header__user-menu {
-        position: relative;
-    }
-
-    .header__user-button {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        background-color: var(--bg-tertiary);
-        border: 1px solid var(--border-light);
-        padding: 0.5rem 1rem;
-        border-radius: var(--radius-full);
-        cursor: pointer;
-        color: var(--text-primary);
-        transition: background-color 0.2s ease;
-    }
-
-    .header__user-button:hover {
-        background-color: var(--bg-hover);
-    }
-
-    .header__user-dropdown {
-        display: none;
-        position: absolute;
-        top: calc(100% + 0.75rem);
-        right: 0;
-        background-color: var(--bg-primary);
-        border: 1px solid var(--border-light);
-        border-radius: var(--radius-md);
-        box-shadow: var(--shadow-lg);
-        padding: 0.5rem;
-        min-width: 180px;
-        z-index: 101;
-    }
-
-    .header__user-menu:hover .header__user-dropdown {
-        display: block;
-    }
-}
-
-/* Para pantallas muy pequeñas, ocultamos el título para asegurar espacio */
-@media (max-width: 380px) {
-    .header__brand-title {
-        display: none;
-    }
-}
-
-/* ==========================================================================
-   ESTILOS COMUNES (Dropdown items, etc.)
-   ========================================================================== */
-.header__dropdown-item {
-    display: block;
-    width: 100%;
-    padding: 0.75rem 1rem;
-    background: none;
-    border: none;
-    text-align: left;
-    color: var(--text-primary);
-    cursor: pointer;
-    border-radius: var(--radius-sm);
-    font-size: 1rem;
-    transition: background-color 0.2s ease;
-    text-decoration: none;
-}
-
-.header__dropdown-item:hover {
-    background-color: var(--bg-tertiary);
 }
