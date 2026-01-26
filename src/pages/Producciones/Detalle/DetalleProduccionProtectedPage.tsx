@@ -53,6 +53,8 @@ const DetalleProduccionProtectedPage: React.FC = () => {
     guardarMetadata,
     estadoActual,
     estructura,
+    updateFieldResponse,
+    updateTableCellResponse,
   });
 
   const isProductionEditable = estadoActual?.produccion.estado === ProductionState.EN_PROCESO;

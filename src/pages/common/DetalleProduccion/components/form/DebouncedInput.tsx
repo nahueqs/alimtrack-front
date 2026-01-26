@@ -25,18 +25,13 @@ export const DebouncedInput: React.FC<DebouncedInputProps> = ({
   const [isSaving, setIsSaving] = useState(false);
 
   const inputRef = useRef<any>(null);
-  // Ref para rastrear el valor global anterior y detectar cambios externos reales
   const prevGlobalValueRef = useRef(globalValue);
   const isMobile = useIsMobile();
 
-  // Sincronizar con cambios externos (WebSocket o recarga)
   useEffect(() => {
     if (globalValue !== prevGlobalValueRef.current) {
-      // Si el valor global cambió, actualizamos el local
-      // Esto maneja el caso donde el WebSocket confirma el guardado
       setLocalValue(globalValue);
       prevGlobalValueRef.current = globalValue;
-      // Si el valor externo coincide con lo que teníamos localmente, ya no hay cambios pendientes
       if (globalValue === localValue) {
         setHasChanged(false);
       }
@@ -48,11 +43,7 @@ export const DebouncedInput: React.FC<DebouncedInputProps> = ({
     setError(null);
     try {
       await onGlobalChange(localValue);
-      // NO reseteamos localValue aquí. Esperamos a que el prop 'value' cambie (via WebSocket/Refetch)
-      // O si queremos optimismo, asumimos que se guardó:
       setHasChanged(false);
-      // Actualizamos la ref para que cuando venga el nuevo valor (que será igual a localValue), no re-renderice innecesariamente
-      // Pero es mejor dejar que el useEffect maneje la sincronización
     } catch (e: any) {
       console.error('Error al guardar input:', e);
       setError(e.message || 'Error al guardar');
@@ -133,7 +124,6 @@ export const DebouncedInput: React.FC<DebouncedInputProps> = ({
               setLocalValue(newValue);
               setHasChanged(newValue !== globalValue);
               setError(null);
-              // Auto-guardar para fechas suele ser mejor UX, pero mantenemos el botón por consistencia
             }}
             {...commonProps}
             {...(rest as any)}
@@ -142,13 +132,20 @@ export const DebouncedInput: React.FC<DebouncedInputProps> = ({
       case TipoDatoCampo.HORA:
         return (
           <TimePicker
-            value={localValue ? dayjs(localValue, 'HH:mm:ss') : null}
+            value={
+              localValue
+                ? localValue.includes('T')
+                  ? dayjs(localValue)
+                  : dayjs(localValue, 'HH:mm:ss')
+                : null
+            }
             onChange={(_time, timeString) => {
               const newValue = typeof timeString === 'string' ? timeString : '';
               setLocalValue(newValue);
               setHasChanged(newValue !== globalValue);
               setError(null);
             }}
+            format="HH:mm:ss" // Aseguramos formato con segundos
             {...commonProps}
             {...(rest as any)}
           />

@@ -6,10 +6,12 @@ import { useAuth } from '@/context/auth/AuthProvider';
 import type {
   EstadoActualProduccionResponseDTO,
   EstructuraProduccionDTO,
+  FieldUpdatePayload,
   ProduccionCambioEstadoRequestDTO,
   ProduccionMetadataModifyRequestDTO,
   RespuestaCampoRequestDTO,
   RespuestaCeldaTablaRequestDTO,
+  TableCellUpdatePayload,
 } from '@/types/production';
 import { TipoDatoCampo } from '@/pages/Recetas/types/TipoDatoCampo';
 import { ProductionState } from '@/constants/ProductionStates';
@@ -38,6 +40,9 @@ interface UseProductionActionsProps {
   ) => Promise<void>;
   estadoActual: EstadoActualProduccionResponseDTO | null;
   estructura: EstructuraProduccionDTO | null;
+  // Nuevas props para actualización optimista
+  updateFieldResponse: (update: FieldUpdatePayload & { timestamp: string }) => void;
+  updateTableCellResponse: (update: TableCellUpdatePayload & { timestamp: string }) => void;
 }
 
 interface UseProductionActionsReturn {
@@ -100,6 +105,8 @@ export const useProductionActions = ({
   guardarRespuestaCeldaTabla,
   cambiarEstadoProduccion,
   guardarMetadata,
+  updateFieldResponse,
+  updateTableCellResponse,
 }: UseProductionActionsProps): UseProductionActionsReturn => {
   const { codigoProduccion } = useParams<{ codigoProduccion: string }>();
   const navigate = useNavigate();
@@ -108,6 +115,14 @@ export const useProductionActions = ({
   const _handleCampoChange = useCallback(
     async (idCampo: number, valor: string, tipoDato: TipoDatoCampo) => {
       if (!codigoProduccion || !user?.email) return;
+
+      // 1. Actualización Optimista
+      const optimisticTimestamp = new Date().toISOString();
+      updateFieldResponse({
+        idCampo,
+        valor,
+        timestamp: optimisticTimestamp,
+      });
 
       const typedData = buildTypedRequestData(valor, tipoDato);
 
@@ -123,10 +138,11 @@ export const useProductionActions = ({
       } catch (e: any) {
         const errorMsg = e.message || 'Error al guardar el cambio';
         message.error(errorMsg);
-        throw e; // Relanzar para que el componente UI (DebouncedInput) se entere
+        // Aquí podríamos revertir el cambio optimista si tuviéramos el valor anterior
+        throw e;
       }
     },
-    [codigoProduccion, user?.email, guardarRespuestaCampo]
+    [codigoProduccion, user?.email, guardarRespuestaCampo, updateFieldResponse]
   );
 
   const _handleTablaChange = useCallback(
@@ -138,6 +154,16 @@ export const useProductionActions = ({
       tipoDato: TipoDatoCampo
     ) => {
       if (!codigoProduccion || !user?.email) return;
+
+      // 1. Actualización Optimista
+      const optimisticTimestamp = new Date().toISOString();
+      updateTableCellResponse({
+        idTabla,
+        idFila,
+        idColumna,
+        valor,
+        timestamp: optimisticTimestamp,
+      });
 
       const typedData = buildTypedRequestData(valor, tipoDato);
 
@@ -161,10 +187,10 @@ export const useProductionActions = ({
       } catch (e: any) {
         const errorMsg = e.message || 'Error al guardar el cambio';
         message.error(errorMsg);
-        throw e; // Relanzar para que el componente UI se entere
+        throw e;
       }
     },
-    [codigoProduccion, user?.email, guardarRespuestaCeldaTabla]
+    [codigoProduccion, user?.email, guardarRespuestaCeldaTabla, updateTableCellResponse]
   );
 
   const _handleMetadataChange = useCallback(
@@ -191,8 +217,6 @@ export const useProductionActions = ({
       const isCancel = nuevoEstado === ProductionState.CANCELADA;
 
       if (!isFinal && !isCancel) {
-        // Si es otro estado (ej: volver a EN_PROCESO), quizás no necesite confirmación tan drástica
-        // Pero por ahora asumimos que solo se llama para finalizar/cancelar
         return;
       }
 
