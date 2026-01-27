@@ -66,7 +66,11 @@ class NotificationService {
     const destination = `/topic/produccion/${codigoProduccion}`;
     if (this.stompClient && this.stompClient.connected) {
       const subscription = this.stompClient.subscribe(destination, (message: IMessage) => {
-        callback(JSON.parse(message.body));
+        try {
+          callback(JSON.parse(message.body));
+        } catch (e) {
+          console.error('[NotificationService] Error parsing message:', e);
+        }
       });
       return () => subscription.unsubscribe();
     }
@@ -78,7 +82,11 @@ class NotificationService {
     const destination = `/topic/produccion/created`;
     if (this.stompClient && this.stompClient.connected) {
       const subscription = this.stompClient.subscribe(destination, (message: IMessage) => {
-        callback(JSON.parse(message.body));
+        try {
+          callback(JSON.parse(message.body));
+        } catch (e) {
+          console.error('[NotificationService] Error parsing message:', e);
+        }
       });
       return () => subscription.unsubscribe();
     }
@@ -92,7 +100,11 @@ class NotificationService {
     const destination = `/topic/producciones/state-changed`;
     if (this.stompClient && this.stompClient.connected) {
       const subscription = this.stompClient.subscribe(destination, (message: IMessage) => {
-        callback(JSON.parse(message.body));
+        try {
+          callback(JSON.parse(message.body));
+        } catch (e) {
+          console.error('[NotificationService] Error parsing message:', e);
+        }
       });
       return () => subscription.unsubscribe();
     }
@@ -106,7 +118,11 @@ class NotificationService {
     const destination = `/topic/produccion/finished`;
     if (this.stompClient && this.stompClient.connected) {
       const subscription = this.stompClient.subscribe(destination, (message: IMessage) => {
-        callback(JSON.parse(message.body));
+        try {
+          callback(JSON.parse(message.body));
+        } catch (e) {
+          console.error('[NotificationService] Error parsing message:', e);
+        }
       });
       return () => subscription.unsubscribe();
     }
@@ -118,7 +134,11 @@ class NotificationService {
     const destination = `/topic/produccion/cancelled`;
     if (this.stompClient && this.stompClient.connected) {
       const subscription = this.stompClient.subscribe(destination, (message: IMessage) => {
-        callback(JSON.parse(message.body));
+        try {
+          callback(JSON.parse(message.body));
+        } catch (e) {
+          console.error('[NotificationService] Error parsing message:', e);
+        }
       });
       return () => subscription.unsubscribe();
     }

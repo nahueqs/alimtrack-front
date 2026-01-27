@@ -36,9 +36,9 @@ export const SessionExpiredModal: React.FC<SessionExpiredModalProps> = ({
         password: values.password,
       });
 
-      if (response.access_token) {
+      if (response.accessToken) {
         message.success('Sesión restaurada');
-        onSuccess(response.access_token);
+        onSuccess(response.accessToken);
         form.resetFields();
       }
     } catch (error) {

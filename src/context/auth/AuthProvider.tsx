@@ -62,13 +62,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         try {
           console.log('[AuthProvider] Intentando refresh silencioso...');
           const response = await authService.refreshToken(storedRefreshToken);
-          const newAccessToken = response.access_token;
+          const newAccessToken = response.accessToken;
 
           if (newAccessToken) {
             console.log('[AuthProvider] Refresh silencioso exitoso.');
             localStorage.setItem('authToken', newAccessToken);
-            if (response.refresh_token) {
-              localStorage.setItem('refreshToken', response.refresh_token);
+            if (response.refreshToken) {
+              localStorage.setItem('refreshToken', response.refreshToken);
             }
             return newAccessToken;
           }
@@ -123,6 +123,18 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         return;
       }
 
+      // Intentar recuperar usuario desde localStorage primero para evitar parpadeo
+      const storedUserData = localStorage.getItem('userData');
+      if (storedUserData) {
+        try {
+          const parsedUser = JSON.parse(storedUserData);
+          setUser(parsedUser);
+        } catch (e) {
+          console.warn('[AuthProvider] Error parseando userData de localStorage', e);
+          localStorage.removeItem('userData'); // Limpiar datos corruptos
+        }
+      }
+
       try {
         const freshUserData = await authService.getCurrentUser();
         setUser(freshUserData);
@@ -144,15 +156,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     try {
       const response: AuthResponse = await authService.login(credentials);
 
-      const token = response.access_token;
+      const token = response.accessToken;
 
       if (!token || !response.user) {
         throw new Error('Respuesta de login inválida desde el servidor.');
       }
 
       localStorage.setItem('authToken', token);
-      if (response.refresh_token) {
-        localStorage.setItem('refreshToken', response.refresh_token);
+      if (response.refreshToken) {
+        localStorage.setItem('refreshToken', response.refreshToken);
       }
       localStorage.setItem('userData', JSON.stringify(response.user));
       setUser(response.user);
@@ -171,15 +183,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     try {
       const response: AuthResponse = await authService.register(userData);
 
-      const token = response.access_token;
+      const token = response.accessToken;
 
       if (!token || !response.user) {
         throw new Error('Respuesta de registro inválida desde el servidor.');
       }
 
       localStorage.setItem('authToken', token);
-      if (response.refresh_token) {
-        localStorage.setItem('refreshToken', response.refresh_token);
+      if (response.refreshToken) {
+        localStorage.setItem('refreshToken', response.refreshToken);
       }
       localStorage.setItem('userData', JSON.stringify(response.user));
       setUser(response.user);
@@ -210,14 +222,19 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   return (
     <AuthContext.Provider value={value}>
-      <Spin spinning={initialLoading} fullscreen tip="Verificando sesión..." />
-      {children}
-      <SessionExpiredModal
-        open={isSessionExpired}
-        user={user}
-        onSuccess={handleSessionRestored}
-        onCancel={handleSessionCancel}
-      />
+      {initialLoading ? (
+        <Spin spinning={initialLoading} fullscreen tip="Verificando sesión..." />
+      ) : (
+        <>
+          {children}
+          <SessionExpiredModal
+            open={isSessionExpired}
+            user={user}
+            onSuccess={handleSessionRestored}
+            onCancel={handleSessionCancel}
+          />
+        </>
+      )}
     </AuthContext.Provider>
   );
 };

@@ -6,7 +6,7 @@ export const authService = {
   async login(credentials: LoginRequest): Promise<AuthResponse> {
     try {
       const response = await apiClient.post<AuthResponse>('/auth/login', credentials);
-      if (!response.access_token || !response.user) {
+      if (!response.accessToken || !response.user) {
         throw new Error('Respuesta de login inválida desde el servidor.');
       }
       return response;
@@ -21,7 +21,7 @@ export const authService = {
   async register(userData: RegisterRequest): Promise<AuthResponse> {
     try {
       const response = await apiClient.post<AuthResponse>('/auth/register', userData);
-      if (!response.access_token || !response.user) {
+      if (!response.accessToken || !response.user) {
         throw new Error('Respuesta de registro inválida desde el servidor.');
       }
       return response;

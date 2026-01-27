@@ -90,25 +90,32 @@ class ApiClient {
 
       if (response.status === 204) return {} as T;
 
-      const contentType = response.headers.get('content-type');
-      let data: any = {};
+      const responseText = await response.text();
+      let data: any;
 
-      if (contentType && contentType.includes('application/json')) {
-        const responseText = await response.text();
-        try {
-          data = responseText ? JSON.parse(responseText) : {};
-        } catch (e) {
-          console.warn('[ApiClient] Error parsing JSON response:', e);
-          if (!response.ok) {
-            data = { message: responseText };
-          }
-        }
-      } else {
-        const responseText = await response.text();
-        if (!response.ok) {
-          const msg =
-            responseText.length > 200 ? responseText.substring(0, 200) + '...' : responseText;
-          data = { message: msg || `Error ${response.status}` };
+      try {
+        // Intentamos parsear JSON siempre, independientemente del Content-Type
+        data = responseText ? JSON.parse(responseText) : {};
+      } catch (e) {
+        // Si falla el parseo JSON
+        if (response.ok) {
+             // Si la respuesta fue exitosa (2xx) pero no es JSON
+             console.warn('[ApiClient] Respuesta 200 OK pero no es JSON:', responseText.substring(0, 100));
+             
+             // Verificamos si es HTML (error común de proxy/SPA fallback)
+             if (responseText.trim().startsWith('<')) {
+                 const error = new Error('El servidor devolvió HTML en lugar de JSON. Verifica la URL de la API.') as ApiError;
+                 error.response = { status: response.status, data: responseText };
+                 throw error;
+             }
+             
+             // Si no es HTML, asumimos que es un error de formato o una respuesta vacía disfrazada
+             // Devolvemos objeto vacío para que el caller maneje la falta de datos
+             data = {};
+        } else {
+             // Si es error (4xx, 5xx), usamos el texto como mensaje
+             const msg = responseText.length > 200 ? responseText.substring(0, 200) + '...' : responseText;
+             data = { message: msg || `Error ${response.status}` };
         }
       }
 
@@ -143,7 +150,13 @@ class ApiClient {
             );
             break;
           case 401:
-            if (tokenRefreshHandler) {
+            // Evitar loop infinito: No intentar refrescar si el error viene del login, registro o del mismo refresh
+            const isAuthRequest =
+              endpoint.includes('/auth/login') ||
+              endpoint.includes('/auth/register') ||
+              endpoint.includes('/auth/refresh-token');
+
+            if (tokenRefreshHandler && !isAuthRequest) {
               console.log('[ApiClient] 401 detectado. Intentando recuperar sesión...');
               try {
                 const newToken = await tokenRefreshHandler();
