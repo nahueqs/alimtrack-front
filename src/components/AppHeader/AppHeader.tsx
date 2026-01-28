@@ -55,6 +55,9 @@ export const AppHeader: React.FC<HeaderProps> = ({ title = 'AlimTrack' }) => {
               <a className="header__nav-link" onClick={() => handleNavigation('/recetas/versiones')}>
                 Recetas
               </a>
+              <a className="header__nav-link" onClick={() => handleNavigation('/public/producciones')}>
+                Vista Pública
+              </a>
 
               <div className="header__user-menu">
                 <div className="header__user-activator">
@@ -100,6 +103,9 @@ export const AppHeader: React.FC<HeaderProps> = ({ title = 'AlimTrack' }) => {
           </a>
           <a className="header__dropdown-item" onClick={() => handleNavigation('/recetas/versiones')}>
             Recetas
+          </a>
+          <a className="header__dropdown-item" onClick={() => handleNavigation('/public/producciones')}>
+            Vista Pública
           </a>
           <hr className="header__separator" />
           <div className="header__mobile-user-info">

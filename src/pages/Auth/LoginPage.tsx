@@ -82,11 +82,12 @@ const LoginPage: React.FC = () => {
             />
           )}
           <Button
-            type="primary"
+            type="link"
             icon={<ScheduleOutlined />}
             onClick={() => navigate('/public/producciones')}
+            style={{ marginTop: '1rem' }}
           >
-            Producciones públicas
+            Ver producciones públicas
           </Button>
         </Card>
 
