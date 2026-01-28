@@ -1,4 +1,4 @@
-import React, { useEffect, useReducer, useRef } from 'react';
+import React, { useEffect, useReducer, useRef, useState } from 'react';
 import type { InputProps } from 'antd';
 import { Button, Checkbox, DatePicker, Input, InputNumber, TimePicker, Tooltip } from 'antd';
 import { ExclamationCircleOutlined, SaveOutlined } from '@ant-design/icons';
@@ -7,6 +7,7 @@ import { useIsMobile } from '@/hooks/useIsMobile';
 import { initialState, inputReducer } from './inputReducer';
 import { useDateTimeParsers } from './useDateTimeParsers';
 import { useValidation } from './useValidation';
+import type { Dayjs } from 'dayjs';
 
 interface ManualSaveInputProps extends Omit<InputProps, 'value' | 'onChange'> {
   value: string;
@@ -27,6 +28,19 @@ export const ManualSaveInput: React.FC<ManualSaveInputProps> = ({
   
   const { parseDate, parseTime, formatForBackend } = useDateTimeParsers(tipoDato);
   const { validate } = useValidation(tipoDato);
+
+  // Estado local SOLO para TimePicker (soluciona el bug de Ant Design de reversión de valor)
+  const [timePickerValue, setTimePickerValue] = useState<Dayjs | null>(
+    tipoDato === TipoDatoCampo.HORA ? parseTime(globalValue) : null
+  );
+
+  // Sincronizar TimePicker cuando cambia el valor local (ej: carga inicial o update externo)
+  useEffect(() => {
+    if (tipoDato === TipoDatoCampo.HORA) {
+      const parsed = parseTime(state.localValue);
+      setTimePickerValue(parsed);
+    }
+  }, [tipoDato, state.localValue, parseTime]);
 
   // Sincronización con valor externo
   useEffect(() => {
@@ -157,10 +171,12 @@ export const ManualSaveInput: React.FC<ManualSaveInputProps> = ({
       case TipoDatoCampo.HORA:
         return (
           <TimePicker
-            value={parseTime(state.localValue)}
+            value={timePickerValue} // Usamos el estado local síncrono
             onChange={(time) => {
-              // Guardamos localmente solo la hora HH:mm:ss
-              // formatForBackend se encargará de agregar la fecha actual al guardar
+              // 1. Actualizar estado local INMEDIATAMENTE para evitar reversión visual
+              setTimePickerValue(time);
+              
+              // 2. Actualizar estado global (reducer)
               const newValue = time ? time.format('HH:mm:ss') : '';
               dispatch({ type: 'VALUE_CHANGED', payload: newValue });
             }}
@@ -169,6 +185,7 @@ export const ManualSaveInput: React.FC<ManualSaveInputProps> = ({
             showNow={false}
             use12Hours={false}
             allowClear
+            needConfirm={false} // UX más fluida
             {...commonProps}
             {...(rest as any)}
           />
