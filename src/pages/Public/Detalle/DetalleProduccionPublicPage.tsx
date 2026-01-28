@@ -107,7 +107,7 @@ const DetalleProduccionPublicPage: React.FC = () => {
           />
         </Space>
       </div>
-      <div style={{ marginTop: '-24px' }}>
+      <div style={{ marginTop: '-24px' }} className="public-readonly">
         {/* Ajuste negativo para compensar el padding del componente hijo si es necesario, o simplemente dejar que fluya */}
         <DetalleProduccionPage
           estructura={estructura}

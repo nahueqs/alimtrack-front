@@ -162,16 +162,16 @@ export const DebouncedInput: React.FC<DebouncedInputProps> = ({
 
   const parseTime = (val: string) => {
     if (!val) return null;
-    // Intentar parsear con formato completo HH:mm:ss
-    let d = dayjs(val, 'HH:mm:ss', true);
-    if (d.isValid()) return d;
     
-    // Intentar parsear con formato corto HH:mm
-    d = dayjs(val, 'HH:mm', true);
-    if (d.isValid()) return d;
+    // Intentar parsear con varios formatos estrictos
+    const formats = ['HH:mm:ss', 'HH:mm', 'H:mm:ss', 'H:mm'];
+    for (const fmt of formats) {
+      const d = dayjs(val, fmt, true);
+      if (d.isValid()) return d;
+    }
     
-    // Fallback a parseo estándar de dayjs si los formatos estrictos fallan
-    d = dayjs(val);
+    // Fallback a parseo estándar de dayjs (útil para ISO strings completos)
+    const d = dayjs(val);
     return d.isValid() ? d : null;
   };
 
@@ -233,8 +233,9 @@ export const DebouncedInput: React.FC<DebouncedInputProps> = ({
         return (
           <TimePicker
             value={parseTime(localValue)}
-            onChange={(_time, timeString) => {
-              const newValue = typeof timeString === 'string' ? timeString : '';
+            onChange={(time) => {
+              // Usamos el objeto time directamente para formatear y evitar discrepancias
+              const newValue = time ? time.format('HH:mm:ss') : '';
               setLocalValue(newValue);
               setHasChanged(newValue !== globalValue);
               setError(null);

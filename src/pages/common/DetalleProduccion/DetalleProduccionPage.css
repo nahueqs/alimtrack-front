@@ -123,6 +123,52 @@
     color: var(--text-tertiary) !important;
 }
 
+/* Estilos específicos para inputs deshabilitados en modo público */
+.public-readonly .ant-input[disabled],
+.public-readonly .ant-input-number-input[disabled],
+.public-readonly .ant-picker-input > input[disabled] {
+    background-color: #ffffff !important; /* Fondo blanco */
+    color: #000000 !important; /* Texto negro */
+    cursor: default !important;
+    border-color: #d9d9d9 !important;
+    opacity: 1 !important; /* Asegurar opacidad completa */
+    -webkit-text-fill-color: #000000 !important; /* Para Safari/Chrome */
+}
+
+/* Asegurar que el contenedor del InputNumber también se vea bien */
+.public-readonly .ant-input-number-disabled {
+    background-color: #ffffff !important;
+    border-color: #d9d9d9 !important;
+    color: #000000 !important;
+}
+
+/* Asegurar que el contenedor del DatePicker/TimePicker también se vea bien */
+.public-readonly .ant-picker-disabled {
+    background-color: #ffffff !important;
+    border-color: #d9d9d9 !important;
+    color: #000000 !important;
+}
+
+/* Checkbox deshabilitado pero visible */
+.public-readonly .ant-checkbox-disabled + span {
+    color: #000000 !important;
+    cursor: default !important;
+}
+
+.public-readonly .ant-checkbox-disabled .ant-checkbox-inner {
+    background-color: #f5f5f5 !important;
+    border-color: #d9d9d9 !important;
+}
+
+.public-readonly .ant-checkbox-checked.ant-checkbox-disabled .ant-checkbox-inner {
+    background-color: #1890ff !important; /* Mantener color azul si está marcado */
+    border-color: #1890ff !important;
+}
+
+.public-readonly .ant-checkbox-checked.ant-checkbox-disabled .ant-checkbox-inner::after {
+    border-color: #ffffff !important;
+}
+
 .group-card {
     background-color: var(--bg-secondary);
     border: 1px solid var(--border-light);

@@ -33,7 +33,11 @@ export const AppHeader: React.FC<HeaderProps> = ({ title = 'AlimTrack' }) => {
   return (
     <header className="header" ref={headerRef}>
       <nav className="header__nav">
-        <div className="header__brand">
+        <div
+          className="header__brand"
+          onClick={() => handleNavigation('/dashboard')}
+          style={{ cursor: 'pointer' }}
+        >
           <img src={logoCideta} alt="Logo Cideta" className="header__brand-logo" />
           <span className="header__brand-title">{title}</span>
         </div>
