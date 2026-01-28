@@ -9,7 +9,7 @@ import React, {
   useState,
 } from 'react';
 import { Spin } from 'antd';
-import type { AuthResponse, LoginRequest, RegisterRequest } from '@/services/auth/Auth.ts';
+import type { LoginRequest, RegisterRequest } from '@/services/auth/Auth.ts';
 import { authService } from '@/services/auth/AuthService.ts';
 import type { User } from '@/services/auth/User.ts';
 import { setOnUnauthorizedHandler, setTokenRefreshHandler } from '@/services/ApiClient.ts';
