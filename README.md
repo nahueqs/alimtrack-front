@@ -23,7 +23,7 @@ Modernizar el ecosistema productivo de la planta piloto, permitiendo:
 * **Módulo de KPIs:** Visualización de indicadores clave de rendimiento y eficiencia de planta.
 
 Stack tecnológico utilizado:
-### 💻 Backend (Java Stack)
+### 💻 Backend (Java Stack) Repositorio https://github.com/nahueqs/alimTrackUnlu
 Construido bajo un patrón de **Arquitectura en Capas (Layered Architecture)** para garantizar mantenibilidad y escalabilidad.
 
 * **Core:** Java 17 con **Spring Boot 3.x**.
@@ -34,7 +34,7 @@ Construido bajo un patrón de **Arquitectura en Capas (Layered Architecture)** p
 * **Documentación:** **OpenAPI 3 / Swagger UI** para la exposición y prueba de endpoints REST.
 * **Logging:** SLF4J con Logback para el rastreo de eventos de auditoría.
 
-### 🎨 Frontend (React Stack) Respositorio: https://github.com/nahueqs/alimtrack-front
+### 🎨 Frontend (React Stack) 
 Desarrollado como una **Single Page Application (SPA)** enfocada en la experiencia de usuario en entornos industriales.
 
 * **Core:** **React 18** utilizando **TypeScript** para un desarrollo robusto y tipado.
@@ -47,3 +47,4 @@ Desarrollado como una **Single Page Application (SPA)** enfocada en la experienc
   
 
 Desarrollador: Nahuel Quiñones https://www.linkedin.com/in/nahueqs/
+
