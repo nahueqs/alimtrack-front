@@ -1,16 +1,21 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { DetalleProduccionPage } from '@/pages/common/DetalleProduccion/DetalleProduccionPage';
 import { AppHeader } from '@/components/AppHeader/AppHeader.tsx';
 import { useProductionData } from '@/hooks/useProductionData';
-import { useProductionWebSocket } from '@/hooks/useProductionWebSocket';
+import { useProductionWebSocket, type NotificationLevel } from '@/hooks/useProductionWebSocket';
 import { useProductionActions } from '@/hooks/useProductionActions';
 import { ProductionStatusDisplay } from '@/components/ProductionStatusDisplay';
 import { SavingIndicator } from '@/components/SavingIndicator';
 import { ProductionState } from '@/constants/ProductionStates';
+import { BellOutlined } from '@ant-design/icons';
+import { Select, Space, Typography } from 'antd';
+
+const { Text } = Typography;
 
 const DetalleProduccionProtectedPage: React.FC = () => {
   const { codigoProduccion } = useParams<{ codigoProduccion: string }>();
+  const [notificationLevel, setNotificationLevel] = useState<NotificationLevel>('ALL');
 
   const {
     loading: loadingData,
@@ -38,6 +43,7 @@ const DetalleProduccionProtectedPage: React.FC = () => {
     updateTableCellResponse,
     updateProductionState,
     updateProductionMetadata,
+    notificationLevel,
   });
 
   const {
@@ -67,16 +73,51 @@ const DetalleProduccionProtectedPage: React.FC = () => {
       estadoActual={estadoActual}
     >
       <SavingIndicator isSaving={isSaving} />
-      <DetalleProduccionPage
-        estructura={estructura!}
-        respuestas={estadoActual!}
-        isEditable={isProductionEditable}
-        onCampoChange={debouncedCampoChange}
-        onTablaChange={debouncedTablaChange}
-        onMetadataChange={debouncedMetadataChange}
-        onCambioEstado={handleCambioEstado}
-        HeaderComponent={AppHeader}
-      />
+      
+      {/* Selector de notificaciones (similar al público pero integrado en el layout protegido) */}
+      <div
+        style={{
+          padding: '0 24px',
+          marginTop: '16px',
+          display: 'flex',
+          justifyContent: 'flex-end',
+          maxWidth: '1200px',
+          margin: '16px auto 0',
+        }}
+      >
+        <Space>
+          <BellOutlined style={{ color: '#8c8c8c' }} />
+          <Text type="secondary" style={{ fontSize: '14px' }}>
+            Avisos:
+          </Text>
+          <Select
+            value={notificationLevel}
+            onChange={setNotificationLevel}
+            style={{ width: 180 }}
+            size="small"
+            placement="bottomRight"
+            getPopupContainer={() => document.body}
+            options={[
+              { value: 'ALL', label: 'Todos los cambios' },
+              { value: 'STATE_ONLY', label: 'Solo estado' },
+              { value: 'NONE', label: 'Silenciar' },
+            ]}
+          />
+        </Space>
+      </div>
+
+      <div style={{ marginTop: '-24px' }}>
+        <DetalleProduccionPage
+          estructura={estructura!}
+          respuestas={estadoActual!}
+          isEditable={isProductionEditable}
+          onCampoChange={debouncedCampoChange}
+          onTablaChange={debouncedTablaChange}
+          onMetadataChange={debouncedMetadataChange}
+          onCambioEstado={handleCambioEstado}
+          HeaderComponent={AppHeader}
+        />
+      </div>
     </ProductionStatusDisplay>
   );
 };
