@@ -12,7 +12,7 @@ export interface RegisterRequest {
 }
 
 export interface AuthResponse {
-  accessToken: string;
-  refreshToken: string;
+  access_token: string;
+  refresh_token: string;
   user: User;
 }
