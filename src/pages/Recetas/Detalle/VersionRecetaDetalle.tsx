@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { Button, Card, Descriptions, message, Spin, Typography } from 'antd';
 import { ArrowLeftOutlined, DeleteOutlined, EditOutlined } from '@ant-design/icons';
 import { useVersionRecetaDetalle } from './useVersionRecetaDetalle.ts';
+import dayjs from 'dayjs';
 
 const { Title, Text } = Typography;
 
@@ -126,13 +127,7 @@ export const VersionRecetaDetalle: React.FC = () => {
 
           <Descriptions.Item label="Fecha de creación">
             {recipe.fechaCreacion
-              ? new Date(recipe.fechaCreacion).toLocaleDateString('es-AR', {
-                  year: 'numeric',
-                  month: 'long',
-                  day: 'numeric',
-                  hour: '2-digit',
-                  minute: '2-digit',
-                })
+              ? dayjs(recipe.fechaCreacion).format('DD/MM/YYYY HH:mm:ss')
               : 'No especificada'}
           </Descriptions.Item>
         </Descriptions>

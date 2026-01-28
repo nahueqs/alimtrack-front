@@ -61,7 +61,7 @@ export const getProductionColumns = ({
       key: 'fechaInicio',
       sorter: (a: ProduccionProtectedResponseDTO, b: ProduccionProtectedResponseDTO) =>
         new Date(a.fechaInicio).getTime() - new Date(b.fechaInicio).getTime(),
-      render: (date: string) => dayjs(date).format('DD/MM/YYYY HH:mm'),
+      render: (date: string) => dayjs(date).format('DD/MM/YYYY HH:mm:ss'),
       responsive: ['xs', 'sm', 'md', 'lg', 'xl'],
     },
     {
@@ -74,7 +74,7 @@ export const getProductionColumns = ({
         if (!b.fechaFin) return 1;
         return new Date(a.fechaFin).getTime() - new Date(b.fechaFin).getTime();
       },
-      render: (date: string | null) => (date ? dayjs(date).format('DD/MM/YYYY HH:mm') : '-'),
+      render: (date: string | null) => (date ? dayjs(date).format('DD/MM/YYYY HH:mm:ss') : '-'),
       defaultSortOrder: 'descend', // Added default sort order
       responsive: ['xs', 'sm', 'md', 'lg', 'xl'],
     },

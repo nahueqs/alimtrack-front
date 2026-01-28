@@ -61,7 +61,7 @@ export const getActiveProductionColumns = ({
       key: 'fechaInicio',
       sorter: (a: ProduccionProtectedResponseDTO, b: ProduccionProtectedResponseDTO) =>
         new Date(a.fechaInicio).getTime() - new Date(b.fechaInicio).getTime(),
-      render: (date: string) => dayjs(date).format('DD/MM/YYYY HH:mm'),
+      render: (date: string) => dayjs(date).format('DD/MM/YYYY HH:mm:ss'),
       responsive: ['xs', 'sm', 'md', 'lg', 'xl'],
     },
     {

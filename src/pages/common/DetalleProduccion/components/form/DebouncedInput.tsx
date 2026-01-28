@@ -4,7 +4,10 @@ import { Button, Checkbox, DatePicker, Input, InputNumber, TimePicker, Tooltip }
 import { ExclamationCircleOutlined, SaveOutlined } from '@ant-design/icons';
 import { TipoDatoCampo } from '@/pages/Recetas/types/TipoDatoCampo';
 import dayjs from 'dayjs';
+import customParseFormat from 'dayjs/plugin/customParseFormat';
 import { useIsMobile } from '@/hooks/useIsMobile';
+
+dayjs.extend(customParseFormat);
 
 interface DebouncedInputProps extends Omit<InputProps, 'value' | 'onChange'> {
   value: string;
@@ -144,19 +147,32 @@ export const DebouncedInput: React.FC<DebouncedInputProps> = ({
 
   const parseDate = (val: string) => {
     if (!val) return null;
-    const d = dayjs(val);
+    // Intentar parsear formato DD/MM/YYYY
+    let d = dayjs(val, 'DD/MM/YYYY', true);
+    if (d.isValid()) return d;
+    
+    // Intentar parsear formato ISO YYYY-MM-DD
+    d = dayjs(val, 'YYYY-MM-DD', true);
+    if (d.isValid()) return d;
+    
+    // Fallback
+    d = dayjs(val);
     return d.isValid() ? d : null;
   };
 
   const parseTime = (val: string) => {
     if (!val) return null;
-    let d = dayjs(val);
+    // Intentar parsear con formato completo HH:mm:ss
+    let d = dayjs(val, 'HH:mm:ss', true);
     if (d.isValid()) return d;
-    d = dayjs(val, 'HH:mm:ss');
+    
+    // Intentar parsear con formato corto HH:mm
+    d = dayjs(val, 'HH:mm', true);
     if (d.isValid()) return d;
-    d = dayjs(val, 'HH:mm');
-    if (d.isValid()) return d;
-    return null;
+    
+    // Fallback a parseo estándar de dayjs si los formatos estrictos fallan
+    d = dayjs(val);
+    return d.isValid() ? d : null;
   };
 
   const renderInput = () => {
@@ -207,7 +223,8 @@ export const DebouncedInput: React.FC<DebouncedInputProps> = ({
               setHasChanged(newValue !== globalValue);
               setError(null);
             }}
-            placeholder={placeholder || 'Seleccione fecha'}
+            format="DD/MM/YYYY"
+            placeholder={placeholder || 'DD/MM/AAAA'}
             {...commonProps}
             {...(rest as any)}
           />
@@ -223,7 +240,7 @@ export const DebouncedInput: React.FC<DebouncedInputProps> = ({
               setError(null);
             }}
             format="HH:mm:ss"
-            placeholder={placeholder || 'Seleccione hora'}
+            placeholder={placeholder || 'HH:mm:ss'}
             {...commonProps}
             {...(rest as any)}
           />
