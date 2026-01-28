@@ -135,6 +135,14 @@
     -webkit-text-fill-color: #000000 !important; /* Para Safari/Chrome */
 }
 
+/* Ocultar placeholder en modo público */
+.public-readonly .ant-input[disabled]::placeholder,
+.public-readonly .ant-input-number-input[disabled]::placeholder,
+.public-readonly .ant-picker-input > input[disabled]::placeholder {
+    color: transparent !important;
+    opacity: 0 !important;
+}
+
 /* Asegurar que el contenedor del InputNumber también se vea bien */
 .public-readonly .ant-input-number-disabled {
     background-color: #ffffff !important;
