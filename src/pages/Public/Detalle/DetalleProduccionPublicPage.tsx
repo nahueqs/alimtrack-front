@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { Alert, Select, Space, Spin, Typography } from 'antd';
+import { Alert, Col, Row, Select, Space, Spin, Typography } from 'antd';
 import { BellOutlined } from '@ant-design/icons';
 import { DetalleProduccionPage } from '@/pages/common/DetalleProduccion/DetalleProduccionPage';
 import { usePublicService } from '@/services/public/usePublicService';
@@ -79,45 +79,46 @@ const DetalleProduccionPublicPage: React.FC = () => {
   return (
     <>
       <PublicHeader />
-      <div
-        style={{
-          padding: '0 24px',
-          marginTop: '16px',
-          display: 'flex',
-          justifyContent: 'flex-end',
-          maxWidth: '1200px',
-          margin: '16px auto 0',
-          flexWrap: 'wrap', // Permite que los elementos bajen si no hay espacio
-        }}
-      >
-        <Space wrap style={{ justifyContent: 'flex-end', width: '100%' }}>
-          <BellOutlined style={{ color: '#8c8c8c' }} />
-          <Text type="secondary" style={{ fontSize: '14px' }}>
-            Avisos:
-          </Text>
-          <Select
-            value={notificationLevel}
-            onChange={setNotificationLevel}
-            style={{ width: 180 }}
-            size="small"
-            placement="bottomRight" // Fuerza que el menú se abra hacia abajo y alineado a la derecha
-            getPopupContainer={(triggerNode) => triggerNode.parentNode} // Renderiza el menú dentro del contenedor padre para evitar problemas de z-index o overflow
-            options={[
-              { value: 'ALL', label: 'Todos los cambios' },
-              { value: 'STATE_ONLY', label: 'Solo estado' },
-              { value: 'NONE', label: 'Silenciar' },
-            ]}
+      
+      {/* Contenedor principal centrado */}
+      <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 24px' }}>
+        
+        {/* Fila para el selector de notificaciones */}
+        <Row justify="end" style={{ marginTop: '16px', marginBottom: '8px' }}>
+          <Col>
+            <Space align="center">
+              <BellOutlined style={{ color: '#8c8c8c' }} />
+              <Text type="secondary" style={{ fontSize: '14px' }}>
+                Avisos:
+              </Text>
+              <Select
+                value={notificationLevel}
+                onChange={setNotificationLevel}
+                style={{ width: 180 }}
+                size="small"
+                placement="bottomRight"
+                // Eliminamos getPopupContainer para dejar que AntD lo maneje en el body (mejor para z-index)
+                // o usamos document.body explícitamente si hay problemas de overflow hidden en padres
+                getPopupContainer={() => document.body} 
+                options={[
+                  { value: 'ALL', label: 'Todos los cambios' },
+                  { value: 'STATE_ONLY', label: 'Solo estado' },
+                  { value: 'NONE', label: 'Silenciar' },
+                ]}
+              />
+            </Space>
+          </Col>
+        </Row>
+
+        {/* Contenido de la producción */}
+        <div className="public-readonly">
+          <DetalleProduccionPage
+            estructura={estructura}
+            respuestas={respuestas}
+            isEditable={false}
+            HeaderComponent={() => null}
           />
-        </Space>
-      </div>
-      <div style={{ marginTop: '-24px' }} className="public-readonly">
-        {/* Ajuste negativo para compensar el padding del componente hijo si es necesario, o simplemente dejar que fluya */}
-        <DetalleProduccionPage
-          estructura={estructura}
-          respuestas={respuestas}
-          isEditable={false}
-          HeaderComponent={() => null} // Pasamos null porque ya renderizamos el Header arriba
-        />
+        </div>
       </div>
     </>
   );
