@@ -62,13 +62,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         try {
           console.log('[AuthProvider] Intentando refresh silencioso...');
           const response = await authService.refreshToken(storedRefreshToken);
-          const newAccessToken = response.accessToken;
+          const newAccessToken = response.access_token;
 
           if (newAccessToken) {
             console.log('[AuthProvider] Refresh silencioso exitoso.');
             localStorage.setItem('authToken', newAccessToken);
-            if (response.refreshToken) {
-              localStorage.setItem('refreshToken', response.refreshToken);
+            if (response.refresh_token) {
+              localStorage.setItem('refreshToken', response.refresh_token);
             }
             return newAccessToken;
           }
@@ -156,15 +156,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     try {
       const response: AuthResponse = await authService.login(credentials);
 
-      const token = response.accessToken;
+      const token = response.access_token;
 
       if (!token || !response.user) {
         throw new Error('Respuesta de login inválida desde el servidor.');
       }
 
       localStorage.setItem('authToken', token);
-      if (response.refreshToken) {
-        localStorage.setItem('refreshToken', response.refreshToken);
+      if (response.refresh_token) {
+        localStorage.setItem('refreshToken', response.refresh_token);
       }
       localStorage.setItem('userData', JSON.stringify(response.user));
       setUser(response.user);
@@ -183,15 +183,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     try {
       const response: AuthResponse = await authService.register(userData);
 
-      const token = response.accessToken;
+      const token = response.access_token;
 
       if (!token || !response.user) {
         throw new Error('Respuesta de registro inválida desde el servidor.');
       }
 
       localStorage.setItem('authToken', token);
-      if (response.refreshToken) {
-        localStorage.setItem('refreshToken', response.refreshToken);
+      if (response.refresh_token) {
+        localStorage.setItem('refreshToken', response.refresh_token);
       }
       localStorage.setItem('userData', JSON.stringify(response.user));
       setUser(response.user);
