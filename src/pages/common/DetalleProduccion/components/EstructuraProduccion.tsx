@@ -3,7 +3,7 @@ import { Card, Form, Table, Typography } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { debounce } from 'lodash';
 import { useRespuestas } from '../context/RespuestasContext';
-import { DebouncedInput } from './form/DebouncedInput';
+import { ManualSaveInput } from './form/ManualSaveInput';
 import type {
   GrupoCamposResponseDTO,
   SeccionResponseDTO,
@@ -24,7 +24,7 @@ const GrupoDeCampos: React.FC<{ grupo: GrupoCamposResponseDTO; isEditable: boole
         </Title>
         {grupo.campos.map((campo) => (
           <Form.Item key={`campo-${campo.id}`} label={campo.nombre}>
-            <DebouncedInput
+            <ManualSaveInput
               value={respuestasCampos[campo.id] || ''}
               onChange={(valor) => onCampoChange(campo.id, valor, campo.tipoDato)}
               placeholder={`Ingrese ${campo.nombre.toLowerCase()}`}
@@ -70,7 +70,7 @@ const TablaProduccion: React.FC<{ tabla: TablaResponseDTO; isEditable: boolean }
               (c) => c.idFila === record.idFila && c.idColumna === col.id
             )?.valor || '';
           return (
-            <DebouncedInput
+            <ManualSaveInput
               value={valor}
               onChange={(nuevoValor) =>
                 onTablaChange(tabla.id, record.idFila, col.id, nuevoValor, col.tipoDato)
@@ -173,7 +173,7 @@ const SeccionProduccion: React.FC<SeccionProduccionProps> = React.memo(
         <Form layout="vertical">
           {seccion.camposSimples.map((campo) => (
             <Form.Item key={`campo-${campo.id}`} label={campo.nombre}>
-              <DebouncedInput
+              <ManualSaveInput
                 value={respuestasCampos[campo.id] || ''}
                 onChange={(valor) => onCampoChange(campo.id, valor, campo.tipoDato)}
                 placeholder={`Ingrese ${campo.nombre.toLowerCase()}`}
