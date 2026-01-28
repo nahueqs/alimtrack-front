@@ -127,7 +127,12 @@ class ApiClient {
 
       return data;
     } catch (error: any) {
-      if (error.response && error.response.status === 401 && tokenRefreshHandler) {
+      // MODIFICACIÓN: Tratamos 403 igual que 401 si tenemos handler de refresh
+      // Esto es para soportar backends que devuelven 403 en lugar de 401 para tokens inválidos
+      const isUnauthorizedOrForbidden = 
+        error.response && (error.response.status === 401 || error.response.status === 403);
+
+      if (isUnauthorizedOrForbidden && tokenRefreshHandler) {
         // Silencioso para el log general, se maneja abajo
       } else {
         console.groupCollapsed(`[ApiClient] Error Capturado`);
@@ -150,6 +155,7 @@ class ApiClient {
             );
             break;
           case 401:
+          case 403: // Unificamos lógica para 401 y 403
             // Evitar loop infinito: No intentar refrescar si el error viene del login, registro o del mismo refresh
             const isAuthRequest =
               endpoint.includes('/auth/login') ||
@@ -157,7 +163,7 @@ class ApiClient {
               endpoint.includes('/auth/refresh-token');
 
             if (tokenRefreshHandler && !isAuthRequest) {
-              console.log('[ApiClient] 401 detectado en:', endpoint);
+              console.log(`[ApiClient] ${status} detectado en:`, endpoint);
               console.log('[ApiClient] Intentando recuperar sesión...');
               try {
                 const newToken = await tokenRefreshHandler();
@@ -180,27 +186,14 @@ class ApiClient {
                 console.error('[ApiClient] Falló la recuperación de sesión (Excepción).', refreshError);
               }
             } else {
-                console.log('[ApiClient] 401 sin intento de refresh. Handler:', !!tokenRefreshHandler, 'IsAuth:', isAuthRequest);
+                console.log(`[ApiClient] ${status} sin intento de refresh. Handler:`, !!tokenRefreshHandler, 'IsAuth:', isAuthRequest);
             }
             
             console.log(`[ApiClient] Interpretado como: Error HTTP ${status}. Ejecutando logout.`);
             friendlyError = new Error(
-              apiMessage || 'Sesión expirada. Por favor, inicie sesión de nuevo.'
+              apiMessage || 'Sesión expirada o sin permisos. Por favor, inicie sesión de nuevo.'
             );
             if (onUnauthorized) onUnauthorized();
-            break;
-          case 403:
-            console.log(`[ApiClient] Interpretado como: Error HTTP ${status}.`);
-            // MODIFICACIÓN: Si recibimos 403 y NO tenemos token, o es inválido, probablemente la sesión expiró
-            // y el backend lo interpreta como "Acceso Denegado" en lugar de "No Autenticado".
-            // Forzamos el logout para limpiar el estado.
-            const currentToken = localStorage.getItem('authToken');
-            if (!currentToken) {
-                console.warn('[ApiClient] 403 recibido sin token. Forzando logout.');
-                if (onUnauthorized) onUnauthorized();
-            }
-            
-            friendlyError = new Error(apiMessage || 'No tienes permisos para realizar esta acción.');
             break;
           case 404:
             console.log(`[ApiClient] Interpretado como: Error HTTP ${status}.`);
@@ -235,8 +228,9 @@ class ApiClient {
         friendlyError = error;
       }
 
+      // Ajustamos la condición de cierre de grupo para incluir 403
       if (
-        !(error.response && error.response.status === 401 && tokenRefreshHandler)
+        !(error.response && (error.response.status === 401 || error.response.status === 403) && tokenRefreshHandler)
       ) {
           console.groupEnd();
       }
