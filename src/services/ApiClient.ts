@@ -171,10 +171,28 @@ class ApiClient {
                 
                 if (newToken) {
                   console.log('[ApiClient] Reintentando petición original...');
+                  
+                  // Reconstruir headers asegurando que Authorization sea el nuevo
+                  // Usamos un objeto plano para evitar problemas con Headers iterables
                   const newHeaders: Record<string, string> = {};
-                  headers.forEach((value, key) => {
-                    newHeaders[key] = value;
-                  });
+                  
+                  // Copiar headers originales (si existen)
+                  if (options.headers) {
+                      const originalHeaders = new Headers(options.headers);
+                      originalHeaders.forEach((value, key) => {
+                          // Ignorar cualquier Authorization previo
+                          if (key.toLowerCase() !== 'authorization') {
+                              newHeaders[key] = value;
+                          }
+                      });
+                  }
+                  
+                  // Asegurar Content-Type si no estaba
+                  if (!newHeaders['Content-Type']) {
+                      newHeaders['Content-Type'] = 'application/json';
+                  }
+
+                  // Poner el nuevo token
                   newHeaders['Authorization'] = `Bearer ${newToken}`;
 
                   return await this.request<T>(endpoint, {
