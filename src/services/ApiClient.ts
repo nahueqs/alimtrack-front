@@ -191,6 +191,15 @@ class ApiClient {
             break;
           case 403:
             console.log(`[ApiClient] Interpretado como: Error HTTP ${status}.`);
+            // MODIFICACIÓN: Si recibimos 403 y NO tenemos token, o es inválido, probablemente la sesión expiró
+            // y el backend lo interpreta como "Acceso Denegado" en lugar de "No Autenticado".
+            // Forzamos el logout para limpiar el estado.
+            const currentToken = localStorage.getItem('authToken');
+            if (!currentToken) {
+                console.warn('[ApiClient] 403 recibido sin token. Forzando logout.');
+                if (onUnauthorized) onUnauthorized();
+            }
+            
             friendlyError = new Error(apiMessage || 'No tienes permisos para realizar esta acción.');
             break;
           case 404:
