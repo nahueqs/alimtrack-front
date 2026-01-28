@@ -18,7 +18,7 @@ export const VersionRecetasPage: React.FC = () => {
   }, [getAllVersiones]);
 
   const handleView = (record: VersionRecetaMetadataResponseDTO) => {
-    navigate(`/recetas/versiones/${record.codigoVersionReceta}`);
+    navigate(`/recetas/ver/${record.codigoVersionReceta}`);
   };
 
   const handleEdit = (record: VersionRecetaMetadataResponseDTO) => {

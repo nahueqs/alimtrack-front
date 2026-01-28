@@ -107,14 +107,17 @@ interface SeccionProduccionProps {
   seccion: SeccionResponseDTO;
   numeroSeccion: number;
   isEditable: boolean;
+  showProgress?: boolean;
 }
 
 const SeccionProduccion: React.FC<SeccionProduccionProps> = React.memo(
-  ({ seccion, numeroSeccion, isEditable }) => {
+  ({ seccion, numeroSeccion, isEditable, showProgress = true }) => {
     const { respuestasCampos, respuestasTablas, onCampoChange } = useRespuestas();
     const [progreso, setProgreso] = useState({ respondidos: 0, total: 0 });
 
     const recalcularProgresoSeccion = useCallback(() => {
+      if (!showProgress) return;
+
       const camposSimplesTotal = seccion.camposSimples.length;
       const camposSimplesRespondidos = seccion.camposSimples.filter((c) =>
         respuestasCampos[c.id]?.trim()
@@ -144,7 +147,7 @@ const SeccionProduccion: React.FC<SeccionProduccionProps> = React.memo(
         total: camposSimplesTotal + camposEnGruposTotal + celdasTotal,
         respondidos: camposSimplesRespondidos + camposEnGruposRespondidos + celdasRespondidas,
       });
-    }, [seccion, respuestasCampos, respuestasTablas]);
+    }, [seccion, respuestasCampos, respuestasTablas, showProgress]);
 
     const debouncedRecalcular = useMemo(
       () => debounce(recalcularProgresoSeccion, 500),
@@ -161,7 +164,7 @@ const SeccionProduccion: React.FC<SeccionProduccionProps> = React.memo(
         <Title level={4} className="section-title">
           <span className="section-number">{numeroSeccion}</span>
           {seccion.titulo}
-          {progreso.total > 0 && (
+          {showProgress && progreso.total > 0 && (
             <span className="section-progress-text">
               ({progreso.respondidos} / {progreso.total})
             </span>
@@ -194,11 +197,13 @@ const SeccionProduccion: React.FC<SeccionProduccionProps> = React.memo(
 interface EstructuraProduccionProps {
   estructura: SeccionResponseDTO[];
   isEditable?: boolean;
+  showProgress?: boolean;
 }
 
 export const EstructuraProduccion: React.FC<EstructuraProduccionProps> = ({
   estructura,
   isEditable = false,
+  showProgress = true,
 }) => (
   <div className="production-structure">
     {estructura.map((seccion, index) => (
@@ -207,6 +212,7 @@ export const EstructuraProduccion: React.FC<EstructuraProduccionProps> = ({
         seccion={seccion}
         numeroSeccion={index + 1}
         isEditable={isEditable}
+        showProgress={showProgress}
       />
     ))}
   </div>

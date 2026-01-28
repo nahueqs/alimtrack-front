@@ -9,6 +9,7 @@ import DetalleProduccionPublicPage from '@/pages/Public/Detalle/DetalleProduccio
 import DetalleProduccionProtectedPage from '@/pages/Producciones/Detalle/DetalleProduccionProtectedPage.tsx';
 import { ListadoProducciones } from '@/pages/Public/Listado/ListadoProducciones.tsx';
 import { VersionRecetasPage } from '@/pages/Recetas/Listado/VersionRecetasPage.tsx';
+import { VisualizarRecetaPage } from '@/pages/Recetas/Detalle/VisualizarRecetaPage.tsx';
 import type { ProduccionFilterRequestDTO } from '@/types/production';
 import { ProductionState } from '@/constants/ProductionStates';
 
@@ -106,6 +107,14 @@ export const routes: RouteObject[] = [
     element: (
       <ProtectedRoute>
         <VersionRecetasPage />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/recetas/ver/:codigoVersion',
+    element: (
+      <ProtectedRoute>
+        <VisualizarRecetaPage />
       </ProtectedRoute>
     ),
   },
