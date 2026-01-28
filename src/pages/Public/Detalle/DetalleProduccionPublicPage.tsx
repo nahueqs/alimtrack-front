@@ -87,9 +87,10 @@ const DetalleProduccionPublicPage: React.FC = () => {
           justifyContent: 'flex-end',
           maxWidth: '1200px',
           margin: '16px auto 0',
+          flexWrap: 'wrap', // Permite que los elementos bajen si no hay espacio
         }}
       >
-        <Space>
+        <Space wrap style={{ justifyContent: 'flex-end', width: '100%' }}>
           <BellOutlined style={{ color: '#8c8c8c' }} />
           <Text type="secondary" style={{ fontSize: '14px' }}>
             Avisos:
@@ -99,6 +100,8 @@ const DetalleProduccionPublicPage: React.FC = () => {
             onChange={setNotificationLevel}
             style={{ width: 180 }}
             size="small"
+            placement="bottomRight" // Fuerza que el menú se abra hacia abajo y alineado a la derecha
+            getPopupContainer={(triggerNode) => triggerNode.parentNode} // Renderiza el menú dentro del contenedor padre para evitar problemas de z-index o overflow
             options={[
               { value: 'ALL', label: 'Todos los cambios' },
               { value: 'STATE_ONLY', label: 'Solo estado' },

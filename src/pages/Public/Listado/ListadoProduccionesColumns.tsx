@@ -1,8 +1,9 @@
 import type { ColumnsType } from 'antd/es/table';
+import { Button, Tooltip } from 'antd';
+import { EyeOutlined } from '@ant-design/icons';
 import { Tag } from 'antd';
 import dayjs from 'dayjs';
-import type { ProduccionPublicMetadataDTO } from '@/types/production'; // Changed import
-import { CustomTableRowActions } from '@/components/ui/CustomTable/CustomTableRowActions.tsx';
+import type { ProduccionPublicMetadataDTO } from '@/types/production';
 import {
   PRODUCTION_STATE_COLORS,
   PRODUCTION_STATE_LABELS,
@@ -57,12 +58,15 @@ export const getPublicProductionColumns = ({
       fixed: 'right',
       width: isMobile ? 50 : 100,
       render: (_, record) => (
-        <CustomTableRowActions
-          record={record}
-          onView={onView}
-          getRecordId={(r) => r.codigoProduccion}
-          isMobile={isMobile}
-        />
+        <div style={{ display: 'flex', justifyContent: 'center' }}>
+          <Tooltip title="Ver detalle">
+            <Button 
+              type="text" // Botón tipo texto para que sea más limpio
+              icon={<EyeOutlined style={{ fontSize: '18px', color: '#1890ff' }} />} 
+              onClick={() => onView(record)} 
+            />
+          </Tooltip>
+        </div>
       ),
     },
   ];
