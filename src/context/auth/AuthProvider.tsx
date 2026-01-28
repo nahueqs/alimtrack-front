@@ -13,7 +13,7 @@ import type { AuthResponse, LoginRequest, RegisterRequest } from '@/services/aut
 import { authService } from '@/services/auth/AuthService.ts';
 import type { User } from '@/services/auth/User.ts';
 import { setOnUnauthorizedHandler, setTokenRefreshHandler } from '@/services/ApiClient.ts';
-import { SessionExpiredModal } from '@/components/auth/SessionExpiredModal.tsx';
+import { SessionTimeoutModal } from '@/components/auth/SessionTimeoutModal.tsx';
 
 interface AuthContextType {
   user: User | null;
@@ -25,7 +25,7 @@ interface AuthContextType {
   logout: () => void;
   clearError: () => void;
   isAuthenticated: boolean;
-  updateUser: (user: User) => void; // Nuevo método para actualizar usuario sin full login
+  updateUser: (user: User) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -39,12 +39,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [loading, setLoading] = useState(false);
   const [initialLoading, setInitialLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [isSessionExpired, setIsSessionExpired] = useState(false);
-
-  // Singleton Promise: Almacena la promesa de refresh en curso para evitar llamadas múltiples
-  const activeRefreshPromise = useRef<Promise<string | null> | null>(null);
   
-  // Resolver para el modal: Permite desbloquear la promesa cuando el usuario interactúa con el modal
+  // Estado para el modal de "Extender Sesión"
+  const [isTimeoutModalOpen, setIsTimeoutModalOpen] = useState(false);
+
+  const activeRefreshPromise = useRef<Promise<string | null> | null>(null);
   const modalResolver = useRef<((token: string | null) => void) | null>(null);
 
   const logout = useCallback(() => {
@@ -53,7 +52,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     localStorage.removeItem('userData');
     setUser(null);
     setError(null);
-    setIsSessionExpired(false);
+    setIsTimeoutModalOpen(false);
     activeRefreshPromise.current = null;
     modalResolver.current = null;
   }, []);
@@ -63,97 +62,93 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     localStorage.setItem('userData', JSON.stringify(newUser));
   }, []);
 
-  // Lógica central de Refresh Token
+  // --- Lógica de Refresh ---
   const handleTokenRefresh = useCallback(async (): Promise<string | null> => {
-    // Si ya hay un proceso de refresh ocurriendo, devolver esa misma promesa (evita race conditions)
     if (activeRefreshPromise.current) {
       return activeRefreshPromise.current;
     }
 
-    // Crear nueva promesa que engloba todo el proceso (Silent + Modal)
     const promise = (async () => {
       try {
-        // 1. Intentar Refresh Silencioso
+        // PASO 1: Preguntar al usuario si quiere extender
+        console.log('[AuthProvider] Token expirado. Preguntando al usuario...');
+        setIsTimeoutModalOpen(true);
+
+        // Esperar decisión del usuario (Extender o Salir)
+        const userDecision = await new Promise<'EXTEND' | 'LOGOUT'>((resolve) => {
+          (modalResolver as any).current = resolve;
+        });
+
+        if (userDecision === 'LOGOUT') {
+          logout();
+          return null;
+        }
+
+        // PASO 2: Intentar Refresh Silencioso
         const storedRefreshToken = localStorage.getItem('refreshToken');
         if (storedRefreshToken) {
           try {
-            console.log('[AuthProvider] Intentando refresh silencioso...');
+            console.log('[AuthProvider] Intentando refresh...');
             const response = await authService.refreshToken(storedRefreshToken);
             const newAccessToken = response.access_token;
 
             if (newAccessToken) {
-              console.log('[AuthProvider] Refresh silencioso exitoso.');
+              console.log('[AuthProvider] Refresh exitoso.');
               localStorage.setItem('authToken', newAccessToken);
               if (response.refresh_token) {
                 localStorage.setItem('refreshToken', response.refresh_token);
               }
+              setIsTimeoutModalOpen(false); // Cerrar modal de timeout
               return newAccessToken;
             }
           } catch (err) {
-            console.warn('[AuthProvider] Falló el refresh silencioso.', err);
-            // No hacemos throw, dejamos que pase al modal
+            console.warn('[AuthProvider] Falló el refresh automático.', err);
           }
         }
 
-        // 2. Si falla el silencioso, activar Modal y esperar interacción del usuario
-        console.log('[AuthProvider] Activando modal de sesión expirada...');
-        setIsSessionExpired(true);
-
-        // Crear una promesa que se resolverá cuando el usuario use el modal
-        return await new Promise<string | null>((resolve) => {
-          modalResolver.current = resolve;
-        });
+        // PASO 3: Si falló el refresh o no había token -> LOGOUT DIRECTO
+        console.warn('[AuthProvider] No se pudo extender la sesión. Deslogueando.');
+        setIsTimeoutModalOpen(false);
+        logout();
+        return null;
 
       } catch (e) {
-        console.error('[AuthProvider] Error fatal en proceso de refresh', e);
+        console.error('[AuthProvider] Error en flujo de refresh', e);
+        logout();
         return null;
       } finally {
-        // Limpiar la promesa activa al terminar (sea éxito o fallo)
         activeRefreshPromise.current = null;
       }
     })();
 
     activeRefreshPromise.current = promise;
     return promise;
-  }, []);
+  }, [logout]);
 
-  // Configurar handlers de ApiClient al montar
+  // --- Handlers para el Modal de Timeout ---
+  const handleExtendSession = () => {
+    if ((modalResolver as any).current) {
+      (modalResolver as any).current('EXTEND');
+    }
+  };
+
+  const handleTimeoutLogout = () => {
+    if ((modalResolver as any).current) {
+      (modalResolver as any).current('LOGOUT');
+    }
+  };
+
+  // --- Configuración Inicial ---
   useEffect(() => {
     setOnUnauthorizedHandler(() => {
-        // Solo hacer logout si NO estamos en medio de un proceso de recuperación
-        // Esto previene que un 401 final mate la sesión mientras el modal está abierto
-        if (!isSessionExpired && !activeRefreshPromise.current) {
-            logout();
-        }
+      // Si ocurre un 401 y NO estamos gestionando un refresh, logout.
+      if (!isTimeoutModalOpen && !activeRefreshPromise.current) {
+        logout();
+      }
     });
-
     setTokenRefreshHandler(handleTokenRefresh);
-  }, [logout, handleTokenRefresh, isSessionExpired]);
+  }, [logout, handleTokenRefresh, isTimeoutModalOpen]);
 
-  // Callbacks del Modal
-  const handleSessionRestored = (token: string, updatedUser: User) => {
-    console.log('[AuthProvider] Sesión restaurada manualmente.');
-    setIsSessionExpired(false);
-    localStorage.setItem('authToken', token);
-    updateUser(updatedUser); // Asegurar que el usuario esté actualizado
-
-    if (modalResolver.current) {
-      modalResolver.current(token);
-      modalResolver.current = null;
-    }
-  };
-
-  const handleSessionCancel = () => {
-    console.log('[AuthProvider] Recuperación cancelada por usuario.');
-    setIsSessionExpired(false);
-    if (modalResolver.current) {
-      modalResolver.current(null);
-      modalResolver.current = null;
-    }
-    logout();
-  };
-
-  // Verificación inicial de sesión
   useEffect(() => {
     const checkAuthStatus = async () => {
       const token = localStorage.getItem('authToken');
@@ -161,27 +156,19 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         setInitialLoading(false);
         return;
       }
-
       const storedUserData = localStorage.getItem('userData');
       if (storedUserData) {
-        try {
-          setUser(JSON.parse(storedUserData));
-        } catch (e) {
-          localStorage.removeItem('userData');
-        }
+        try { setUser(JSON.parse(storedUserData)); } catch (e) { localStorage.removeItem('userData'); }
       }
-
       try {
         const freshUserData = await authService.getCurrentUser();
         updateUser(freshUserData);
       } catch (err) {
-        console.error('[AuthProvider] Token inválido al inicio. Deslogueando.');
         logout();
       } finally {
         setInitialLoading(false);
       }
     };
-
     checkAuthStatus();
   }, [logout, updateUser]);
 
@@ -189,15 +176,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setLoading(true);
     setError(null);
     try {
-      const response: AuthResponse = await authService.login(credentials);
-      if (!response.access_token || !response.user) {
-        throw new Error('Respuesta inválida del servidor.');
-      }
-
+      const response = await authService.login(credentials);
       localStorage.setItem('authToken', response.access_token);
-      if (response.refresh_token) {
-        localStorage.setItem('refreshToken', response.refresh_token);
-      }
+      if (response.refresh_token) localStorage.setItem('refreshToken', response.refresh_token);
       updateUser(response.user);
     } catch (err: any) {
       setError(err.message || 'Error al iniciar sesión.');
@@ -211,15 +192,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setLoading(true);
     setError(null);
     try {
-      const response: AuthResponse = await authService.register(userData);
-      if (!response.access_token || !response.user) {
-        throw new Error('Respuesta inválida del servidor.');
-      }
-
+      const response = await authService.register(userData);
       localStorage.setItem('authToken', response.access_token);
-      if (response.refresh_token) {
-        localStorage.setItem('refreshToken', response.refresh_token);
-      }
+      if (response.refresh_token) localStorage.setItem('refreshToken', response.refresh_token);
       updateUser(response.user);
     } catch (err: any) {
       setError(err.message || 'Error al registrarse.');
@@ -251,11 +226,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       ) : (
         <>
           {children}
-          <SessionExpiredModal
-            open={isSessionExpired}
-            user={user}
-            onSuccess={handleSessionRestored}
-            onCancel={handleSessionCancel}
+          
+          {/* Modal Único: Pregunta si extender */}
+          <SessionTimeoutModal 
+            open={isTimeoutModalOpen}
+            onExtend={handleExtendSession}
+            onLogout={handleTimeoutLogout}
           />
         </>
       )}

@@ -44,8 +44,9 @@ export const SessionExpiredModal: React.FC<SessionExpiredModalProps> = ({
       });
 
       if (response.access_token && response.user) {
-        // Validación extra de seguridad: Verificar que el ID coincida si teníamos usuario previo
-        if (user && response.user.id !== user.id) {
+        // Validación extra de seguridad: Verificar que el email coincida si teníamos usuario previo
+        // Usamos email porque 'id' no existe en la interfaz User actual
+        if (user && response.user.email !== user.email) {
             message.error('Error de seguridad: La cuenta ingresada no coincide con la sesión actual.');
             // No hacemos onSuccess, forzamos al usuario a intentar de nuevo o cancelar (logout)
             return;
