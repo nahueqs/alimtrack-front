@@ -128,7 +128,7 @@ class ApiClient {
       return data;
     } catch (error: any) {
       if (error.response && error.response.status === 401 && tokenRefreshHandler) {
-        // Silencioso
+        // Silencioso para el log general, se maneja abajo
       } else {
         console.groupCollapsed(`[ApiClient] Error Capturado`);
         console.error(error);
@@ -157,11 +157,14 @@ class ApiClient {
               endpoint.includes('/auth/refresh-token');
 
             if (tokenRefreshHandler && !isAuthRequest) {
-              console.log('[ApiClient] 401 detectado. Intentando recuperar sesión...');
+              console.log('[ApiClient] 401 detectado en:', endpoint);
+              console.log('[ApiClient] Intentando recuperar sesión...');
               try {
                 const newToken = await tokenRefreshHandler();
+                console.log('[ApiClient] Resultado refresh:', newToken ? 'Éxito' : 'Falló/Cancelado');
+                
                 if (newToken) {
-                  console.log('[ApiClient] Sesión recuperada. Reintentando petición...');
+                  console.log('[ApiClient] Reintentando petición original...');
                   const newHeaders: Record<string, string> = {};
                   headers.forEach((value, key) => {
                     newHeaders[key] = value;
@@ -174,10 +177,13 @@ class ApiClient {
                   });
                 }
               } catch (refreshError) {
-                console.error('[ApiClient] Falló la recuperación de sesión.', refreshError);
+                console.error('[ApiClient] Falló la recuperación de sesión (Excepción).', refreshError);
               }
+            } else {
+                console.log('[ApiClient] 401 sin intento de refresh. Handler:', !!tokenRefreshHandler, 'IsAuth:', isAuthRequest);
             }
-            console.log(`[ApiClient] Interpretado como: Error HTTP ${status}.`);
+            
+            console.log(`[ApiClient] Interpretado como: Error HTTP ${status}. Ejecutando logout.`);
             friendlyError = new Error(
               apiMessage || 'Sesión expirada. Por favor, inicie sesión de nuevo.'
             );

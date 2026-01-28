@@ -25,6 +25,7 @@ interface AuthContextType {
   logout: () => void;
   clearError: () => void;
   isAuthenticated: boolean;
+  updateUser: (user: User) => void; // Nuevo método para actualizar usuario sin full login
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -40,8 +41,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [error, setError] = useState<string | null>(null);
   const [isSessionExpired, setIsSessionExpired] = useState(false);
 
-  // Referencia para guardar la función 'resolve' de la promesa de refresco
-  const refreshResolver = useRef<((token: string | null) => void) | null>(null);
+  // Singleton Promise: Almacena la promesa de refresh en curso para evitar llamadas múltiples
+  const activeRefreshPromise = useRef<Promise<string | null> | null>(null);
+  
+  // Resolver para el modal: Permite desbloquear la promesa cuando el usuario interactúa con el modal
+  const modalResolver = useRef<((token: string | null) => void) | null>(null);
 
   const logout = useCallback(() => {
     localStorage.removeItem('authToken');
@@ -49,72 +53,107 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     localStorage.removeItem('userData');
     setUser(null);
     setError(null);
+    setIsSessionExpired(false);
+    activeRefreshPromise.current = null;
+    modalResolver.current = null;
   }, []);
 
-  // Configurar handlers de ApiClient
-  useEffect(() => {
-    setOnUnauthorizedHandler(logout);
+  const updateUser = useCallback((newUser: User) => {
+    setUser(newUser);
+    localStorage.setItem('userData', JSON.stringify(newUser));
+  }, []);
 
-    setTokenRefreshHandler(async () => {
-      // 1. Intentar Refresh Silencioso
-      const storedRefreshToken = localStorage.getItem('refreshToken');
-      if (storedRefreshToken) {
-        try {
-          console.log('[AuthProvider] Intentando refresh silencioso...');
-          const response = await authService.refreshToken(storedRefreshToken);
-          const newAccessToken = response.access_token;
+  // Lógica central de Refresh Token
+  const handleTokenRefresh = useCallback(async (): Promise<string | null> => {
+    // Si ya hay un proceso de refresh ocurriendo, devolver esa misma promesa (evita race conditions)
+    if (activeRefreshPromise.current) {
+      return activeRefreshPromise.current;
+    }
 
-          if (newAccessToken) {
-            console.log('[AuthProvider] Refresh silencioso exitoso.');
-            localStorage.setItem('authToken', newAccessToken);
-            if (response.refresh_token) {
-              localStorage.setItem('refreshToken', response.refresh_token);
+    // Crear nueva promesa que engloba todo el proceso (Silent + Modal)
+    const promise = (async () => {
+      try {
+        // 1. Intentar Refresh Silencioso
+        const storedRefreshToken = localStorage.getItem('refreshToken');
+        if (storedRefreshToken) {
+          try {
+            console.log('[AuthProvider] Intentando refresh silencioso...');
+            const response = await authService.refreshToken(storedRefreshToken);
+            const newAccessToken = response.access_token;
+
+            if (newAccessToken) {
+              console.log('[AuthProvider] Refresh silencioso exitoso.');
+              localStorage.setItem('authToken', newAccessToken);
+              if (response.refresh_token) {
+                localStorage.setItem('refreshToken', response.refresh_token);
+              }
+              return newAccessToken;
             }
-            return newAccessToken;
+          } catch (err) {
+            console.warn('[AuthProvider] Falló el refresh silencioso.', err);
+            // No hacemos throw, dejamos que pase al modal
           }
-        } catch (err) {
-          console.warn('[AuthProvider] Falló el refresh silencioso.', err);
-          // Si falla, continuamos al modal
         }
-      }
 
-      // 2. Si falla el silencioso, mostrar Modal
-      if (isSessionExpired && refreshResolver.current) {
-        return new Promise<string | null>((resolve) => {
-          const oldResolver = refreshResolver.current;
-          refreshResolver.current = (token) => {
-            if (oldResolver) oldResolver(token);
-            resolve(token);
-          };
+        // 2. Si falla el silencioso, activar Modal y esperar interacción del usuario
+        console.log('[AuthProvider] Activando modal de sesión expirada...');
+        setIsSessionExpired(true);
+
+        // Crear una promesa que se resolverá cuando el usuario use el modal
+        return await new Promise<string | null>((resolve) => {
+          modalResolver.current = resolve;
         });
+
+      } catch (e) {
+        console.error('[AuthProvider] Error fatal en proceso de refresh', e);
+        return null;
+      } finally {
+        // Limpiar la promesa activa al terminar (sea éxito o fallo)
+        activeRefreshPromise.current = null;
       }
+    })();
 
-      setIsSessionExpired(true);
-      return new Promise<string | null>((resolve) => {
-        refreshResolver.current = resolve;
-      });
+    activeRefreshPromise.current = promise;
+    return promise;
+  }, []);
+
+  // Configurar handlers de ApiClient al montar
+  useEffect(() => {
+    setOnUnauthorizedHandler(() => {
+        // Solo hacer logout si NO estamos en medio de un proceso de recuperación
+        // Esto previene que un 401 final mate la sesión mientras el modal está abierto
+        if (!isSessionExpired && !activeRefreshPromise.current) {
+            logout();
+        }
     });
-  }, [logout, isSessionExpired]);
 
-  const handleSessionRestored = (token: string) => {
+    setTokenRefreshHandler(handleTokenRefresh);
+  }, [logout, handleTokenRefresh, isSessionExpired]);
+
+  // Callbacks del Modal
+  const handleSessionRestored = (token: string, updatedUser: User) => {
+    console.log('[AuthProvider] Sesión restaurada manualmente.');
     setIsSessionExpired(false);
     localStorage.setItem('authToken', token);
+    updateUser(updatedUser); // Asegurar que el usuario esté actualizado
 
-    if (refreshResolver.current) {
-      refreshResolver.current(token);
-      refreshResolver.current = null;
+    if (modalResolver.current) {
+      modalResolver.current(token);
+      modalResolver.current = null;
     }
   };
 
   const handleSessionCancel = () => {
+    console.log('[AuthProvider] Recuperación cancelada por usuario.');
     setIsSessionExpired(false);
-    if (refreshResolver.current) {
-      refreshResolver.current(null);
-      refreshResolver.current = null;
+    if (modalResolver.current) {
+      modalResolver.current(null);
+      modalResolver.current = null;
     }
     logout();
   };
 
+  // Verificación inicial de sesión
   useEffect(() => {
     const checkAuthStatus = async () => {
       const token = localStorage.getItem('authToken');
@@ -123,24 +162,20 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         return;
       }
 
-      // Intentar recuperar usuario desde localStorage primero para evitar parpadeo
       const storedUserData = localStorage.getItem('userData');
       if (storedUserData) {
         try {
-          const parsedUser = JSON.parse(storedUserData);
-          setUser(parsedUser);
+          setUser(JSON.parse(storedUserData));
         } catch (e) {
-          console.warn('[AuthProvider] Error parseando userData de localStorage', e);
-          localStorage.removeItem('userData'); // Limpiar datos corruptos
+          localStorage.removeItem('userData');
         }
       }
 
       try {
         const freshUserData = await authService.getCurrentUser();
-        setUser(freshUserData);
-        localStorage.setItem('userData', JSON.stringify(freshUserData));
+        updateUser(freshUserData);
       } catch (err) {
-        console.error('[AuthProvider] Falló la validación del token. Deslogueando.', err);
+        console.error('[AuthProvider] Token inválido al inicio. Deslogueando.');
         logout();
       } finally {
         setInitialLoading(false);
@@ -148,29 +183,24 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     };
 
     checkAuthStatus();
-  }, [logout]);
+  }, [logout, updateUser]);
 
   const login = async (credentials: LoginRequest) => {
     setLoading(true);
     setError(null);
     try {
       const response: AuthResponse = await authService.login(credentials);
-
-      const token = response.access_token;
-
-      if (!token || !response.user) {
-        throw new Error('Respuesta de login inválida desde el servidor.');
+      if (!response.access_token || !response.user) {
+        throw new Error('Respuesta inválida del servidor.');
       }
 
-      localStorage.setItem('authToken', token);
+      localStorage.setItem('authToken', response.access_token);
       if (response.refresh_token) {
         localStorage.setItem('refreshToken', response.refresh_token);
       }
-      localStorage.setItem('userData', JSON.stringify(response.user));
-      setUser(response.user);
+      updateUser(response.user);
     } catch (err: any) {
-      console.error('[AuthProvider] Login fallido.', err);
-      setError(err.message || 'Ocurrió un error inesperado.');
+      setError(err.message || 'Error al iniciar sesión.');
       throw err;
     } finally {
       setLoading(false);
@@ -182,31 +212,24 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setError(null);
     try {
       const response: AuthResponse = await authService.register(userData);
-
-      const token = response.access_token;
-
-      if (!token || !response.user) {
-        throw new Error('Respuesta de registro inválida desde el servidor.');
+      if (!response.access_token || !response.user) {
+        throw new Error('Respuesta inválida del servidor.');
       }
 
-      localStorage.setItem('authToken', token);
+      localStorage.setItem('authToken', response.access_token);
       if (response.refresh_token) {
         localStorage.setItem('refreshToken', response.refresh_token);
       }
-      localStorage.setItem('userData', JSON.stringify(response.user));
-      setUser(response.user);
+      updateUser(response.user);
     } catch (err: any) {
-      console.error('[AuthProvider] Registro fallido.', err);
-      setError(err.message || 'Ocurrió un error inesperado.');
+      setError(err.message || 'Error al registrarse.');
       throw err;
     } finally {
       setLoading(false);
     }
   };
 
-  const clearError = () => {
-    setError(null);
-  };
+  const clearError = () => setError(null);
 
   const value = {
     user,
@@ -218,6 +241,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     logout,
     clearError,
     isAuthenticated: !!user,
+    updateUser,
   };
 
   return (
