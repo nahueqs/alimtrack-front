@@ -78,7 +78,16 @@ export const DebouncedInput: React.FC<DebouncedInputProps> = ({
     setIsSaving(true);
     setError(null);
     try {
-      await onGlobalChange(localValue);
+      // Si es fecha, formatear a ISO-8601 con hora (inicio del día) para el backend
+      let valueToSend = localValue;
+      if (tipoDato === TipoDatoCampo.FECHA && localValue) {
+        const d = dayjs(localValue, 'DD/MM/YYYY');
+        if (d.isValid()) {
+          valueToSend = d.format('YYYY-MM-DDTHH:mm:ss');
+        }
+      }
+
+      await onGlobalChange(valueToSend);
       setHasChanged(false);
     } catch (e: any) {
       console.error('Error al guardar input:', e);
@@ -113,7 +122,7 @@ export const DebouncedInput: React.FC<DebouncedInputProps> = ({
     onBlur: handleBlur,
     status: error ? ('error' as const) : undefined,
     disabled: isSaving || rest.disabled,
-    style: { width: '100%' },
+    style: { width: '100%', color: 'var(--text-primary)' }, // Forzar color de texto
     ref: inputRef,
   };
 
@@ -147,17 +156,15 @@ export const DebouncedInput: React.FC<DebouncedInputProps> = ({
 
   const parseDate = (val: string) => {
     if (!val) return null;
-    // Intentar parsear formato DD/MM/YYYY
+    // Intentar parsear formato DD/MM/YYYY (formato visual)
     let d = dayjs(val, 'DD/MM/YYYY', true);
     if (d.isValid()) return d;
     
-    // Intentar parsear formato ISO YYYY-MM-DD
-    d = dayjs(val, 'YYYY-MM-DD', true);
+    // Intentar parsear formato ISO YYYY-MM-DD (formato backend)
+    d = dayjs(val); // dayjs maneja ISO 8601 automáticamente
     if (d.isValid()) return d;
     
-    // Fallback
-    d = dayjs(val);
-    return d.isValid() ? d : null;
+    return null;
   };
 
   const parseTime = (val: string) => {

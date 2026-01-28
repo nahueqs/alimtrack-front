@@ -119,6 +119,12 @@
     color: var(--text-primary) !important;
 }
 
+/* Forzar color de texto normal en inputs habilitados */
+.section-card .ant-input:not([disabled]),
+.section-card .ant-input-number-input:not([disabled]) {
+    color: var(--text-primary) !important;
+}
+
 .section-card .ant-input::placeholder {
     color: var(--text-tertiary) !important;
 }
