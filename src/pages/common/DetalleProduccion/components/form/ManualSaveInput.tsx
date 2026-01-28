@@ -159,11 +159,16 @@ export const ManualSaveInput: React.FC<ManualSaveInputProps> = ({
           <TimePicker
             value={parseTime(state.localValue)}
             onChange={(time) => {
+              // Guardamos localmente solo la hora HH:mm:ss
+              // formatForBackend se encargará de agregar la fecha actual al guardar
               const newValue = time ? time.format('HH:mm:ss') : '';
               dispatch({ type: 'VALUE_CHANGED', payload: newValue });
             }}
             format="HH:mm:ss"
             placeholder={placeholder || 'HH:mm:ss'}
+            showNow={false}
+            use12Hours={false}
+            allowClear
             {...commonProps}
             {...(rest as any)}
           />
