@@ -155,11 +155,12 @@ class ApiClient {
             break;
           case 401:
           case 403: // Unificamos lógica para 401 y 403
-            // Evitar loop infinito: No intentar refrescar si el error viene del login, registro o del mismo refresh
+            // Evitar loop infinito: No intentar refrescar si el error viene del login, registro, refresh o verificación inicial
             const isAuthRequest =
               endpoint.includes('/auth/login') ||
               endpoint.includes('/auth/register') ||
-              endpoint.includes('/auth/refresh-token');
+              endpoint.includes('/auth/refresh-token') ||
+              endpoint.includes('/auth/me');
 
             if (tokenRefreshHandler && !isAuthRequest) {
               console.log(`[ApiClient] ${status} detectado en:`, endpoint);
