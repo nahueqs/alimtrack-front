@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, Form, Input, message } from 'antd';
+import { Button, Form, Input, message, Alert } from 'antd';
 import { LockOutlined, MailOutlined, UserOutlined } from '@ant-design/icons';
 import type { RegisterRequest } from '@/services/auth/Auth.ts';
 import './RegisterForm.css';
@@ -8,18 +8,26 @@ interface RegisterFormProps {
   onRegister: (userData: RegisterRequest) => Promise<void>;
   loading: boolean;
   onSwitchToLogin: () => void;
-  error: string | null; // Cambiado a string | null
+  error: string | null;
 }
 
 export const RegisterForm: React.FC<RegisterFormProps> = ({
   onRegister,
   loading,
   onSwitchToLogin,
-  error, // Usando el string de error
+  error,
 }) => {
   const [form] = Form.useForm();
 
+  // Deshabilitamos temporalmente el registro
+  const isRegistrationDisabled = true;
+
   const onFinish = async (values: RegisterRequest) => {
+    if (isRegistrationDisabled) {
+      message.warning('El registro de nuevos usuarios está deshabilitado temporalmente.');
+      return;
+    }
+
     try {
       await onRegister(values);
       message.success('Registro exitoso. ¡Bienvenido!');
@@ -39,9 +47,19 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
     <div className={`register-form ${loading ? 'register-form--loading' : ''}`}>
       <h2 className="register-form__title">Crear Cuenta</h2>
 
-      {error && ( // Si hay un string de error, lo muestra
+      {isRegistrationDisabled && (
+        <Alert
+          message="Registro Deshabilitado"
+          description="Por el momento no se permiten nuevos registros. Contacte al administrador."
+          type="warning"
+          showIcon
+          style={{ marginBottom: '1rem' }}
+        />
+      )}
+
+      {error && !isRegistrationDisabled && (
         <div className="register-form__error">
-          {error} {/* Muestra el mensaje de error real */}
+          {error}
         </div>
       )}
 
@@ -53,7 +71,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
         onFinishFailed={onFinishFailed}
         autoComplete="off"
         layout="vertical"
-        disabled={loading}
+        disabled={loading || isRegistrationDisabled} // Deshabilitamos todo el formulario
       >
         <Form.Item
           label="Nombre Completo"
@@ -109,7 +127,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
         </Form.Item>
 
         <Form.Item>
-          <Button type="primary" htmlType="submit" block loading={loading}>
+          <Button type="primary" htmlType="submit" block loading={loading} disabled={isRegistrationDisabled}>
             Crear Cuenta
           </Button>
         </Form.Item>

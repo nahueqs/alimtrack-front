@@ -9,6 +9,9 @@ interface ProgresoProduccionCardProps {
 }
 
 export const ProgresoProduccionCard: React.FC<ProgresoProduccionCardProps> = ({ progreso }) => {
+  const showCampos = progreso.totalCampos > 0;
+  const showTablas = progreso.totalCeldasTablas > 0;
+
   return (
     <Card className="progress-card">
       <Title level={4} className="progress-card-title">
@@ -21,17 +24,26 @@ export const ProgresoProduccionCard: React.FC<ProgresoProduccionCardProps> = ({ 
           format={(percent) => `${percent}%`}
         />
       </div>
-      <div style={{ display: 'flex', justifyContent: 'space-around' }}>
-        <Statistic
-          title="Campos"
-          value={progreso.camposRespondidos}
-          suffix={`/ ${progreso.totalCampos}`}
-        />
-        <Statistic
-          title="Tablas"
-          value={progreso.celdasRespondidas}
-          suffix={`/ ${progreso.totalCeldasTablas}`}
-        />
+      <div style={{ display: 'flex', justifyContent: 'space-around', flexWrap: 'wrap', gap: '16px' }}>
+        {showCampos && (
+          <Statistic
+            title="Campos"
+            value={progreso.camposRespondidos}
+            suffix={`/ ${progreso.totalCampos}`}
+          />
+        )}
+        {showTablas && (
+          <Statistic
+            title="Tablas"
+            value={progreso.celdasRespondidas}
+            suffix={`/ ${progreso.totalCeldasTablas}`}
+          />
+        )}
+        {!showCampos && !showTablas && (
+          <div style={{ color: '#8c8c8c', fontStyle: 'italic' }}>
+            Sin elementos para completar
+          </div>
+        )}
       </div>
     </Card>
   );
