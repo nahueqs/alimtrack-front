@@ -10,13 +10,13 @@ import DetalleProduccionProtectedPage from '@/pages/Producciones/Detalle/Detalle
 import { ListadoProducciones } from '@/pages/Public/Listado/ListadoProducciones.tsx';
 import { VersionRecetasPage } from '@/pages/Recetas/Listado/VersionRecetasPage.tsx';
 import { VisualizarRecetaPage } from '@/pages/Recetas/Detalle/VisualizarRecetaPage.tsx';
-import type { ProduccionFilterRequestDTO } from '@/types/production';
 import { ProductionState } from '@/constants/ProductionStates';
+import type { LocalProductionFilters } from '@/pages/Producciones/Listado/ProduccionFilters.tsx';
 
-const produccionesActivasFilters: ProduccionFilterRequestDTO = {
+const produccionesActivasFilters: Partial<LocalProductionFilters> = {
   estado: ProductionState.EN_PROCESO,
 };
-const produccionesFinalizadasFilters: ProduccionFilterRequestDTO = {
+const produccionesFinalizadasFilters: Partial<LocalProductionFilters> = {
   estado: ProductionState.FINALIZADA,
 };
 

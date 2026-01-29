@@ -68,9 +68,11 @@ const DetalleProduccionProtectedPage: React.FC = () => {
   return (
     <ProductionStatusDisplay
       loading={loadingData}
-      error={errorData}
+      error={errorData ? 'Error al cargar la producción' : null} // Adaptamos el booleano a string/null si es necesario, o dejamos que el componente maneje booleanos
       estructura={estructura}
       estadoActual={estadoActual}
+      redirectPath="/producciones"
+      redirectLabel="Volver al Listado"
     >
       <SavingIndicator isSaving={isSaving} />
       
