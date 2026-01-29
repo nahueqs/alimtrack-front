@@ -30,11 +30,11 @@ const ProductionsResultPage: React.FC<ProductionsResultPageProps> = ({ initialFi
   }, [getProducciones, filters]);
 
   const handleView = (record: ProduccionProtectedResponseDTO) => {
-    navigate(`/public/producciones/${record.codigoProduccion}`);
+    window.open(`/public/producciones/ver/${record.codigoProduccion}`, '_blank');
   };
 
   const handleEdit = (record: ProduccionProtectedResponseDTO) => {
-    navigate(`/producciones/ver/${record.codigoProduccion}`);
+    window.open(`/producciones/ver/${record.codigoProduccion}`, '_blank');
   };
 
   const handleDelete = (codigoProduccion: string) => {
@@ -58,7 +58,7 @@ const ProductionsResultPage: React.FC<ProductionsResultPageProps> = ({ initialFi
   };
 
   const handleFilterChange = (newFilters: ProduccionFilterRequestDTO) => {
-    setFilters((prev) => ({ ...prev, ...newFilters }));
+    setFilters(newFilters);
   };
 
   const columns = getProductionColumns({

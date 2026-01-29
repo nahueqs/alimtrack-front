@@ -7,9 +7,16 @@ import type { ProduccionPublicMetadataDTO } from '@/types/production';
 import { usePublicService } from '@/services/public/usePublicService.ts';
 import { useIsMobile } from '@/hooks/useIsMobile.ts';
 import './ListadoProducciones.css';
+import { notificationService } from '@/services/notificaciones/notificationService.ts';
 
 export const ListadoProducciones: React.FC = () => {
-  const { producciones, loading, error, getProduccionesPublicas } = usePublicService();
+  const {
+    producciones,
+    loading,
+    error,
+    getProduccionesPublicas,
+    updateProductionStateInList,
+  } = usePublicService();
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   const [searchTerm, setSearchTerm] = useState('');
@@ -17,6 +24,43 @@ export const ListadoProducciones: React.FC = () => {
   useEffect(() => {
     getProduccionesPublicas();
   }, [getProduccionesPublicas]);
+
+  // Suscripción a WebSockets para actualizaciones en tiempo real
+  useEffect(() => {
+    let unsubscribeState: (() => void) | undefined;
+    let unsubscribeCreated: (() => void) | undefined;
+
+    const connectAndSubscribe = () => {
+      notificationService.connect(() => {
+        // Suscribirse a cambios de estado globales
+        unsubscribeState = notificationService.subscribeToProductionStateChanges((message) => {
+          if (message.type === 'STATE_CHANGED') {
+            updateProductionStateInList(message.codigoProduccion, {
+              ...message.payload,
+              timestamp: message.timestamp,
+            });
+          }
+        });
+
+        // Suscribirse a nuevas producciones creadas
+        unsubscribeCreated = notificationService.subscribeToProductionCreated((message) => {
+          // Cuando se crea una producción, recargamos la lista completa para simplificar
+          // Podríamos optimizar agregando solo la nueva, pero requeriría mapear el payload al DTO completo
+          if (message.type === 'PRODUCTION_METADATA_CREATED') {
+            getProduccionesPublicas();
+          }
+        });
+      });
+    };
+
+    connectAndSubscribe();
+
+    return () => {
+      if (unsubscribeState) unsubscribeState();
+      if (unsubscribeCreated) unsubscribeCreated();
+      notificationService.disconnect();
+    };
+  }, [updateProductionStateInList, getProduccionesPublicas]);
 
   const handleView = (record: ProduccionPublicMetadataDTO) => {
     navigate(`/public/producciones/ver/${record.codigoProduccion}`);
@@ -65,7 +109,9 @@ export const ListadoProducciones: React.FC = () => {
             loading={loading}
             rowKey="codigoProduccion"
             locale={{
-              emptyText: error ? 'Error al cargar las producciones' : 'No se encontraron producciones',
+              emptyText: error
+                ? 'Error al cargar las producciones'
+                : 'No se encontraron producciones',
             }}
           />
         </div>

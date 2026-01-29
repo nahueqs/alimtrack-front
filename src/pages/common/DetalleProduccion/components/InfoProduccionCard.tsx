@@ -75,18 +75,21 @@ export const InfoProduccionCard: React.FC<InfoProduccionCardProps> = ({
     return <Tag color={color}>{text}</Tag>;
   };
 
+  // Check if we are in a protected context (has 'encargado' property)
+  const isProtected = 'encargado' in produccion;
+
   return (
     <Card className="info-card">
       <div className="info-card-header">
         <Title level={4} className="info-card-title">
           Información de Producción
         </Title>
-        {isEditable && !isEditing && (
+        {isEditable && !isEditing && isProtected && (
           <Button type="text" icon={<EditOutlined />} onClick={handleEdit}>
             Editar
           </Button>
         )}
-        {isEditable && isEditing && (
+        {isEditable && isEditing && isProtected && (
           <Button type="primary" icon={<SaveOutlined />} onClick={handleSave}>
             Guardar
           </Button>
@@ -112,7 +115,7 @@ export const InfoProduccionCard: React.FC<InfoProduccionCardProps> = ({
             <Text strong>{produccion.lote || '-'}</Text>
           </Descriptions.Item>
           <Descriptions.Item label="Estado">
-            {isEditable ? (
+            {isEditable && isProtected ? (
               <Select
                 defaultValue={produccion.estado}
                 style={{ width: 120 }}
