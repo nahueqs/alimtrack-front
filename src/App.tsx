@@ -1,4 +1,4 @@
-import React, { memo, Suspense, useEffect } from 'react';
+import React, { memo, Suspense } from 'react';
 import { BrowserRouter as Router, useRoutes } from 'react-router-dom';
 import { ThemeProvider } from './styles/darkMode/ThemeContexts.tsx';
 import { routes } from './index.tsx';
@@ -58,9 +58,8 @@ const AppRoutes = memo(() => {
 AppRoutes.displayName = 'AppRoutes';
 
 export const App: React.FC = () => {
-  useEffect(() => {
-    document.title = 'Alimtrack'; // Set the desired title
-  }, []); // Run once on mount
+  // Eliminado el useEffect que forzaba el título 'Alimtrack' al montar App
+  // Esto permite que las páginas individuales controlen su propio título
 
   return (
     <ErrorBoundary>
