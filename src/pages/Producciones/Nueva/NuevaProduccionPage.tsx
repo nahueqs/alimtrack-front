@@ -18,15 +18,13 @@ export const NuevaProduccionPage: React.FC = () => {
 
   const {
     loading: loadingVersions,
-    versiones: recipeVersions, // Changed from 'versions' to 'versiones'
-    error: versionsError, // Changed from 'hasError' to 'error'
-    getAllVersiones: refetchVersions, // Changed from 'refetch' to 'getAllVersiones'
+    versiones: recipeVersions,
+    error: versionsError,
+    getAllVersiones: refetchVersions,
   } = useVersionRecetaService();
 
-  // Derive hasVersionsError from versionsError
   const hasVersionsError = !!versionsError;
 
-  // Fetch versions on component mount
   useEffect(() => {
     refetchVersions();
   }, [refetchVersions]);
@@ -43,18 +41,30 @@ export const NuevaProduccionPage: React.FC = () => {
         console.log('[NuevaProduccionPage] Datos a enviar:', dataWithCreator);
       }
 
-      const newProduction = await createProduction(dataWithCreator); // Corrected the argument
+      const newProduction = await createProduction(dataWithCreator);
       message.success('Producción creada exitosamente');
+      
       if (import.meta.env.DEV) {
         console.log('Producción creada:', newProduction);
       }
-      navigate(`/producciones/ver/${newProduction.codigoProduccion}`);
-    } catch (error) {
-      // El error ya es manejado y mostrado por apiClient.
-      // El catch se mantiene para prevenir que la navegación ocurra si hay un error.
+      
+      // Navegación robusta: usar replace para evitar volver al formulario con "Atrás"
+      navigate(`/producciones/ver/${newProduction.codigoProduccion}`, { replace: true });
+      
+    } catch (error: any) {
       if (import.meta.env.DEV) {
         console.error('Error al crear la producción:', error);
       }
+      
+      // Manejo específico de errores comunes
+      if (error.message && error.message.includes('Conflicto')) {
+         message.error('Ya existe una producción con ese código. Por favor, elige otro.');
+      } else if (error.message) {
+         message.error(`Error al crear la producción: ${error.message}`);
+      } else {
+         message.error('Ocurrió un error inesperado al crear la producción.');
+      }
+      
     } finally {
       setLoadingSubmit(false);
     }
