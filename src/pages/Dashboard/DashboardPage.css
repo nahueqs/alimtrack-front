@@ -4,12 +4,18 @@
 .dashboard {
     min-height: 100vh;
     background-color: var(--bg-secondary);
+    /* Aseguramos que el contenedor principal tenga un flujo normal */
+    display: flex;
+    flex-direction: column;
 }
 
 .dashboard__main {
-    padding: 2rem 1rem; /* Aumentado padding superior para separar del header */
+    /* Aumentamos significativamente el padding superior para compensar el header sticky */
+    padding: 2rem 1rem; 
     max-width: 1200px;
     margin: 0 auto;
+    width: 100%; /* Asegura que ocupe el ancho disponible */
+    box-sizing: border-box;
 }
 
 /* ==========================================================================
@@ -18,6 +24,8 @@
 .dashboard__welcome {
     margin-bottom: 2rem;
     text-align: center;
+    /* Añadimos un margen superior extra al contenido interno por si acaso */
+    margin-top: 1rem;
 }
 
 .dashboard__welcome-title {
@@ -73,11 +81,13 @@
    ========================================================================== */
 @media (min-width: 768px) {
     .dashboard__main {
-        padding: 3rem 1.5rem; /* Aumentado padding superior en desktop */
+        /* Aumentamos aún más el padding en desktop */
+        padding: 4rem 1.5rem; 
     }
 
     .dashboard__welcome {
         margin-bottom: 3rem;
+        margin-top: 1.5rem;
     }
 
     .dashboard__welcome-title {

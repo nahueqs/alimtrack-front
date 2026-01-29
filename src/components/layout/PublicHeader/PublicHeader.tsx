@@ -1,11 +1,14 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button } from 'antd';
-import { ScheduleOutlined } from '@ant-design/icons';
+import { Button, Space } from 'antd';
+import { LoginOutlined, ScheduleOutlined } from '@ant-design/icons';
 import './PublicHeader.css';
+import { useAuth } from '@/context/auth/AuthProvider';
 
 export const PublicHeader: React.FC = () => {
   const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
+
   return (
     <header className="public-dashboard-header">
       <h1
@@ -15,13 +18,22 @@ export const PublicHeader: React.FC = () => {
       >
         AlimTrack UNLu
       </h1>
-      <Button
-        type="primary"
-        icon={<ScheduleOutlined />}
-        onClick={() => navigate('/public/producciones')}
-      >
-        Producciones
-      </Button>
+      <Space>
+        <Button
+          type="link"
+          icon={<ScheduleOutlined />}
+          onClick={() => navigate('/public/producciones')}
+        >
+          Producciones
+        </Button>
+        <Button
+          type="link"
+          icon={<LoginOutlined />}
+          onClick={() => navigate(isAuthenticated ? '/dashboard' : '/login')}
+        >
+          {isAuthenticated ? 'Ir al Dashboard' : 'Iniciar Sesión'}
+        </Button>
+      </Space>
     </header>
   );
 };

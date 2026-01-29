@@ -100,18 +100,28 @@ class ApiClient {
         // Si falla el parseo JSON
         if (response.ok) {
              // Si la respuesta fue exitosa (2xx) pero no es JSON
-             console.warn('[ApiClient] Respuesta 200 OK pero no es JSON:', responseText.substring(0, 100));
-             
-             // Verificamos si es HTML (error común de proxy/SPA fallback)
+             // Intentamos ver si es un string plano válido que no es JSON (ej: "OK")
+             // Si es HTML, probablemente sea un error de proxy o fallback
              if (responseText.trim().startsWith('<')) {
+                 console.warn('[ApiClient] Respuesta 200 OK pero es HTML (posible fallback):', responseText.substring(0, 100));
                  const error = new Error('El servidor devolvió HTML en lugar de JSON. Verifica la URL de la API.') as ApiError;
                  error.response = { status: response.status, data: responseText };
                  throw error;
              }
              
-             // Si no es HTML, asumimos que es un error de formato o una respuesta vacía disfrazada
-             // Devolvemos objeto vacío para que el caller maneje la falta de datos
-             data = {};
+             // Si no es HTML, asumimos que es una respuesta de texto plano válida
+             // Devolvemos el texto tal cual si T es string, o un objeto con el mensaje
+             // Para mayor seguridad, devolvemos un objeto vacío o el texto en una propiedad si no podemos inferir
+             // Pero dado que esperamos T, y falló JSON.parse, es arriesgado.
+             // Mejor estrategia: Si el texto no es vacío, lo devolvemos como si fuera parte de la data
+             if (responseText.trim().length > 0) {
+                 // Hack: si T es string, esto funcionaría, pero T suele ser objeto.
+                 // Asumimos que si no es JSON, es un error o un mensaje simple.
+                 // Vamos a devolver un objeto con una propiedad 'message' o 'text'
+                 data = { message: responseText };
+             } else {
+                 data = {};
+             }
         } else {
              // Si es error (4xx, 5xx), usamos el texto como mensaje
              const msg = responseText.length > 200 ? responseText.substring(0, 200) + '...' : responseText;
