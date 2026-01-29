@@ -24,7 +24,7 @@ class NotificationService {
       reconnectDelay: 5000,
       heartbeatIncoming: 10000,
       heartbeatOutgoing: 10000,
-      // debug: (str) => { console.log(str); },
+      // debug: (str) => { if (import.meta.env.DEV) console.log(str); }, // Solo loguear en desarrollo si es necesario
       onConnect: () => {
         if (this.onConnectCallback) {
           this.onConnectCallback();
@@ -34,8 +34,8 @@ class NotificationService {
         this.onConnectCallback = null;
       },
       onStompError: (frame) => {
+        // Solo loguear errores críticos
         console.error('Broker reported error: ' + frame.headers['message']);
-        console.error('Additional details: ' + frame.body);
       },
       webSocketFactory: () => new SockJS(this.websocketEndpoint),
     });
@@ -74,7 +74,7 @@ class NotificationService {
       });
       return () => subscription.unsubscribe();
     }
-    console.warn('Attempted to subscribe before WebSocket connection was active.');
+    // Silenciamos el warning si no está conectado, ya que puede ser normal en el ciclo de vida de React
     return () => {};
   }
 
@@ -90,9 +90,6 @@ class NotificationService {
       });
       return () => subscription.unsubscribe();
     }
-    console.warn(
-      'Attempted to subscribe to production created events before WebSocket connection was active.'
-    );
     return () => {};
   }
 
@@ -108,9 +105,6 @@ class NotificationService {
       });
       return () => subscription.unsubscribe();
     }
-    console.warn(
-      'Attempted to subscribe to global production state changes before WebSocket connection was active.'
-    );
     return () => {};
   }
 
@@ -126,7 +120,6 @@ class NotificationService {
       });
       return () => subscription.unsubscribe();
     }
-    console.warn('Attempted to subscribe before WebSocket connection was active.');
     return () => {};
   }
 
@@ -142,7 +135,6 @@ class NotificationService {
       });
       return () => subscription.unsubscribe();
     }
-    console.warn('Attempted to subscribe before WebSocket connection was active.');
     return () => {};
   }
 }

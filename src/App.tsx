@@ -58,8 +58,6 @@ const AppRoutes = memo(() => {
 AppRoutes.displayName = 'AppRoutes';
 
 export const App: React.FC = () => {
-  // Eliminado el useEffect que forzaba el título 'Alimtrack' al montar App
-  // Esto permite que las páginas individuales controlen su propio título
 
   return (
     <ErrorBoundary>
