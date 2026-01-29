@@ -13,7 +13,10 @@ const { Text } = Typography;
 
 const DetalleProduccionPublicPage: React.FC = () => {
   const { codigoProduccion } = useParams<{ codigoProduccion: string }>();
+  
+  // Usamos el código de producción para el título, o un mensaje genérico si no está disponible
   usePageTitle(codigoProduccion ? `Producción ${codigoProduccion}` : 'Detalle de Producción');
+
   const [notificationLevel, setNotificationLevel] = useState<NotificationLevel>('ALL');
 
   const {

@@ -16,7 +16,10 @@ const { Text } = Typography;
 
 const DetalleProduccionProtectedPage: React.FC = () => {
   const { codigoProduccion } = useParams<{ codigoProduccion: string }>();
+  
+  // Usamos el código de producción para el título, o un mensaje genérico si no está disponible
   usePageTitle(codigoProduccion ? `Producción ${codigoProduccion}` : 'Detalle de Producción');
+
   const [notificationLevel, setNotificationLevel] = useState<NotificationLevel>('ALL');
 
   const {
@@ -70,7 +73,7 @@ const DetalleProduccionProtectedPage: React.FC = () => {
   return (
     <ProductionStatusDisplay
       loading={loadingData}
-      error={errorData ? 'Error al cargar la producción' : null} // Adaptamos el booleano a string/null si es necesario, o dejamos que el componente maneje booleanos
+      error={errorData ? 'Error al cargar la producción' : null}
       estructura={estructura}
       estadoActual={estadoActual}
       redirectPath="/producciones"
@@ -78,7 +81,7 @@ const DetalleProduccionProtectedPage: React.FC = () => {
     >
       <SavingIndicator isSaving={isSaving} />
       
-      {/* Selector de notificaciones (similar al público pero integrado en el layout protegido) */}
+      {/* Selector de notificaciones */}
       <div
         style={{
           padding: '0 24px',
