@@ -75,7 +75,7 @@ export const getProductionColumns = ({
         return new Date(a.fechaFin).getTime() - new Date(b.fechaFin).getTime();
       },
       render: (date: string | null) => (date ? dayjs(date).format('DD/MM/YYYY HH:mm:ss') : '-'),
-      defaultSortOrder: 'descend', // Added default sort order
+      defaultSortOrder: 'descend',
       responsive: ['xs', 'sm', 'md', 'lg', 'xl'],
     },
     {

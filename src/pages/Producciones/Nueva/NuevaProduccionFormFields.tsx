@@ -39,7 +39,6 @@ export const getProduccionFormFields = (
   hasVersionsError: boolean,
   refetchVersions: () => void,
   onVersionChange: (value: string) => void
-  // selectedVersion: VersionRecetaMetadataResponseDTO | null <-- ELIMINADO
 ): FormFieldConfig[] => {
   const getSelectPlaceholder = () =>
     (recipeVersions || []).length === 0 && !isFormSubmitting && !hasVersionsError
@@ -123,17 +122,25 @@ export const getProduccionFormFields = (
         { required: true, message: 'El código de producción es requerido' },
         { min: 1, message: 'El código de producción no puede estar vacío' },
         { max: 255, message: 'No puede exceder 255 caracteres' },
+        {
+          pattern: /^[a-zA-Z0-9-_]+$/,
+          message: 'Solo se permiten letras, números, guiones y guiones bajos',
+        },
       ],
       prefix: <BarcodeOutlined style={{ color: '#1890ff' }} />,
       props: { maxLength: 255, showCount: true, allowClear: true },
     },
     {
       name: 'lote',
-      label: 'Número de Lote', // Removed required label class and asterisk
+      label: 'Número de Lote',
       type: 'text',
       placeholder: 'Ej: LOTE-2024-001',
       rules: [
-        // Removed {required: true} rule
+        { max: 100, message: 'No puede exceder 100 caracteres' },
+        {
+          pattern: /^[a-zA-Z0-9-_]+$/,
+          message: 'Solo se permiten letras, números, guiones y guiones bajos',
+        },
       ],
       prefix: <FieldNumberOutlined style={{ color: '#1890ff' }} />,
       props: {
@@ -148,11 +155,10 @@ export const getProduccionFormFields = (
     },
     {
       name: 'encargado',
-      label: 'Encargado de Producción', // Removed required label class and asterisk
+      label: 'Encargado de Producción',
       type: 'text',
       placeholder: 'Ej: Juan Pérez',
       rules: [
-        // Removed {required: true} rule
         { min: 1, message: 'El encargado no puede estar vacío' },
         { max: 100, message: 'No puede exceder 100 caracteres' },
       ],

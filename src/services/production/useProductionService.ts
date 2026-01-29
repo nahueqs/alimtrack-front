@@ -28,6 +28,7 @@ interface UseProductionServiceReturn {
   createProduction: (
     data: ProduccionCreateRequestDTO
   ) => Promise<ProduccionProtectedResponseDTO>;
+  deleteProduction: (codigo: string) => Promise<void>;
   getUltimasRespuestas: (codigo: string) => Promise<void>;
   guardarRespuestaCampo: (
     codigoProduccion: string,
@@ -206,6 +207,21 @@ export const useProductionService = (): UseProductionServiceReturn => {
     }
   }, []);
 
+  const deleteProduction = useCallback(async (codigo: string) => {
+    setLoading(true);
+    setError(false);
+    try {
+      await productionService.deleteProduction(codigo);
+      // Actualizamos el estado local eliminando la producción
+      setProducciones((prev) => prev.filter((p) => p.codigoProduccion !== codigo));
+    } catch (err) {
+      setError(true);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
   // Delegamos las actualizaciones al hook genérico
   const updateFieldResponse = useCallback(
     (update: FieldUpdatePayload & { timestamp: string }) => {
@@ -275,6 +291,7 @@ export const useProductionService = (): UseProductionServiceReturn => {
     getProducciones,
     getProduccionByCodigo,
     createProduction,
+    deleteProduction,
     getUltimasRespuestas,
     guardarRespuestaCampo,
     guardarRespuestaCeldaTabla,

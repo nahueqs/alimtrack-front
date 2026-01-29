@@ -13,13 +13,14 @@ import type {
 } from '@/types/production';
 import './ProduccionesPage.css';
 import { useIsMobile } from '@/hooks/useIsMobile.ts';
+import { message, Modal } from 'antd';
 
 interface ProductionsResultPageProps {
   initialFilters?: ProduccionFilterRequestDTO;
 }
 
 const ProductionsResultPage: React.FC<ProductionsResultPageProps> = ({ initialFilters = {} }) => {
-  const { producciones, loading, error, getProducciones } = useProductionService();
+  const { producciones, loading, error, getProducciones, deleteProduction } = useProductionService();
   const navigate = useNavigate();
   const [filters, setFilters] = useState<ProduccionFilterRequestDTO>(initialFilters);
   const isMobile = useIsMobile();
@@ -29,17 +30,31 @@ const ProductionsResultPage: React.FC<ProductionsResultPageProps> = ({ initialFi
   }, [getProducciones, filters]);
 
   const handleView = (record: ProduccionProtectedResponseDTO) => {
-    navigate(`/producciones/ver/${record.codigoProduccion}`);
+    navigate(`/public/producciones/${record.codigoProduccion}`);
   };
 
   const handleEdit = (record: ProduccionProtectedResponseDTO) => {
-    // Implementar navegación a edición si existe
-    console.log('Editar', record);
+    navigate(`/producciones/ver/${record.codigoProduccion}`);
   };
 
-  const handleDelete = (id: string) => {
-    // Implementar lógica de borrado
-    console.log('Eliminar', id);
+  const handleDelete = (codigoProduccion: string) => {
+    Modal.confirm({
+      title: '¿Estás seguro de eliminar esta producción?',
+      content: `Se eliminará la producción con código: ${codigoProduccion}. Esta acción no se puede deshacer.`,
+      okText: 'Sí, eliminar',
+      okType: 'danger',
+      cancelText: 'Cancelar',
+      onOk: async () => {
+        try {
+          await deleteProduction(codigoProduccion);
+          message.success(`Producción ${codigoProduccion} eliminada exitosamente`);
+          // No es necesario llamar a getProducciones() porque deleteProduction ya actualiza el estado local
+        } catch (err: any) {
+          console.error('Error al eliminar producción:', err);
+          message.error(err.message || 'Error al eliminar la producción');
+        }
+      },
+    });
   };
 
   const handleFilterChange = (newFilters: ProduccionFilterRequestDTO) => {
