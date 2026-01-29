@@ -52,7 +52,7 @@ export const VersionRecetasPage: React.FC = () => {
     <div className="dashboard">
       <AppHeader title="AlimTrack" />
       <main className="dashboard__main container">
-        <div className="productions-list__header">
+        <div className="productions-list__header" style={{ marginTop: '1.5rem' }}>
           <h1 className="productions-list__title">Versiones de Recetas</h1>
           {/* Aquí podrías agregar un botón de "Nueva Versión" si fuera necesario */}
         </div>

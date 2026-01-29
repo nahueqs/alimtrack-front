@@ -30,6 +30,11 @@
     padding-bottom: 2rem;
 }
 
+.public-list-header {
+    margin-top: 1rem; /* Agregado margen superior */
+    margin-bottom: 2rem;
+}
+
 .public-dashboard__feedback {
     display: flex;
     justify-content: center;
@@ -62,4 +67,10 @@
 
 .production-table-container .ant-table-tbody > tr.ant-table-row:hover > td {
     background-color: var(--bg-tertiary);
+}
+
+@media (min-width: 768px) {
+    .public-list-header {
+        margin-top: 1.5rem; /* Aumentado margen superior en desktop */
+    }
 }

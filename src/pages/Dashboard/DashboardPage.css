@@ -7,7 +7,7 @@
 }
 
 .dashboard__main {
-    padding: 1.5rem 1rem; /* Reducido padding horizontal para móviles */
+    padding: 2rem 1rem; /* Aumentado padding superior para separar del header */
     max-width: 1200px;
     margin: 0 auto;
 }
@@ -73,7 +73,7 @@
    ========================================================================== */
 @media (min-width: 768px) {
     .dashboard__main {
-        padding: 2rem 1.5rem;
+        padding: 3rem 1.5rem; /* Aumentado padding superior en desktop */
     }
 
     .dashboard__welcome {
