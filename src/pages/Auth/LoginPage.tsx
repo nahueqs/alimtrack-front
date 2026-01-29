@@ -6,11 +6,13 @@ import logoUnlu from '@/assets/logoUnlu.png';
 import logoCideta from '@/assets/logoCideta.png';
 import { useAuth } from '@/context/auth/AuthProvider.tsx';
 import { Card, Button } from '@/components/ui';
+import { usePageTitle } from '@/hooks/usePageTitle.ts';
 import './LoginPage.css';
 import { ScheduleOutlined } from '@ant-design/icons';
 import type { LoginRequest, RegisterRequest } from '@/services/auth/Auth.ts';
 
 const LoginPage: React.FC = () => {
+  usePageTitle('Iniciar Sesión');
   const [isLogin, setIsLogin] = useState(true);
   const { login, register, loading, error, clearError, isAuthenticated, user } = useAuth();
   const navigate = useNavigate();

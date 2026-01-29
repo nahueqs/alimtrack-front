@@ -8,6 +8,7 @@ import { Button, message, Modal } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { type LocalProductionFilters, ProduccionFilters } from './ProduccionFilters.tsx';
 import type { ProduccionProtectedResponseDTO } from '@/types/production';
+import { usePageTitle } from '@/hooks/usePageTitle.ts';
 import './ProduccionesPage.css';
 import { useIsMobile } from '@/hooks/useIsMobile.ts';
 import dayjs from 'dayjs';
@@ -22,6 +23,7 @@ interface ProductionsResultPageProps {
 }
 
 const ProductionsResultPage: React.FC<ProductionsResultPageProps> = ({ initialFilters = {} }) => {
+  usePageTitle('Producciones');
   const { producciones, loading, error, getProducciones, deleteProduction } = useProductionService();
   const navigate = useNavigate();
   

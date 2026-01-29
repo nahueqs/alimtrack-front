@@ -6,8 +6,10 @@ import { useNavigate } from 'react-router-dom';
 import { useVersionRecetaService } from '@/services/recetas/useVersionRecetaService.ts';
 import type { VersionRecetaMetadataResponseDTO } from '@/types/production';
 import { useIsMobile } from '@/hooks/useIsMobile.ts';
+import { usePageTitle } from '@/hooks/usePageTitle.ts';
 
 export const VersionRecetasPage: React.FC = () => {
+  usePageTitle('Versiones de Recetas');
   const { versiones, loading, error, getAllVersiones } = useVersionRecetaService();
   const navigate = useNavigate();
   const isMobile = useIsMobile();

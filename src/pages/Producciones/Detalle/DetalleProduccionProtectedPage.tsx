@@ -10,11 +10,13 @@ import { SavingIndicator } from '@/components/SavingIndicator';
 import { ProductionState } from '@/constants/ProductionStates';
 import { BellOutlined } from '@ant-design/icons';
 import { Select, Space, Typography } from 'antd';
+import { usePageTitle } from '@/hooks/usePageTitle.ts';
 
 const { Text } = Typography;
 
 const DetalleProduccionProtectedPage: React.FC = () => {
   const { codigoProduccion } = useParams<{ codigoProduccion: string }>();
+  usePageTitle(codigoProduccion ? `Producción ${codigoProduccion}` : 'Detalle de Producción');
   const [notificationLevel, setNotificationLevel] = useState<NotificationLevel>('ALL');
 
   const {

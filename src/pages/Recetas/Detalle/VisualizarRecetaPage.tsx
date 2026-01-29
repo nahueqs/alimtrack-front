@@ -7,11 +7,13 @@ import { EstructuraProduccion } from '@/pages/common/DetalleProduccion/component
 import { RespuestasContext } from '@/pages/common/DetalleProduccion/context/RespuestasContext';
 import { AppHeader } from '@/components/AppHeader/AppHeader';
 import type { EstructuraProduccionDTO } from '@/types/production';
+import { usePageTitle } from '@/hooks/usePageTitle.ts';
 
 const { Title, Text } = Typography;
 
 export const VisualizarRecetaPage: React.FC = () => {
   const { codigoVersion } = useParams<{ codigoVersion: string }>();
+  usePageTitle(codigoVersion ? `Receta ${codigoVersion}` : 'Detalle de Receta');
   const navigate = useNavigate();
   const [estructura, setEstructura] = useState<EstructuraProduccionDTO | null>(null);
   const [loading, setLoading] = useState(true);

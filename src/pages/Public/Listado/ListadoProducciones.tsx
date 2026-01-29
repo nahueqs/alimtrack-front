@@ -8,8 +8,10 @@ import { usePublicService } from '@/services/public/usePublicService.ts';
 import { useIsMobile } from '@/hooks/useIsMobile.ts';
 import './ListadoProducciones.css';
 import { notificationService } from '@/services/notificaciones/notificationService.ts';
+import { usePageTitle } from '@/hooks/usePageTitle.ts';
 
 export const ListadoProducciones: React.FC = () => {
+  usePageTitle('Producciones');
   const {
     producciones,
     loading,

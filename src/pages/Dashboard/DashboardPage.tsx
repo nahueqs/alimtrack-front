@@ -4,9 +4,11 @@ import { useNavigate } from 'react-router-dom';
 import { ProductionsCard } from './ProductionsCard.tsx';
 import { RecetasCard } from './RecipesCard.tsx';
 import { AppHeader } from '@/components/AppHeader/AppHeader.tsx';
+import { usePageTitle } from '@/hooks/usePageTitle.ts';
 import './DashboardPage.css';
 
 export const DashboardPage: React.FC = () => {
+  usePageTitle('Dashboard');
   const { user } = useAuth();
   const navigate = useNavigate();
 

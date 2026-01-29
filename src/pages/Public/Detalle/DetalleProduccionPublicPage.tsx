@@ -7,11 +7,13 @@ import { usePublicService } from '@/services/public/usePublicService';
 import { PublicHeader } from '@/components/layout/PublicHeader/PublicHeader.tsx';
 import { useProductionWebSocket, type NotificationLevel } from '@/hooks/useProductionWebSocket';
 import { ProductionStatusDisplay } from '@/components/ProductionStatusDisplay';
+import { usePageTitle } from '@/hooks/usePageTitle.ts';
 
 const { Text } = Typography;
 
 const DetalleProduccionPublicPage: React.FC = () => {
   const { codigoProduccion } = useParams<{ codigoProduccion: string }>();
+  usePageTitle(codigoProduccion ? `Producción ${codigoProduccion}` : 'Detalle de Producción');
   const [notificationLevel, setNotificationLevel] = useState<NotificationLevel>('ALL');
 
   const {

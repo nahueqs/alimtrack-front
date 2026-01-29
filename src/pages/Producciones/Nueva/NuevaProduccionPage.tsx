@@ -9,8 +9,10 @@ import { AppHeader } from '@/components/AppHeader/AppHeader.tsx';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeftIcon } from 'lucide-react';
 import { Button } from '@/components/ui';
+import { usePageTitle } from '@/hooks/usePageTitle.ts';
 
 export const NuevaProduccionPage: React.FC = () => {
+  usePageTitle('Nueva Producción');
   const [loadingSubmit, setLoadingSubmit] = useState(false);
   const { user } = useAuth();
   const { createProduction } = useProductionService();
