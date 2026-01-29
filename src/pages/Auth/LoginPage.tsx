@@ -5,10 +5,9 @@ import { useNavigate } from 'react-router-dom';
 import logoUnlu from '@/assets/logoUnlu.png';
 import logoCideta from '@/assets/logoCideta.png';
 import { useAuth } from '@/context/auth/AuthProvider.tsx';
-import { Card } from '@/components/ui';
+import { Card, Button } from '@/components/ui';
 import './LoginPage.css';
 import { ScheduleOutlined } from '@ant-design/icons';
-import { Button } from 'antd';
 import type { LoginRequest, RegisterRequest } from '@/services/auth/Auth.ts';
 
 const LoginPage: React.FC = () => {
@@ -82,9 +81,9 @@ const LoginPage: React.FC = () => {
             />
           )}
           <Button
-            type="link"
+            variant="link"
             icon={<ScheduleOutlined />}
-            onClick={() => navigate('/public/producciones')}
+            href="/public/producciones"
             style={{ marginTop: '1rem' }}
           >
             Ver producciones públicas

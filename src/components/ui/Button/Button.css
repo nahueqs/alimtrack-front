@@ -67,6 +67,18 @@
     padding: 0.25rem 0.5rem;
 }
 
+.btn--link {
+    background: none;
+    border: none;
+    color: var(--primary-500);
+    padding: 0.25rem 0.5rem;
+}
+
+.btn--link:hover:not(:disabled) {
+    color: var(--primary-600);
+    text-decoration: underline;
+}
+
 /* Button states */
 .btn:disabled,
 .btn--disabled {

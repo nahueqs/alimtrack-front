@@ -1,7 +1,7 @@
 import { type ButtonHTMLAttributes, forwardRef, type ReactNode } from 'react';
 import './Button.css';
 
-type ButtonVariant = 'primary' | 'secondary' | 'text' | 'outline';
+type ButtonVariant = 'primary' | 'secondary' | 'text' | 'outline' | 'link';
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: ButtonVariant;
@@ -9,9 +9,11 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   fullWidth?: boolean;
   icon?: ReactNode;
   iconPosition?: 'left' | 'right';
+  href?: string;
+  target?: string;
 }
 
-export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
+export const Button = forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonProps>(
   (
     {
       children,
@@ -23,6 +25,8 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       icon,
       iconPosition = 'left',
       type = 'button',
+      href,
+      target,
       ...props
     },
     ref
@@ -45,9 +49,31 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       </span>
     );
 
+    if (href) {
+      return (
+        <a
+          ref={ref as React.Ref<HTMLAnchorElement>}
+          href={href}
+          target={target}
+          className={`${baseClasses} ${variantClass} ${widthClass} ${loadingClass} ${disabledClass} ${className}`}
+          aria-disabled={disabled || isLoading}
+          {...(props as any)}
+        >
+          {isLoading ? (
+            <span className="flex items-center justify-center">
+              <span className="btn__spinner"></span>
+              <span className="ml-2">Cargando...</span>
+            </span>
+          ) : (
+            content
+          )}
+        </a>
+      );
+    }
+
     return (
       <button
-        ref={ref}
+        ref={ref as React.Ref<HTMLButtonElement>}
         type={type}
         disabled={disabled || isLoading}
         className={`${baseClasses} ${variantClass} ${widthClass} ${loadingClass} ${disabledClass} ${className}`}
